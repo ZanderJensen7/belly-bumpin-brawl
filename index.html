@@ -136,7 +136,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 
 <div id="touch"><div id="tstick"><div id="tbase"><div id="tknob"></div></div><div class="hint">drag to move</div></div>
 <div class="tb2" id="tParry"><b>🛡️</b>PARRY</div><div class="tb2" id="tBump"><b>🍺</b>BUMP</div><div class="tb2" id="tThrow"><b>🥛</b>THROW</div><div class="tb2" id="tEmote">😂</div></div>
-<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 30<span id="netinfo"></span></div>
+<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 31<span id="netinfo"></span></div>
 <div id="rotate"><div>📱↻</div>Turn your phone sideways to brawl</div>
 <div id="lobby" class="screen">
   <div class="panel"><button class="mtog" id="bMini">▲ Hide menu (practice)</button>
@@ -836,12 +836,12 @@ function joinStart(code){code=code.toUpperCase().replace(/[^A-Z0-9]/g,'');if(cod
   const hi=setInterval(()=>{if(ok||NET.mqp!==probes){clearInterval(hi);return}for(const o of probes)if(o.up)o.pub(RT(code)+'h',JSON.stringify({f:rid,d:hello()}))},800)};
  if(FORCE_RELAY){startRelay();return}
  const peer=new Peer(PEEROPT);NET.peer=peer;setTimeout(startRelay,QS.get('rdelay')?+QS.get('rdelay'):6000);
- NET.dfail='signal';peer.on('open',id=>{NET.dfail='ice';if(ok&&!NET.relay)return;const conn=peer.connect(PID(code),{reliable:true,serialization:'json'});
+ NET.dfail='signal';peer.on('open',id=>{NET.dfail='no answer';if(ok&&!NET.relay)return;const conn=peer.connect(PID(code),{reliable:true,serialization:'json'});conn.on('iceStateChanged',st=>{NET.dfail='ice '+st});conn.on('error',e=>{NET.dfail='err '+(e&&e.type||e)})
   conn.on('open',()=>{if(NET.mode!=='client'||(ok&&!NET.relay)){try{conn.close()}catch(e){}return}
    const up=ok&&NET.relay?NET.myId:null;const wasOk=ok;ok=true;clearTimeout(fail);try{(NET.mqp||[]).forEach(o=>o.close())}catch(e){}NET.mqp=null;try{if(NET.mq)NET.mq.close()}catch(e){}NET.mq=null;NET.relay=0;
    if(!up)NET.myId=id;NET.hostConn=conn;conn.send({t:'h',v:PROTO,name:me.name,color:me.color,hat:me.hat,fc:me.fc|0,lv:myLv(),up});if(wasOk)toast('Switched to a direct link. Less lag!',3);else{toast('Joined room '+code+'!');showLobby()}});
   conn.on('data',clientMsg);conn.on('close',()=>{if(NET.hostConn!==conn)return;toast('The host left. Party\'s over (for now).',6);leaveToTitle(true)})});
- peer.on('error',e=>{if(e.type==='peer-unavailable'&&!relayOn){clearTimeout(fail);toast('No room called '+code+'. Typo? Drunk? Both?',5);leaveToTitle(true)}else{console.warn(e);if(!ok)startRelay()}})}
+ peer.on('error',e=>{if(e.type==='peer-unavailable'&&!relayOn){clearTimeout(fail);toast('No room called '+code+'. Typo? Drunk? Both?',5);leaveToTitle(true)}else{console.warn(e);NET.dfail=(NET.dfail||'')+' / '+e.type;if(!ok)startRelay()}})}
 function clientMsg(m){if(!m)return;if(m.t==='old'){toast(m.v>PROTO?'The host has a newer version. Refresh this page and rejoin!':'The host has an older version. Ask them to refresh!',8);leaveToTitle(true);return}if(m.t==='po'){const r=(performance.now()-m.k)/1000;if(r>=0&&r<5)NET.rtt=NET.rtt==null?r:NET.rtt*.8+r*.2;return}if(m.t==='w'){NET.myId=m.id;return}if(m.t==='full'){toast('Room is full (6 max)!',5);leaveToTitle(true);return}
  if(m.t==='s'){const s=m.s;if(s.pk){s.players=s.pk.map(a=>{const o={};PK.forEach((k,i)=>{o[k]=PKB.has(k)?!!a[i]:a[i]});return o});delete s.pk}if(!s.rails&&V)s.rails=V.rails;if(!s.rails)s.rails=[];
   for(const p of s.players){let d=disp[p.id];if(!d||!p.alive||hyp(d.x-p.x,d.y-p.y)>(p.id===NET.myId?260:160)){d=disp[p.id]={x:p.x,y:p.y}}d.tx=p.x;d.ty=p.y;d.vx=p.vx;d.vy=p.vy;d.age=0}
