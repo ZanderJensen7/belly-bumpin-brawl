@@ -136,7 +136,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 
 <div id="touch"><div id="tstick"><div id="tbase"><div id="tknob"></div></div><div class="hint">drag to move</div></div>
 <div class="tb2" id="tParry"><b>🛡️</b>PARRY</div><div class="tb2" id="tBump"><b>🍺</b>BUMP</div><div class="tb2" id="tThrow"><b>🥛</b>THROW</div><div class="tb2" id="tEmote">😂</div></div>
-<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 31<span id="netinfo"></span></div>
+<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 32<span id="netinfo"></span></div>
 <div id="rotate"><div>📱↻</div>Turn your phone sideways to brawl</div>
 <div id="lobby" class="screen">
   <div class="panel"><button class="mtog" id="bMini">▲ Hide menu (practice)</button>
@@ -1230,7 +1230,7 @@ function drawHUD(t){const ph=V.phase;
   if(cont2){ctx.font='22px Fredoka,sans-serif';ctx.fillStyle='#fff6e0';ctx.fillText(MODES[md2].d,W/2,H/2-40)}
   else V.mut.forEach((m,i)=>{const y=H/2-70+i*110;bigText(MUTS[m].n.toUpperCase(),W/2,y,70*sIn,['#f5a623','#ff7eb6'][i],-wob);ctx.font='22px Fredoka,sans-serif';ctx.fillStyle='#fff6e0';ctx.textAlign='center';ctx.fillText(MUTS[m].d,W/2,y+50)});
   const n=pt<1.2?0:pt<2?3:pt<2.8?2:pt<3.6?1:0;if(n){const f=((pt-1.2)%.8)/.8;bigText(String(n),W/2,H/2+170,120*(1.4-f*.5),'#fff',0)}}
- if(ph==='play'&&V.pt<.8){bigText('BRAWL!',W/2,H/2,140*(1+V.pt*.3),'#ff5a5f',Math.sin(t*8)*.1)}
+ if(ph==='play'&&V.pt<.6){const k=V.pt/.6;ctx.save();ctx.globalAlpha=clamp(1-k*k*1.2,0,1);bigText('BRAWL!',W/2,H*.16+k*-30,90*(1-k*.25),'#ff5a5f',Math.sin(t*8)*.06);ctx.restore()}
  if(ph==='lobby'){ctx.font='16px Fredoka,sans-serif';ctx.textAlign='center';ctx.fillStyle='rgba(255,246,224,.85)';ctx.fillText('Practice area',W/2+150,H-20)}
  const mp=V.players.find(p=>p.id===NET.myId);if(mp&&!mp.alive&&ph==='play'&&V.settings.mode==='stock'&&mp.lives>0){bigText('BACK IN A SEC',W/2,140,40,'#fff',Math.sin(t*2)*.05);ctx.font='18px Fredoka,sans-serif';ctx.fillStyle='#fff6e0';ctx.textAlign='center';ctx.fillText(mp.lives===1?'Last life. Make it count!':mp.lives+' lives left',W/2,172)}
  else if(mp&&!mp.alive&&ph==='play'){bigText('YOU\'RE FISH FOOD',W/2,140,40,'#fff',Math.sin(t*2)*.05);ctx.font='18px Fredoka,sans-serif';ctx.fillStyle='#fff6e0';ctx.textAlign='center';ctx.fillText('Press 1-4 to heckle',W/2,172)}}
