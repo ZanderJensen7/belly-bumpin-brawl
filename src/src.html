@@ -160,7 +160,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
       <button id="bStart" class="big go">Start the brawl!</button>
     </div>
     <div class="waitmsg" id="lwait">Waiting for the host to start. Waddle around and practice!</div>
-    <div class="ctrls"><div class="touchonly"><b>Touch:</b> drag the left side to move. Hold <b>BUMP</b> to charge, let go to launch. Tap <b>PARRY</b> right before a hit. <b>THROW</b> shows up when you grab Empty Pints. Turn your phone sideways and use fullscreen ⛶.</div><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch (or turn on Mouse aim: hold left click, release to launch toward the cursor). Taps nudge, full charges YEET. Hold a full charge too long and you burp yourself stunned. Hit 'em from behind for a BUTT BUMP. Belly bump a flying pint to smash it back FASTER.<br><b>Empty Pints</b> (from crates, 2 throws): press <kbd>F</kbd> (or left click) to chug, then the aim swings across a cone in front of you. Press <kbd>F</kbd> again to time the throw. Missed pints can be picked back up.<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES pints. Parrying a bump knocks them back stunned, so punish them. Whiffing makes you wobble. It always works in place: charge a bump, then hit it mid-dash for a DASH PARRY that beats other bumps.<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in. <br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for Empty Pints (throwables), Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
+    <div class="ctrls"><div class="touchonly"><b>Touch:</b> drag the left side to move. Hold <b>BUMP</b> to charge, let go to launch. Tap <b>PARRY</b> right before a hit. <b>THROW</b> shows up when you grab Empty Pints. Turn your phone sideways and use fullscreen ⛶.</div><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch (or turn on Mouse aim: hold left click, release to launch toward the cursor). Taps nudge, full charges YEET. Hold a full charge too long and you burp yourself stunned. Hit 'em from behind for a BUTT BUMP. Belly bump a flying pint to smash it back FASTER.<br><b>Throw your drink:</b> everyone starts each life holding one, and crates give extra Empty Pints. Press <kbd>F</kbd> (or left click) to chug, then the aim swings across a cone in front of you. Press <kbd>F</kbd> again to time the throw. Missed pints can be picked back up.<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES pints. Parrying a bump knocks them back stunned, so punish them. Whiffing makes you wobble. It always works in place: charge a bump, then hit it mid-dash for a DASH PARRY that beats other bumps.<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in. <br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for Empty Pints (throwables), Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
   </div>
 </div>
 
@@ -376,7 +376,7 @@ function readInput(){let x=0,y=0,d=false,f=false,pa=false;
 let S=null; // authoritative state (host only)
 function newState(code){return {code,phase:'lobby',pt:0,rt:0,t:0,round:0,mut:[],arenaR:BASE_R,rot:0,rotV:0,tiltA:0,gx:0,gy:0,sudden:false,
  players:[],kegs:[],bumpers:[],bomb:null,bombNext:0,kegT:0,evq:[],outOrder:[],card:null,over:null,rails:[],railT:0,settings:{target:5,drinks:1,mode:'classic',map:'random',guns:1,lives:3},endT:0,slowT:0,hs:0,lastMut:[],map:'round',zone:null,matchT:0,nextMutT:30,mutT:0,items:[],corks:[],loose:[],itemT:4}}
-function newPlayer(id,name,color,hat,bot){return {id,name:String(name||'???').slice(0,24),color,hat,bot:!!bot,x:CX,y:CY,vx:0,vy:0,face:Math.PI/2,r:26,alive:true,fall:0,
+function newPlayer(id,name,color,hat,bot){return {id,gun:1,name:String(name||'???').slice(0,24),color,hat,bot:!!bot,x:CX,y:CY,vx:0,vy:0,face:Math.PI/2,r:26,alive:true,fall:0,
  charge:0,charging:0,full:0,dash:0,dpow:0,stun:0,buzz:0,score:0,emote:-1,emoteT:0,hitBy:null,hitT:-9,inp:{x:0,y:0,d:0},hicT:rnd(2,5),teeter:0,
  kos:0,falls:0,selfs:0,hics:0,wins:0,ph:Math.random()*TAU,respawn:0,emCd:0,inv:0,team:0,gun:0,pd:0,sx:CX,sy:CY}}
 function ev(k,o){const e=Object.assign({k},o||{});S.evq.push(e);onEv(e)}
@@ -392,7 +392,7 @@ function placeRandom(p){const av=S.players.filter(q=>q!==p&&q.alive).map(q=>[q.x
 function makeBumpers(){return S.mut.includes('bumpers')?safePoints(4,75,[[CX,CY]]).map(q=>({lx:q[2],ly:q[3],x:q[0],y:q[1],r:30})):[]}
 function pickMap(){const st=S.settings.map;if(st&&st!=='random'&&MAPS[st])return st;return pick(Object.keys(MAPS).filter(k=>k!==S.map))}
 function spawnRing(){const pts=safePoints(S.players.length,60,S.bumpers.map(b=>[b.x,b.y]));S.players.forEach((p,i)=>{p.x=pts[i][0];p.y=pts[i][1];p.sx=p.x;p.sy=p.y;
- p.vx=p.vy=0;p.face=Math.atan2(CY-p.y,CX-p.x);p.respawn=0;p.inv=0;p.slosh=0;p.gun=0;p.aiming=0;p.parry=0;p.wob=0;p.pcd=0;p.armor=0;p.courage=0;p.gulp=0;p.alive=true;p.fall=0;p.stun=0;p.dash=0;p.charge=0;p.charging=0;p.hitBy=null;p.teeter=0;p.r=S.mut.includes('big')?40:26;p.hicT=rnd(2,5)})}
+ p.vx=p.vy=0;p.face=Math.atan2(CY-p.y,CX-p.x);p.respawn=0;p.inv=0;p.slosh=0;p.gun=1;p.aiming=0;p.parry=0;p.wob=0;p.pcd=0;p.armor=0;p.courage=0;p.gulp=0;p.alive=true;p.fall=0;p.stun=0;p.dash=0;p.charge=0;p.charging=0;p.hitBy=null;p.teeter=0;p.r=S.mut.includes('big')?40:26;p.hicT=rnd(2,5)})}
 function startMatch(){S.round=0;S.players.forEach(p=>{p.score=0;p.buzz=0;p.kos=0;p.falls=0;p.selfs=0;p.hics=0;p.wins=0;p.gun=0});S.over=null;S.lastMut=[];S.map='';S.matchT=0;S.nextMutT=30;S.zone=null;
  if(S.settings.mode==='teams'&&(!S.players.some(p=>p.team===0)||!S.players.some(p=>p.team===1)))S.players.forEach((p,i)=>p.team=i%2);nextRound()}
 function chooseMuts(first){const r=S.round,mp=MAPS[S.map]||{};if(first)return (mp.noMut||[]).includes('rails')?['none']:['rails'];let pool=MUT_POOL.filter(m=>!S.lastMut.includes(m)&&!(mp.noMut||[]).includes(m));const a=pick(pool);
@@ -452,7 +452,7 @@ function botThink(b,dt){if(b.ai&&b.ai.fire){b.inp.d=0;b.ai.fire=0}if(S.phase==='
  b.inp.f=0;b.inp.a=null;
  if(b.gun>0&&T&&(S.phase==='play'||S.phase==='lobby')&&!(ai.hold>0)){const d=hyp(T.x-b.x,T.y-b.y);
   if(b.aiming){if(b.thT>.18){const ta=Math.atan2(T.y-b.y,T.x-b.x),da=Math.abs(((ta-b.aimA+Math.PI*3)%TAU)-Math.PI);if(da<ai.tol)b.inp.f=1}}
-  else if(d>140&&d<420&&Math.random()<dt*.3){b.inp.f=1;b.inp.a=Math.atan2(T.y-b.y,T.x-b.x)+rnd(-.4,.4);ai.tol=rnd(.15,.45)}}
+  else if(d>140&&d<420&&Math.random()<dt*.15){b.inp.f=1;b.inp.a=Math.atan2(T.y-b.y,T.x-b.x)+rnd(-.4,.4);ai.tol=rnd(.15,.45)}}
  if(S.phase==='play'||S.phase==='lobby'){
   if(ai.hold>0){ai.hold-=dt;b.inp.d=ai.hold>0?1:0;if(ai.hold<=0)setTimeout(()=>{ai.hop=null},300)}
   else{b.inp.d=0;if(T&&b.dash<=0&&b.stun<=0){const d=hyp(T.x-b.x,T.y-b.y);const tEdge=hyp(T.x-CX,T.y-CY)/S.arenaR;if(d<240&&Math.random()<dt*(.55+tEdge*1.4))ai.hold=rnd(.1,.75)}}}
@@ -509,7 +509,7 @@ function simStep(dt){
  for(const p of S.players){
   if(p.bot)botThink(p,dt);
   p.emoteT=Math.max(0,p.emoteT-dt);p.emCd=Math.max(0,p.emCd-dt);p.inv=Math.max(0,p.inv-dt);
-  if(!p.alive){if(p.fall>0)p.fall=Math.max(0,p.fall-dt*1.4);if(p.respawn>0){p.respawn-=dt;if(p.respawn<=0){p.alive=true;p.fall=0;placeRandom(p);p.stun=0;p.dash=0;p.inv=free?0:1.5;p.hitBy=null;p.gun=0;p.aiming=0;p.slosh=0;p.r=S.mut.includes('big')?40:26}}continue}
+  if(!p.alive){if(p.fall>0)p.fall=Math.max(0,p.fall-dt*1.4);if(p.respawn>0){p.respawn-=dt;if(p.respawn<=0){p.alive=true;p.fall=0;placeRandom(p);p.stun=0;p.dash=0;p.inv=free?0:1.5;p.hitBy=null;p.gun=1;p.aiming=0;p.slosh=0;p.r=S.mut.includes('big')?40:26}}continue}
   const inp=p.inp;let ix=inp.x||0,iy=inp.y||0;const il=hyp(ix,iy);if(il>1){ix/=il;iy/=il}
   if(M.includes('reverse')){ix=-ix;iy=-iy}
   if(ph==='intro'){ix=0;iy=0}
@@ -900,7 +900,7 @@ function drawGuy(c,p,a,t,opts){opts=opts||{};const r=p.r,col=COLORS[p.color]||'#
  [-1,1].forEach(s=>{const shx=s*r*.82,shy=-r*.25,aa=armA(s)+(s>0?0:Math.PI)*0,len=r*.85;const hx=shx+Math.cos(aa)*len*s*(flail?.6:.7)+s*r*.15,hy=shy+Math.sin(aa)*len;
   c.strokeStyle='#2a1608';c.lineWidth=r*.3+4;c.beginPath();c.moveTo(shx,shy);c.quadraticCurveTo(shx+s*r*.4,(shy+hy)/2,hx,hy);c.stroke();
   c.strokeStyle=col;c.lineWidth=r*.3;c.beginPath();c.moveTo(shx,shy);c.quadraticCurveTo(shx+s*r*.4,(shy+hy)/2,hx,hy);c.stroke();
-  if(s>0){c.save();c.translate(hx,hy);c.rotate(flail?Math.sin(t*20)*.8:.2);c.fillStyle='#f5b52e';rr(-7,-9,14,17,3);c.fill();c.lineWidth=2.5;c.stroke();c.fillStyle='#fff';c.beginPath();c.arc(-4,-9,4,0,TAU);c.arc(1,-10,4.5,0,TAU);c.arc(5,-9,3.5,0,TAU);c.fill();
+  if(s>0&&(p.gun==null||p.gun>0)){c.save();c.translate(hx,hy);c.rotate(flail?Math.sin(t*20)*.8:.2);c.fillStyle='#f5b52e';rr(-7,-9,14,17,3);c.fill();c.lineWidth=2.5;c.stroke();c.fillStyle='#fff';c.beginPath();c.arc(-4,-9,4,0,TAU);c.arc(1,-10,4.5,0,TAU);c.arc(5,-9,3.5,0,TAU);c.fill();
    c.beginPath();c.arc(8,0,4.5,-Math.PI/2,Math.PI/2);c.stroke();c.restore()}else{c.fillStyle=col;c.beginPath();c.arc(hx,hy,r*.2,0,TAU);c.fill();c.lineWidth=2.5;c.stroke()}});
  // body
  c.fillStyle=col;c.strokeStyle='#2a1608';c.lineWidth=3.5;c.beginPath();c.ellipse(0,-r*.2,r,r*1.1,0,0,TAU);c.fill();c.stroke();
@@ -933,7 +933,7 @@ function drawTag(c,p,isMe,t){if(!p.alive)return;const y=p.y-p.r*2.65-(isMe?6:0);
  c.strokeText(label,p.x,y);c.fillStyle=isMe?'#fff':COLORS[p.color];c.fillText(label,p.x,y);
  if(false&&p.slosh>0){const pc=Math.round(p.slosh*100);c.font='13px '+FONT;c.lineWidth=3;c.strokeStyle='#2a1608';c.strokeText(pc+'% sloshed',p.x,y+28);c.fillStyle=pc>=90?'#ff5a5f':pc>=45?'#ffd23f':'#fff6e0';c.fillText(pc+'% sloshed',p.x,y+28)}
  if(V&&V.settings&&V.settings.mode==='stock'&&V.phase!=='lobby'&&p.lives>0){c.font='14px sans-serif';c.textAlign='center';c.fillStyle='#ff5a5f';c.fillText('♥'.repeat(p.lives),p.x,y-18)}
- const n=p.gun||0;for(let i=0;i<n;i++){const x=p.x-(n-1)*6+i*12;c.save();c.translate(x,y+11);c.scale(.4,.4);drawPint(c,1);c.restore()}}
+ const n=(p.gun||0)>1?p.gun:0;for(let i=0;i<n;i++){const x=p.x-(n-1)*6+i*12;c.save();c.translate(x,y+11);c.scale(.4,.4);drawPint(c,1);c.restore()}}
 function drawBubble(c,p,t){if(!p.alive||p.emote<0||p.emoteT<=0)return;const txt=EMOTES[p.emote];const a=clamp(p.emoteT*3,0,1),s=p.emoteT>2?1+(p.emoteT-2)*2:1;
  c.save();c.globalAlpha=a;c.translate(p.x+p.r,p.y-p.r*2.6);c.scale(s,s);c.font='17px '+FONT;const w=c.measureText(txt).width+18;
  c.fillStyle='#fff';c.strokeStyle='#2a1608';c.lineWidth=3;rr(0,-30,w,28,10);c.fill();c.stroke();c.beginPath();c.moveTo(6,-3);c.lineTo(-6,8);c.lineTo(16,-3);c.fill();
@@ -1146,7 +1146,7 @@ $('#segP').onclick=e=>{const v=e.target.dataset.v;if(v&&S){S.settings.map=v;SFX.
 $('#bStart').onclick=()=>{if(S&&S.players.length>=2){SFX.pop();startMatch()}};
 $('#bNext').onclick=()=>{if(S&&S.phase==='results'){SFX.click();afterResults()}};
 $('#bRe').onclick=()=>{if(S){SFX.pop();startMatch()}};
-$('#bLob').onclick=()=>{if(S){S.phase='lobby';S.mut=[];S.bumpers=[];S.kegs=[];S.bomb=null;S.zone=null;S.items=[];S.corks=[];S.loose=[];S.arenaR=BASE_R;S.rot=0;S.rotV=0;S.gx=S.gy=0;S.map=S.settings.map==='random'?'round':S.settings.map;S.players.forEach(p=>{p.alive=true;p.fall=0;p.respawn=0;p.gun=0;p.r=26;placeRandom(p)});S.rails=makeRails()}};
+$('#bLob').onclick=()=>{if(S){S.phase='lobby';S.mut=[];S.bumpers=[];S.kegs=[];S.bomb=null;S.zone=null;S.items=[];S.corks=[];S.loose=[];S.arenaR=BASE_R;S.rot=0;S.rotV=0;S.gx=S.gy=0;S.map=S.settings.map==='random'?'round':S.settings.map;S.players.forEach(p=>{p.alive=true;p.fall=0;p.respawn=0;p.gun=1;p.r=26;placeRandom(p)});S.rails=makeRails()}};
 function toggleMute(){muted=!muted;store.set('muted',muted);if(MG)MG.gain.value=muted?0:vol/100;$('#bMute').textContent=muted?'🔇':'🔊';if(muted&&'speechSynthesis' in window)speechSynthesis.cancel()}
 $('#bMute').onclick=()=>{initAudio();toggleMute()};$('#bMute').textContent=muted?'🔇':'🔊';
 $('#bVoice').onclick=()=>{voiceOn=!voiceOn;store.set('voice',voiceOn);$('#bVoice').style.opacity=voiceOn?1:.4;toast(voiceOn?'Announcer ON':'Announcer OFF');if(voiceOn)say('Hello, drunkards.',1)};$('#bVoice').style.opacity=voiceOn?1:.4;
