@@ -202,7 +202,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 </div></div>
 
 <div id="toast"></div>
-<div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bVoice" title="Announcer voice">🗣️</button><button id="bFull" title="Fullscreen">⛶</button></div>
+<div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bVoice" title="Announcer voice (click to change)">🗣️</button><button id="bFull" title="Fullscreen">⛶</button></div>
 
 <script>/*__PEERJS__*/</script>
 <script>
@@ -441,8 +441,10 @@ const Music={next:0,step:0,timer:null,wob:0,cur:'lobby',int:0,
 
 // ============================================================ ANNOUNCER (speech synthesis)
 let lastSay=0;
+const VOX=[{n:'Bar Boss',p:.75,r:1.08},{n:'Big Deep',p:.3,r:.92},{n:'Hype Man',p:1.35,r:1.22},{n:'Posh Butler',p:.9,r:1,lang:/en[-_]GB/i},{n:'Aussie Mate',p:1,r:1.12,lang:/en[-_](AU|NZ)/i},{n:'Robo Bartender',p:.1,r:.95,lang:/en[-_](IN|IE|ZA)/i},{n:'Chipmunk',p:2,r:1.35}];
+let voxI=store.get('vox',0)|0;function voxVoice(v){try{const vs=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang));if(!vs.length)return null;if(v.lang){const m=vs.find(x=>v.lang.test(x.lang));if(m)return m}return null}catch(e){return null}}
 function say(text,force){if(!voiceOn||!('speechSynthesis' in window))return;const t=performance.now();if(!force&&(speechSynthesis.speaking||t-lastSay<1200))return;
- lastSay=t;try{if(force)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=1.08;u.pitch=.75;u.volume=muted?0:vol/100;speechSynthesis.speak(u)}catch(e){}}
+ lastSay=t;try{if(force)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);{const v=VOX[voxI]||VOX[0];u.rate=v.r;u.pitch=v.p;const vv=voxVoice(v);if(vv)u.voice=vv}u.volume=muted?0:vol/100;speechSynthesis.speak(u)}catch(e){}}
 
 // ============================================================ INPUT
 const keys={};let emoteQ=-1;
@@ -1339,7 +1341,7 @@ $('#bRe').onclick=()=>{if(S){SFX.pop();startMatch()}};
 $('#bLob').onclick=()=>{if(S){S.phase='lobby';S.mut=[];S.bumpers=[];S.kegs=[];S.bomb=null;S.zone=null;S.items=[];S.corks=[];S.loose=[];S.arenaR=BASE_R;S.rot=0;S.rotV=0;S.gx=S.gy=0;S.map=S.settings.map==='random'?'round':S.settings.map;S.players.forEach(p=>{p.alive=true;p.fall=0;p.respawn=0;p.gun=1;p.r=26;placeRandom(p)});S.rails=makeRails()}};
 function toggleMute(){muted=!muted;store.set('muted',muted);if(MG)MG.gain.value=muted?0:vol/100;$('#bMute').textContent=muted?'🔇':'🔊';if(muted&&'speechSynthesis' in window)speechSynthesis.cancel()}
 $('#bMute').onclick=()=>{initAudio();toggleMute()};$('#bMute').textContent=muted?'🔇':'🔊';
-$('#bVoice').onclick=()=>{voiceOn=!voiceOn;store.set('voice',voiceOn);$('#bVoice').style.opacity=voiceOn?1:.4;toast(voiceOn?'Announcer ON':'Announcer OFF');if(voiceOn)say('Hello, drunkards.',1)};$('#bVoice').style.opacity=voiceOn?1:.4;
+$('#bVoice').onclick=()=>{if(!voiceOn){voiceOn=true;voxI=0}else if(voxI<VOX.length-1)voxI++;else voiceOn=false;store.set('voice',voiceOn);store.set('vox',voxI);$('#bVoice').style.opacity=voiceOn?1:.4;toast(voiceOn?'🗣️ '+VOX[voxI].n:'Announcer off');if(voiceOn)say('Hello, drunkards.',1)};$('#bVoice').style.opacity=voiceOn?1:.4;
 $('#bFull').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
 addEventListener('beforeunload',()=>{try{if(NET.mode==='client'&&NET.hostConn)NET.hostConn.send({t:'bye'})}catch(e){}});
 if(!hatOk(me.hat))me.hat=0;if(!faceOk(me.fc|0))me.fc=0;refreshPick();lvBar();
