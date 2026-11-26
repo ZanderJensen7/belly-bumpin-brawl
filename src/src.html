@@ -615,7 +615,10 @@ function buildOver(c,title){const by=(f)=>[...S.players].sort((a,b)=>f(b)-f(a))[
 const NET={mode:null,peer:null,conns:new Map(),hostConn:null,myId:null,bc:null,lastIn:'',inT:0};
 function genCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=A[Math.floor(Math.random()*A.length)];return s}
 const PID=c=>'lastcallbrawl-v1-'+c.toUpperCase();
-const PEEROPT=(()=>{const ps=QS.get('ps');if(!ps)return {debug:1};const [host,port]=ps.split(':');return {debug:1,host,port:+port,path:'/',secure:false}})();
+const ICE={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},
+ {urls:['turn:eu-0.turn.peerjs.com:3478','turn:us-0.turn.peerjs.com:3478'],username:'peerjs',credential:'peerjsp'},
+ {urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp','turns:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}],sdpSemantics:'unified-plan'};
+const PEEROPT=(()=>{const ps=QS.get('ps');if(!ps)return {debug:1,config:ICE};const [host,port]=ps.split(':');return {debug:1,host,port:+port,path:'/',secure:false}})();
 function hostStart(offline){NET.mode='host';NET.myId='host';const code=offline?'SOLO':genCode();S=newState(code);
  const p=newPlayer('host',me.name,me.color,me.hat,false);S.players.push(p);placeRandom(p);S.rails=makeRails();
  if(offline){addBot();addBot();addBot();showLobby();return}
@@ -626,6 +629,7 @@ function hostStart(offline){NET.mode='host';NET.myId='host';const code=offline?'
   peer.on('open',()=>{S.code=code;toast('Room '+code+' is open!');showLobby()});
   peer.on('error',e=>{if(e.type==='unavailable-id'){peer.destroy();open(genCode())}else if(e.type!=='peer-unavailable'){toast('Network hiccup: '+e.type,4);console.warn(e)}});
   peer.on('disconnected',()=>{try{peer.reconnect()}catch(e){}});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&NET.peer===peer&&peer.disconnected&&!peer.destroyed){try{peer.reconnect();toast('Reconnected the room',2)}catch(e){}}});
   peer.on('connection',conn=>{conn.on('open',()=>{NET.conns.set(conn.peer,conn)});conn.on('data',d=>hostMsg(conn,d));
    const drop=()=>{NET.conns.delete(conn.peer);const q=P(conn.peer);if(q){S.players=S.players.filter(x=>x!==q);toast(q.name+' left the bar')}};conn.on('close',drop);conn.on('error',drop)})};
  open(code)}
@@ -1077,6 +1081,7 @@ $('#bSolo').onclick=()=>{initAudio();SFX.pop();hostStart(true)};
 $('#bJoin').onclick=()=>{initAudio();SFX.pop();joinStart($('#code').value)};
 $('#code').addEventListener('keydown',e=>{if(e.key==='Enter')$('#bJoin').click()});
 $('#bCopy').onclick=()=>{const link=location.protocol.startsWith('http')?location.href.split('#')[0]+'#'+V.code:'';const txt=link?('Join my Last Call Brawl room! '+link+'  (code '+V.code+')'):('Last Call Brawl room code: '+V.code);
+ if(IS_TOUCH&&navigator.share){navigator.share({title:'Last Call Brawl',text:txt}).catch(()=>{});return}
  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('Copied! Paste it to your friends.')).catch(()=>toast('Room code: '+V.code))};
 $('#segT').onclick=e=>{const v=+e.target.dataset.v;if(v&&S){S.settings.target=v;SFX.click()}};
 $('#segD').onclick=e=>{const v=e.target.dataset.v;if(v!==undefined&&S){S.settings.drinks=+v;SFX.click()}};
