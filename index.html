@@ -10,7 +10,7 @@
 :root{--ink:#2a1608;--amber:#f5a623;--foam:#fff6e0;--red:#ff5a5f;--panel:#fff3d6;--wood:#7a4520}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:#3b1d0a;font-family:Fredoka,system-ui,sans-serif;color:var(--ink);user-select:none;-webkit-user-select:none}
-canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+canvas#c{cursor:crosshair;position:fixed;inset:0;width:100%;height:100%;display:block}
 .screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;z-index:5}
 .screen.on{display:flex}
 .H{font-family:'Luckiest Guy',Impact,sans-serif;letter-spacing:1px}
@@ -123,7 +123,7 @@ kbd{font-family:inherit;font-weight:700;background:var(--ink);color:var(--foam);
       <button id="bStart" class="big go">Start the brawl!</button>
     </div>
     <div class="waitmsg" id="lwait">Waiting for the host to start. Waddle around and practice!</div>
-    <div class="ctrls"><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch. Taps nudge, full charges YEET. Hit 'em from behind for a BUTT BUMP. Belly bump a flying cork to smash it back FASTER.<br><b>Cork:</b> hold <kbd>F</kbd> (or <kbd>L</kbd>) to aim, release to fire. You get 2. Pick them back up (or steal them).<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES corks. Whiffing makes you wobble. Hold a direction while you tap it to DODGE instead (also catches corks).<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in. Every hit you take makes you more <b>sloshed</b>, so you fly farther next time.<br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for +2 corks, Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
+    <div class="ctrls"><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch. Taps nudge, full charges YEET. Hit 'em from behind for a BUTT BUMP. Belly bump a flying cork to smash it back FASTER.<br><b>Cork:</b> <b>mouse:</b> point, hold <b>left click</b> to aim, release to fire (right click = parry). <b>Keyboard:</b> hold <kbd>F</kbd>/<kbd>L</kbd>, tap a direction to aim (snaps to 8 ways), release to fire. You get 2. Pick them back up (or steal them).<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES corks. Whiffing makes you wobble. Hold a direction while you tap it to DODGE instead (also catches corks).<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in. Every hit you take makes you more <b>sloshed</b>, so you fly farther next time.<br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for +2 corks, Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
   </div>
 </div>
 
@@ -334,7 +334,8 @@ function readInput(){let x=0,y=0,d=false,f=false,pa=false;
   const bt=i=>gp.buttons[i]&&gp.buttons[i].pressed;if(bt(0)||bt(7))d=true;if(bt(2)||bt(5))f=true;if(bt(1)||bt(4))pa=true;
   {const p=bt(3);if(p&&!padPrev[gp.index+'_3'])emoteQ=ri(0,3);padPrev[gp.index+'_3']=p}}
  const l=hyp(x,y);if(l>1){x/=l;y/=l}
- return {x:Math.round(x*100)/100,y:Math.round(y*100)/100,d:d?1:0,f:f?1:0,p:pa?1:0}}
+ if(mouse.l)f=true;if(mouse.r)pa=true;let a=null;if(performance.now()-mouse.t<5000&&V){const mp=V.players.find(q=>q.id===NET.myId);if(mp){const w=mouseWorld();a=Math.round(Math.atan2(w[1]-(mp.y-6),w[0]-mp.x)*100)/100}}
+ return {x:Math.round(x*100)/100,y:Math.round(y*100)/100,d:d?1:0,f:f?1:0,p:pa?1:0,a}}
 
 // ============================================================ HOST SIMULATION
 let S=null; // authoritative state (host only)
@@ -412,9 +413,9 @@ function botThink(b,dt){if(b.ai&&b.ai.fire){b.inp.d=0;b.ai.fire=0}if(S.phase==='
  b.inp.p=0;if((b.pcd||0)<=0&&b.stun<=0){for(const c of S.corks){if(c.o===b.id)continue;const dx=b.x-c.x,dy=b.y-c.y,d=hyp(dx,dy);if(d<170&&(c.vx*dx+c.vy*dy)>0&&Math.random()<dt*6){b.inp.p=1;break}}
   if(!b.inp.p)for(const q of S.players){if(q===b||!q.alive||q.dash<=0)continue;const dx=b.x-q.x,dy=b.y-q.y,d=hyp(dx,dy);if(d<130&&(q.vx*dx+q.vy*dy)>0&&Math.random()<dt*4){b.inp.p=1;break}}}
  if(b.gun>0&&T&&(S.phase==='play'||S.phase==='lobby')&&!(ai.hold>0)){const d=hyp(T.x-b.x,T.y-b.y);
-  if(ai.aimT>0){ai.aimT-=dt;const lead=d/1100;let ax=T.x+T.vx*lead-b.x,ay=T.y+T.vy*lead-b.y;const l=hyp(ax,ay)||1;b.inp.x=ax/l+ai.aimE;b.inp.y=ay/l+ai.aimE2;if(S.mut.includes('reverse')){b.inp.x=-b.inp.x;b.inp.y=-b.inp.y}b.inp.f=ai.aimT>0?1:0;b.inp.d=0;return}
+  if(ai.aimT>0){ai.aimT-=dt;const lead=d/1100;let ax=T.x+T.vx*lead-b.x,ay=T.y+T.vy*lead-b.y;const l=hyp(ax,ay)||1;b.inp.x=ax/l+ai.aimE;b.inp.y=ay/l+ai.aimE2;b.inp.a=Math.atan2(b.inp.y,b.inp.x);if(S.mut.includes('reverse')){b.inp.x=-b.inp.x;b.inp.y=-b.inp.y}b.inp.f=ai.aimT>0?1:0;b.inp.d=0;return}
   if(d>130&&d<470&&Math.random()<dt*.8){ai.aimT=rnd(.25,.55);ai.aimE=rnd(-.2,.2);ai.aimE2=rnd(-.2,.2);b.inp.f=1;b.inp.d=0;return}}
- b.inp.f=0;
+ b.inp.f=0;b.inp.a=null;
  if(S.phase==='play'||S.phase==='lobby'){
   if(ai.hold>0){ai.hold-=dt;b.inp.d=ai.hold>0?1:0;if(ai.hold<=0)setTimeout(()=>{ai.hop=null},300)}
   else{b.inp.d=0;if(T&&b.dash<=0&&b.stun<=0){const d=hyp(T.x-b.x,T.y-b.y);const tEdge=hyp(T.x-CX,T.y-CY)/S.arenaR;if(d<240&&Math.random()<dt*(.55+tEdge*1.4))ai.hold=rnd(.1,.75)}}}
@@ -481,7 +482,7 @@ function simStep(dt){
   if(inp.p&&!p.ppd&&p.pcd<=0&&p.stun<=0&&act){p.parry=.22;p.pcd=.9;p.blocked=0;const dl=hyp(ix,iy);if(dl>.5&&p.dash<=0){p.dodge=.2;p.blocked=1;p.vx=ix/dl*640;p.vy=iy/dl*640;p.charging=0;p.charge=0;p.aiming=0}ev('parry',{id:p.id,dodge:p.dodge>0?1:0})}
   p.dodge=Math.max(0,(p.dodge||0)-dt);p.ppd=inp.p;
   if(p.parry>0){p.parry-=dt;if(p.parry<=0){p.parry=0;if(!p.blocked){p.wob=.5;ev('whiff',{id:p.id})}}}p.wob=Math.max(0,(p.wob||0)-dt);
-  if(inp.f&&p.gun>0&&p.stun<=0&&p.dash<=0&&act){if(!p.aiming){p.aiming=1;p.aimA=p.face}if(hyp(ix,iy)>.3){const ta=Math.atan2(iy,ix);const da=((ta-p.aimA+Math.PI*3)%TAU)-Math.PI;p.aimA+=da*Math.min(1,dt*14)}p.face=p.aimA;p.charging=0;p.charge=0}
+  if(inp.f&&p.gun>0&&p.stun<=0&&p.dash<=0&&act){if(!p.aiming){p.aiming=1;p.aimA=p.face}if(typeof inp.a==='number')p.aimA=inp.a;else{let ax=inp.x||0,ay=inp.y||0;if(M.includes('reverse')){ax=-ax;ay=-ay}if(hyp(ax,ay)>.3)p.aimA=Math.round(Math.atan2(ay,ax)/(Math.PI/4))*(Math.PI/4)}p.face=p.aimA;p.charging=0;p.charge=0}
   else if(p.aiming){if(!inp.f&&p.stun<=0&&p.gun>0&&act)fireCork(p);p.aiming=0}
   if(p.aiming){}
   else if(inp.d&&canAct){p.charging=1;p.charge=Math.min(1,p.charge+dt*1.5*(p.courage>0?4:1));if(p.charge>=1&&!p.full){p.full=1;ev('full',{id:p.id})}}
@@ -491,7 +492,7 @@ function simStep(dt){
   p.courage=Math.max(0,(p.courage||0)-dt);if(p.gulp>0){p.gulp-=dt;if(p.gulp<=0){p.gulp=0;p.r=S.mut.includes('big')?40:26}}
   p.stun=Math.max(0,p.stun-dt);
   const ctrl=p.stun>0?.15:1,bombBoost=(S.bomb&&S.bomb.h===p.id)?1.12:1;
-  const maxS=(p.charging?105:255)*bombBoost*(p.r>30?.9:1)*(p.aiming?0:1)*(p.wob>0?.35:1)*(p.parry>0&&!(p.dodge>0)?.5:1);
+  const maxS=(p.charging?105:255)*bombBoost*(p.r>30?.9:1)*(p.aiming?(typeof inp.a==='number'?.45:0):1)*(p.wob>0?.35:1)*(p.parry>0&&!(p.dodge>0)?.5:1);
   let dvx=ix*maxS*ctrl,dvy=iy*maxS*ctrl;
   const rx=p.x-CX,ry=p.y-CY;
   if(S.rotV){dvx+=-ry*S.rotV;dvy+=rx*S.rotV}
@@ -596,7 +597,7 @@ function hostMsg(c,m){if(!m||!S)return;const id=connId(c);let p=P(id);
  if(m.t==='h'){if(!p){if(S.players.length>=6){c.send({t:'full'});return}p=newPlayer(id,m.name,uniqueColor(m.color|0),m.hat|0,false);p.team=balTeam();placeRandom(p);if(S.phase!=='lobby'){p.alive=false;p.fall=0;if(S.phase==='play'&&isCont())p.respawn=1}S.players.push(p);
    toast(p.name+' stumbled in!');ev('emote',{id:p.id,k:2});}c.send({t:'w',id});return}
  if(!p)return;
- if(m.t==='i'){p.inp.x=clamp(+m.x||0,-1,1);p.inp.y=clamp(+m.y||0,-1,1);p.inp.d=m.d?1:0;p.inp.f=m.f?1:0;p.inp.p=m.p?1:0}
+ if(m.t==='i'){p.inp.x=clamp(+m.x||0,-1,1);p.inp.y=clamp(+m.y||0,-1,1);p.inp.d=m.d?1:0;p.inp.f=m.f?1:0;p.inp.p=m.p?1:0;p.inp.a=(typeof m.a==='number'&&isFinite(m.a))?m.a:null}
  else if(m.t==='e'){emote(p,clamp(m.k|0,0,3))}
  else if(m.t==='bye'){S.players=S.players.filter(x=>x!==p)}}
 function broadcast(){if(!S)return;const s=snapshot();for(const c of NET.conns.values()){try{if(c.open!==false)c.send({t:'s',s})}catch(e){}}S.evq=[]}
@@ -627,7 +628,7 @@ function leaveToTitle(silent){try{if(NET.peer)NET.peer.destroy()}catch(e){}try{i
  showScreen('title')}
 function sendInput(dt){const inp=readInput();
  if(NET.mode==='host'){const p=P('host');if(p)p.inp=inp;if(emoteQ>=0&&p)emote(p,emoteQ)}
- else if(NET.mode==='client'&&NET.hostConn){const k=inp.x+','+inp.y+','+inp.d+inp.f+inp.p;NET.inT-=dt;if(k!==NET.lastIn||NET.inT<=0){NET.lastIn=k;NET.inT=.1;try{NET.hostConn.send({t:'i',x:inp.x,y:inp.y,d:inp.d,f:inp.f,p:inp.p})}catch(e){}}
+ else if(NET.mode==='client'&&NET.hostConn){const k=inp.x+','+inp.y+','+inp.d+inp.f+inp.p+','+inp.a;NET.inT-=dt;if(k!==NET.lastIn||NET.inT<=0){NET.lastIn=k;NET.inT=.1;try{NET.hostConn.send({t:'i',x:inp.x,y:inp.y,d:inp.d,f:inp.f,p:inp.p,a:inp.a})}catch(e){}}
   if(emoteQ>=0)try{NET.hostConn.send({t:'e',k:emoteQ})}catch(e){}}
  emoteQ=-1}
 
@@ -683,6 +684,13 @@ function onEv(e){const p=e.id?vp(e.id):null;const pitch=p?.8+((p.color*7)%8)/10:
 const cv=$('#c'),ctx=cv.getContext('2d');let DPR=1,SC=1,OX=0,OY=0;
 function resize(){DPR=Math.min(window.devicePixelRatio||1,2);cv.width=innerWidth*DPR;cv.height=innerHeight*DPR;SC=Math.min(cv.width/W,cv.height/H);OX=(cv.width-W*SC)/2;OY=(cv.height-H*SC)/2}
 addEventListener('resize',resize);resize();
+const mouse={x:0,y:0,t:-1e9,l:0,r:0};
+cv.addEventListener('pointermove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;mouse.t=performance.now()});
+cv.addEventListener('pointerdown',e=>{mouse.x=e.clientX;mouse.y=e.clientY;mouse.t=performance.now();if(e.button===0)mouse.l=1;if(e.button===2)mouse.r=1});
+addEventListener('pointerup',e=>{if(e.button===0)mouse.l=0;if(e.button===2)mouse.r=0});
+addEventListener('blur',()=>{mouse.l=mouse.r=0});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+function mouseWorld(){const vx=(mouse.x*DPR-OX)/SC,vy=(mouse.y*DPR-OY)/SC;return [(vx-W/2)/camZ+camX,(vy-H/2)/camZ+camY]}
 const FONT="'Luckiest Guy',Impact,sans-serif";
 // --- pre-rendered table
 const raft=(()=>{const c=document.createElement('canvas');c.width=c.height=640;const g=c.getContext('2d');const R=300;g.translate(320,320);
