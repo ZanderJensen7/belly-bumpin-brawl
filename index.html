@@ -150,7 +150,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 
 <div id="touch"><div id="tstick"><div id="tbase"><div id="tknob"></div></div><div class="hint">drag to move</div></div>
 <div class="tb2" id="tParry"><b>🛡️</b>PARRY</div><div class="tb2" id="tBump"><b>🍺</b>BUMP</div><div class="tb2" id="tThrow"><b>🥛</b>THROW</div><div class="tb2" id="tEmote">😂</div></div>
-<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 44<span id="netinfo"></span></div>
+<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 45<span id="netinfo"></span></div>
 <div id="rotate"><div>📱↻</div>Turn your phone sideways to brawl</div>
 <div id="lobby" class="screen">
   <div class="panel"><button class="mtog" id="bMini">▲ Hide menu (practice)</button>
@@ -829,21 +829,23 @@ async function rtcUpgrade(){if(NET.mode!=='client'||!NET.relay||NET.rtcPc||typeo
  pc.onicecandidate=e=>{if(e.candidate&&sent&&NET.relay&&NET.rtcPc===pc)NET.hostConn.send({t:'rtc',c:e.candidate.toJSON()})};
  setTimeout(()=>{if(!sent){if(pc.localDescription)sendSdp();else NET.rst='stuck '+NET.rst}},5000);
  const of=await pc.createOffer();NET.rst='local';await pc.setLocalDescription(of);NET.rst='gather';await gathered(pc);if(NET.rtcPc!==pc||!NET.relay){NET.rst='abort';return}sendSdp();setTimeout(()=>{if(NET.rtcPc===pc&&NET.rst==='sent')NET.rst='host silent'},8000)}catch(e){console.warn(e);NET.rst='err '+(e&&e.name||'')}}
-async function rtcAnswer(c,sdp){try{const pc=new RTCPeerConnection(ICE),rid=connId(c);c.rpc=pc;c.rq=c.rq||[];let sent=false;pc.onicecandidate=e=>{if(e.candidate&&sent)c.send({t:'rtc',c:e.candidate.toJSON()})};pc.ondatachannel=ev=>{const dc=ev.channel,id='w_'+rid+'_'+Math.random().toString(36).slice(2,6);
+async function rtcAnswer(c,sdp){try{c.send({t:'hst',s:'got offer'});const pc=new RTCPeerConnection(ICE),rid=connId(c);c.rpc=pc;c.rq=c.rq||[];let sent=false;pc.onicecandidate=e=>{if(e.candidate&&sent)c.send({t:'rtc',c:e.candidate.toJSON()})};pc.ondatachannel=ev=>{const dc=ev.channel,id='w_'+rid+'_'+Math.random().toString(36).slice(2,6);
   const conn={id,open:true,send:d=>{if(dc.readyState==='open')dc.send(JSON.stringify(d))},close:()=>{try{pc.close()}catch(e){}}};
   dc.onopen=()=>NET.conns.set(id,conn);dc.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(x){return}hostMsg(conn,m)};dc.onclose=()=>dropConn(id)};
  pc.oniceconnectionstatechange=()=>{try{c.send({t:'hst',s:pc.iceConnectionState})}catch(e){}};
- await pc.setRemoteDescription({type:'offer',sdp:String(sdp)});for(const q of c.rq.splice(0))pc.addIceCandidate(q).catch(()=>{});await pc.setLocalDescription(await pc.createAnswer());await gathered(pc);sent=true;c.send({t:'rtc',sdp:pc.localDescription.sdp})}catch(e){console.warn(e)}}
+ await pc.setRemoteDescription({type:'offer',sdp:String(sdp)});for(const q of c.rq.splice(0))pc.addIceCandidate(q).catch(()=>{});await pc.setLocalDescription(await pc.createAnswer());await gathered(pc);sent=true;c.send({t:'rtc',sdp:pc.localDescription.sdp})}catch(e){console.warn(e);try{c.send({t:'hst',s:'err '+(e&&e.name||e)})}catch(_){}}}
 function kickPlayer(id){if(NET.mode!=='host'||!S||id===NET.myId)return;const q=P(id);if(!q)return;const c=NET.conns.get(id);NET.banned=NET.banned||new Set();if(!q.bot){NET.banned.add(id);if(q.uid)NET.banned.add('u:'+q.uid)}
  if(c){try{c.send({t:'kick'})}catch(e){}setTimeout(()=>{try{c.close&&c.close()}catch(e){}},400);NET.conns.delete(id)}S.players=S.players.filter(x=>x!==q);if(!q.bot)toast('🚪 '+q.name+' got bounced',3);SFX.click()}
 function dropConn(id){if(!NET.conns.has(id))return;NET.conns.delete(id);if(!S)return;const q=P(id);if(q){S.players=S.players.filter(x=>x!==q);toast(q.name+' left the bar')}}
-setInterval(()=>{{const el=$('#netinfo');if(el)el.textContent=NET.mode==='client'&&NET.rtt!=null?' · '+(NET.relay?'relay ':'direct ')+Math.round(NET.rtt*1000)+'ms'+(NET.relay?' (pj: '+(NET.dfail||'-')+', rtc: '+(NET.rst||'-')+(NET.hrst?'/'+NET.hrst:'')+(NET.relayUrl?', '+NET.relayUrl.replace(/^wss?:\/\/(broker\.|mqtt\.|test\.)?/,'').split(/[.:]/)[0]:'')+')':''):''}if(NET.mode==='client'&&NET.relay&&performance.now()-(NET.lastRx||0)>12000){toast('Lost the host. Party\'s over (for now).',6);leaveToTitle(true)}if(NET.mode!=='host')return;const n=performance.now();for(const c of [...NET.conns.values()])if(c.relay&&n-c.seen>15000)dropConn(c.id)},2000);
+setInterval(()=>{{const el=$('#netinfo');if(el)el.textContent=NET.mode==='host'&&NET.hcheck&&S&&S.code!=='SOLO'?' · host direct: '+NET.hcheck:NET.mode==='client'&&NET.rtt!=null?' · '+(NET.relay?'relay ':'direct ')+Math.round(NET.rtt*1000)+'ms'+(NET.relay?' (pj: '+(NET.dfail||'-')+', rtc: '+(NET.rst||'-')+(NET.hrst?'/'+NET.hrst:'')+(NET.relayUrl?', '+NET.relayUrl.replace(/^wss?:\/\/(broker\.|mqtt\.|test\.)?/,'').split(/[.:]/)[0]:'')+')':''):''}if(NET.mode==='client'&&NET.relay&&performance.now()-(NET.lastRx||0)>12000){toast('Lost the host. Party\'s over (for now).',6);leaveToTitle(true)}if(NET.mode!=='host')return;const n=performance.now();for(const c of [...NET.conns.values()])if(c.relay&&n-c.seen>15000)dropConn(c.id)},2000);
+async function rtcSelfTest(){NET.hcheck='testing';try{if(typeof RTCPeerConnection==='undefined')throw {name:'missing'};const pc=new RTCPeerConnection(ICE);pc.createDataChannel('t');let srflx=0,any=0;pc.onicecandidate=e=>{if(e.candidate){any++;if(/ typ (srflx|relay)/.test(e.candidate.candidate))srflx++}};
+ await pc.setLocalDescription(await pc.createOffer());await gathered(pc);await new Promise(r=>setTimeout(r,300));pc.close();NET.hcheck=srflx?'ok':any?'local only':'no candidates';if(!srflx)toast('⚠️ Your browser/network is blocking direct links ('+NET.hcheck+'). Friends will go through the laggy relay.',8)}catch(e){NET.hcheck='blocked '+(e&&e.name||'');toast('⚠️ Your browser is blocking WebRTC. Friends will go through the laggy relay.',8)}}
 function hostStart(offline){NET.mode='host';NET.myId='host';const code=offline?'SOLO':genCode();S=newState(code);
  const p=newPlayer('host',me.name,me.color,me.hat,false);S.players.push(p);p.lv=myLv();p.fc=me.fc|0;p.bk=me.bk|0;p.tag=me.tag;p.ic=me.ic|0;S.settings.bots=store.get('botlv',1);placeRandom(p);S.rails=makeRails();
  if(offline){addBot();addBot();addBot();showLobby();return}
  if(LOCAL){NET.bc=new BroadcastChannel('lcb-'+code);NET.bc.onmessage=e=>{const m=e.data;if(m.to!=='host')return;let c=NET.conns.get(m.from);
    if(!c){c={id:m.from,send:d=>NET.bc.postMessage({to:m.from,from:'host',data:d})};NET.conns.set(m.from,c)}hostMsg(c,m.data)};showLobby();return}
- toast('Opening room...',8);
+ toast('Opening room...',8);rtcSelfTest();
  const open=code=>{if(FORCE_RELAY){S.code=code;relayHost(code);toast('Room '+code+' is open (relay)!');showLobby();return}const peer=new Peer(PID(code),PEEROPT);NET.peer=peer;
   peer.on('open',()=>{S.code=code;relayHost(code);toast('Room '+code+' is open!');showLobby()});
   peer.on('error',e=>{if(e.type==='unavailable-id'){peer.destroy();open(genCode())}else if(e.type!=='peer-unavailable'){toast('Network hiccup: '+e.type,4);console.warn(e)}});
