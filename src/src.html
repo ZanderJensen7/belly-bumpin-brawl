@@ -123,7 +123,7 @@ kbd{font-family:inherit;font-weight:700;background:var(--ink);color:var(--foam);
       <button id="bStart" class="big go">Start the brawl!</button>
     </div>
     <div class="waitmsg" id="lwait">Waiting for the host to start. Waddle around and practice!</div>
-    <div class="ctrls"><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch. Taps nudge, full charges YEET. Hold a full charge too long and you burp yourself stunned. Hit 'em from behind for a BUTT BUMP. Belly bump a flying pint to smash it back FASTER.<br><b>Empty Pints</b> (from crates, 2 throws): press <kbd>F</kbd> (or left click) to chug, then the aim swings across a cone in front of you. Press <kbd>F</kbd> again to time the throw. Missed pints can be picked back up.<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES pints. Parrying a bump stuns them and gives you a COUNTER: your next bump is instantly fully charged. Whiffing makes you wobble. Hold a direction while you tap it to DODGE instead (also catches pints).<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in. Every hit you take makes you more <b>sloshed</b>, so you fly farther next time.<br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for Empty Pints (throwables), Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
+    <div class="ctrls"><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch. Taps nudge, full charges YEET. Hit 'em from behind for a BUTT BUMP. Belly bump a flying pint to smash it back FASTER.<br><b>Empty Pints</b> (from crates, 2 throws): press <kbd>F</kbd> (or left click) to chug, then the aim swings across a cone in front of you. Press <kbd>F</kbd> again to time the throw. Missed pints can be picked back up.<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES pints. Parrying a bump knocks them back stunned, so punish them. Whiffing makes you wobble. Hold a direction while you tap it to DODGE instead (also catches pints).<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in. Every hit you take makes you more <b>sloshed</b>, so you fly farther next time.<br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for Empty Pints (throwables), Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
   </div>
 </div>
 
@@ -408,7 +408,6 @@ function botThink(b,dt){if(b.ai&&b.ai.fire){b.inp.d=0;b.ai.fire=0}if(S.phase==='
  if(b.gun>0&&T&&(S.phase==='play'||S.phase==='lobby')&&!(ai.hold>0)){const d=hyp(T.x-b.x,T.y-b.y);
   if(b.aiming){if(b.thT>.45){const ta=Math.atan2(T.y-b.y,T.x-b.x),da=Math.abs(((ta-b.aimA+Math.PI*3)%TAU)-Math.PI);if(da<ai.tol)b.inp.f=1}}
   else if(d>140&&d<420&&Math.random()<dt*.3){b.inp.f=1;b.inp.a=Math.atan2(T.y-b.y,T.x-b.x)+rnd(-.4,.4);ai.tol=rnd(.15,.45)}}
- if((b.ctr||0)>0&&T&&!(ai.hold>0)&&b.stun<=0&&hyp(T.x-b.x,T.y-b.y)<320&&Math.random()<dt*3){ai.hold=.1;ai.hop=[T.x-b.x,T.y-b.y]}
  if(S.phase==='play'||S.phase==='lobby'){
   if(ai.hold>0){ai.hold-=dt;b.inp.d=ai.hold>0?1:0;if(ai.hold<=0)setTimeout(()=>{ai.hop=null},300)}
   else{b.inp.d=0;if(T&&b.dash<=0&&b.stun<=0){const d=hyp(T.x-b.x,T.y-b.y);const tEdge=hyp(T.x-CX,T.y-CY)/S.arenaR;if(d<240&&Math.random()<dt*(.55+tEdge*1.4))ai.hold=rnd(.1,.75)}}}
@@ -481,8 +480,8 @@ function simStep(dt){
   if(!p.aiming&&fP&&p.gun>0&&p.stun<=0&&p.dash<=0&&act){p.aiming=1;p.thT=0;p.charging=0;p.charge=0;let c0=p.face;if(typeof inp.a==='number')c0=inp.a;else if(hyp(inp.x||0,inp.y||0)>.3){c0=Math.atan2(inp.y,inp.x);if(M.includes('reverse'))c0+=Math.PI}p.aimC=c0;p.aimA=c0;ev('drink',{id:p.id})}
   else if(p.aiming){p.thT+=dt;if(p.thT>.45){p.aimA=p.aimC+Math.sin((p.thT-.45)*2.8)*Math.PI/4;p.face=p.aimA;if(fP||p.thT>3.5){fireCork(p);p.aiming=0}}}
   if(p.aiming){}
-  else if(inp.d&&canAct){p.charging=1;p.charge=Math.min(1,p.charge+dt*1.5*(p.courage>0?4:1));if(p.ctr>0)p.charge=1;if(p.charge>=1&&!p.full){p.full=1;p.fullT=0;ev('full',{id:p.id})}
-   if(p.full){p.fullT+=dt;if(p.fullT>1.4&&!(p.ctr>0)){p.charging=0;p.charge=0;p.full=0;p.fullT=0;p.stun=.55;p.vx*=.2;p.vy*=.2;ev('burp',{id:p.id,x:p.x|0,y:p.y|0})}}}
+  else if(inp.d&&canAct){p.charging=1;p.charge=Math.min(1,p.charge+dt*1.5*(p.courage>0?4:1));if(p.charge>=1&&!p.full){p.full=1;p.fullT=0;ev('full',{id:p.id})}
+}
   else if(p.charging){if(!inp.d&&canAct){doDash(p,p.charge);p.perf=0}p.charging=0;p.charge=0;p.full=0;p.fullT=0}
   p.ctr=Math.max(0,(p.ctr||0)-dt);
   for(let ii=0;ii<S.items.length;ii++){const it=S.items[ii];if(hyp(it.x-p.x,it.y-p.y)<p.r+24){S.items.splice(ii,1);openCrate(p,it);break}}
@@ -517,7 +516,7 @@ function simStep(dt){
   if(aD&&bD&&Math.abs((a.dc||0)-(b.dc||0))>.3){const W=(a.dc||0)>(b.dc||0)?a:b,L=W===a?b:a;L.dash=0;if(W===a)bD=false;else aD=false;W.dc=Math.max(0,(W.dc||0)-.15);ev('over',{x:mx,y:my})}
   if(aD&&bD){const imp=vrel*.6+380;a.vx-=nx*imp;a.vy-=ny*imp;b.vx+=nx*imp;b.vy+=ny*imp;a.stun=b.stun=.4;a.dash=b.dash=0;a.hitBy=b.id;b.hitBy=a.id;a.hitT=b.hitT=S.t;ev('clang',{x:mx,y:my});S.hs=.07}
   else if(aD||bD){const Aa=aD?a:b,Bb=aD?b:a,sx=aD?nx:-nx,sy=aD?ny:-ny,pw=Aa.dpow;const dc=Aa.dc||0,kb=(190+880*dc*dc+380*dc+Math.abs(vrel)*.12)*(Bb.inv>0?.35:1)*(Bb.parry>0?1:absorb(Bb)*slosh(Bb));Aa.inv=0;
-   if(Bb.parry>0){Bb.blocked=1;const k2=280+520*dc;Aa.vx=-sx*k2;Aa.vy=-sy*k2;Aa.stun=.3+.4*dc;Aa.dash=0;Aa.charging=0;Aa.hitBy=Bb.id;Aa.hitT=S.t;Bb.vx*=.2;Bb.vy*=.2;Bb.ctr=.8;Bb.pcd=0;Bb.wob=0;ev('deflect',{x:mx,y:my,bump:1,id:Bb.id});S.hs=.12}else{
+   if(Bb.parry>0){Bb.blocked=1;const k2=280+520*dc;Aa.vx=-sx*k2;Aa.vy=-sy*k2;Aa.stun=.3+.4*dc;Aa.dash=0;Aa.charging=0;Aa.hitBy=Bb.id;Aa.hitT=S.t;Bb.vx*=.2;Bb.vy*=.2;Bb.pcd=0;Bb.wob=0;ev('deflect',{x:mx,y:my,bump:1,id:Bb.id});S.hs=.12}else{
    const butt=(Math.cos(Bb.face)*sx+Math.sin(Bb.face)*sy)>.55&&dc>.15,kbF=kb*(butt?1.7:1);Bb.vx=sx*kbF+Bb.vx*.15;Bb.vy=sy*kbF+Bb.vy*.15;Bb.stun=.12+.7*dc;Bb.hitBy=Aa.id;Bb.hitT=S.t;Bb.charging=0;Bb.charge=0;
    Aa.vx*=.2;Aa.vy*=.2;Aa.dash=0;ev('bonk',{x:mx,y:my,s:Math.round(pw*100)/100,id:Bb.id,butt:butt?1:0,perf:Aa.perf?1:0});S.hs=Math.max(S.hs||0,.02+.09*Math.min(1,dc)+(butt||Aa.perf?.04:0))}}
   else{const imp=vrel*1.15+90;a.vx-=nx*imp*.6;a.vy-=ny*imp*.6;b.vx+=nx*imp*.6;b.vy+=ny*imp*.6;if(vrel>110){ev('bump',{x:mx,y:my});a.hitBy=b.id;b.hitBy=a.id;a.hitT=b.hitT=S.t}}}
@@ -671,7 +670,7 @@ function onEv(e){const p=e.id?vp(e.id):null;const pitch=p?.8+((p.color*7)%8)/10:
  case 'drink':if(p){addPop(p.x,p.y-60,'*glug glug*','#ffe9a8',20,.6);const t0=AC?now():0;if(AC)for(let i=0;i<4;i++)tone('sine',rnd(180,260),rnd(90,140),.09,.25,t0+i*.1)}break;
  case 'parry':SFX.whoosh(e.dodge?.6:.2);if(p&&e.dodge)burst(p.x,p.y,8,['#fff','#e8f4ff'],160,6,0);if(p&&!e.dodge)rings.push({x:p.x,y:p.y-8,t:0,life:.22,r:55,col:'#ffd23f'});break;
  case 'catch':SFX.pickup();if(p)addPop(p.x,p.y-60,'CAUGHT IT!','#5be37d',30);shake=Math.max(shake,5);break;
- case 'deflect':SFX.clang();addPop(e.x,e.y-30,e.bat?pick(['RETURN TO SENDER!','BELLY SMASH!','HOME RUN!']):e.bump?'PARRIED!':'DEFLECTED!','#ffd23f',e.bump?36:30);if(e.bump&&p){addPop(p.x,p.y-80,'COUNTER!','#fff',24,.8);tone('square',660,990,.1,.15)}burst(e.x,e.y,16,['#ffd23f','#fff'],380,5,0);shake=Math.max(shake,8);flash=.08;break;
+ case 'deflect':SFX.clang();addPop(e.x,e.y-30,e.bat?pick(['RETURN TO SENDER!','BELLY SMASH!','HOME RUN!']):e.bump?'PARRIED!':'DEFLECTED!','#ffd23f',e.bump?36:30);burst(e.x,e.y,16,['#ffd23f','#fff'],380,5,0);shake=Math.max(shake,8);flash=.08;break;
  case 'burp':SFX.bonk(.2);tone('sawtooth',90,55,.35,.25);if(p){addPop(p.x,p.y-60,pick(['*BUUURP*','OVERCOOKED','HELD IT TOO LONG']),'#9be37a',26,.9);burst(p.x,p.y-10,14,['#c8f0a0','#9be37a','#fff'],200,7,0)}break;
  case 'perfect':tone('square',880,1320,.12,.18);if(p)rings.push({x:p.x,y:p.y-8,t:0,life:.25,r:70,col:'#ffd23f'});break;
  case 'over':SFX.clang();shake=Math.max(shake,12);addPop(e.x,e.y-34,'OVERPOWERED!','#ff9f1c',36);burst(e.x,e.y,20,['#ff9f1c','#fff'],460,6,0);break;
@@ -829,7 +828,7 @@ function drawGuy(c,p,a,t,opts){opts=opts||{};const r=p.r,col=COLORS[p.color]||'#
  c.restore();
  if(!p.alive)return;
  // charge ring
- if(charging){c.save();c.translate(p.x,p.y);const fT=p.fullT||0;c.strokeStyle=p.charge>=1?(p.ctr>0?'#ffd23f':fT>.9?(Math.floor(t*20)%2?'#9be37a':'#ff5a5f'):(Math.floor(t*12)%2?'#fff':'#ff5a5f')):'#fff';if(c.lineWidth<6)c.lineWidth=5;c.beginPath();c.arc(0,-r*.2,r+10,-Math.PI/2,-Math.PI/2+TAU*p.charge);c.stroke();
+ if(charging){c.save();c.translate(p.x,p.y);const fT=p.fullT||0;c.strokeStyle=p.charge>=1?(Math.floor(t*12)%2?'#fff':'#ff5a5f'):'#fff';if(c.lineWidth<6)c.lineWidth=5;c.beginPath();c.arc(0,-r*.2,r+10,-Math.PI/2,-Math.PI/2+TAU*p.charge);c.stroke();
   c.fillStyle='rgba(255,255,255,'+(p.charge*.25)+')';c.beginPath();c.arc(0,-r*.2,r+10,0,TAU);c.fill();c.restore()}
  if(p.dash>0){c.save();c.translate(p.x,p.y);c.rotate(Math.atan2(p.vy,p.vx));c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=3;for(let i=0;i<4;i++){const y=(i-1.5)*r*.45;c.beginPath();c.moveTo(-r-10-rnd(0,20),y);c.lineTo(-r-40-rnd(0,40),y);c.stroke()}c.restore()}
  if(p.stun>0){for(let i=0;i<3;i++){const aa=t*6+i/3*TAU;drawStar(c,p.x+Math.cos(aa)*r*.9,p.y-r*1.9+Math.sin(aa)*r*.3,7,'#ffd23f')}}
