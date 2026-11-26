@@ -2,7 +2,7 @@
 
 A wobbly, drunk-friendly party brawler for 2–6 friends online. Belly-bump each other off a floating bar table. Winners get drunker.
 
-**Play:** https://zanderjensen7.github.io/last-call-brawl/
+**Play:** https://zanderjensen7.github.io/belly-bumpin-brawl/
 
 - Host a room, share the 4-letter code, and friends join from their browsers. No installs.
 - Modes: Last One Standing, Tag Team 2v2, Happy Hour, King of the Coaster
