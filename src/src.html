@@ -119,8 +119,14 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 #draft .dc kbd{display:inline-block;margin-top:6px;font-size:12px;opacity:.6}
 #draft .dt{width:min(600px,80vw);height:10px;border:3px solid #2a1608;border-radius:8px;background:#fff6e0;margin-top:18px;overflow:hidden}#draft .dt i{display:block;height:100%;background:#e8473f}
 #achs{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:34vh;overflow:auto;margin:0 0 10px}#achs div{display:flex;gap:8px;align-items:center;background:#fff;border:3px solid var(--ink);border-radius:12px;padding:5px 8px;text-align:left}#achs div.no{opacity:.4;filter:grayscale(1)}#achs i{font-style:normal;font-size:24px}#achs b{display:block;font-weight:600;font-size:15px}#achs span{font-size:12px;opacity:.75}#achh{font-weight:600;margin:4px 0}
-#hub{justify-content:flex-start;align-items:flex-start;padding:16px;pointer-events:none}#hub .panel{pointer-events:auto;width:min(300px,86vw)}#hlog{max-height:200px;overflow:auto;font-size:14px;text-align:left;background:#fff;border:3px solid var(--ink);border-radius:10px;padding:4px 8px;margin-top:6px;line-height:1.3;word-break:break-word}#hlog:empty{display:none}#hlog b{font-weight:600}#hin{width:100%;box-sizing:border-box;margin-top:6px;font-size:15px}
-#clog{max-height:110px;overflow:auto;font-size:14px;text-align:left;background:#fff;border:3px solid var(--ink);border-radius:10px;padding:4px 8px;margin-top:6px;line-height:1.3;word-break:break-word}#clog:empty{display:none}#clog b{font-weight:600}#cin{width:100%;box-sizing:border-box;margin-top:6px;font-size:15px}
+#hub{justify-content:flex-start;align-items:flex-start;padding:16px;pointer-events:none}#hub .panel{pointer-events:auto;width:min(300px,86vw)}
+#chatw{position:fixed;left:16px;bottom:16px;width:min(340px,70vw);z-index:30;display:none;flex-direction:column;background:rgba(30,14,4,.72);border:3px solid #2a1608;border-radius:14px;overflow:hidden;box-shadow:0 6px 0 rgba(0,0,0,.25)}body.chaton #chatw{display:flex}
+#chatw .ch{font:600 13px Fredoka,sans-serif;color:#ffd23f;padding:5px 10px 3px;letter-spacing:.5px;background:rgba(0,0,0,.25)}
+#clog{height:150px;overflow-y:auto;font:15px Fredoka,sans-serif;color:#fff6e0;text-align:left;padding:4px 10px;line-height:1.35;word-break:break-word;scrollbar-width:thin}#clog b{font-weight:600}#clog .sys{opacity:.6;font-style:italic}
+#cin{width:100%;box-sizing:border-box;border:0;border-top:2px solid rgba(255,255,255,.15);border-radius:0;background:rgba(0,0,0,.35);color:#fff;font:15px Fredoka,sans-serif;padding:8px 10px;margin:0;outline:none}#cin::placeholder{color:rgba(255,246,224,.5)}#cin:focus{background:rgba(0,0,0,.55)}
+body.chaton #lobby .panel{max-height:calc(100vh - 250px)}
+.tpanel{width:min(460px,94vw)}#title .row .big{min-height:66px;font-size:clamp(20px,5.5vw,28px);white-space:nowrap;padding:8px 10px}#title .row .hubbtn,#title .row .custbtn{min-height:78px}.tme input{width:100%;box-sizing:border-box}.tsub button{flex:1;margin-top:0!important;font-size:17px;padding:10px 6px}.custbtn{background:linear-gradient(180deg,#ffb3d9,#ff7eb6)!important;display:flex;flex-direction:column;align-items:center;gap:2px}.custbtn span{font:500 13px Fredoka,sans-serif;opacity:.8;text-transform:none;letter-spacing:0}
+.hubbtn{background:linear-gradient(180deg,#7fe0ff,#2bb6e8)!important;display:flex;flex-direction:column;align-items:center;gap:2px;animation:hubpulse 2.4s ease-in-out infinite}.hubbtn span{font:500 13px Fredoka,sans-serif;opacity:.8;text-transform:none;letter-spacing:0}@keyframes hubpulse{0%,100%{box-shadow:0 5px 0 #2a1608,0 0 0 0 rgba(43,182,232,.0)}50%{box-shadow:0 5px 0 #2a1608,0 0 0 7px rgba(43,182,232,.45)}}
 #lbList div{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;text-align:left}#lbList div.me{background:#fff3b0}#lbList i{font-style:normal;font-weight:600;opacity:.7}#lbList b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}.sgrid div{background:#fff;border:3px solid var(--ink);border-radius:12px;padding:6px;text-align:center}.sgrid b{display:block;font-family:'Luckiest Guy',Impact,sans-serif;font-size:28px;font-weight:400}.sgrid span{font-size:12px;font-weight:700;opacity:.65;text-transform:uppercase}
 </style>
@@ -131,11 +137,14 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 <div id="title" class="screen on">
   <div class="logo"><span>BELLY</span> <span>BUMPIN'</span> <span>BRAWL</span></div>
   <div class="tag">Bump your friends into the beer.</div>
-  <div class="panel">
-    <div class="row">
-      <canvas id="pv" width="200" height="200" style="width:150px;height:150px;flex:none"></canvas>
-      <div class="col">
-        <label for="nm">Your name</label><input id="nm" maxlength="24" autocomplete="off" spellcheck="false">
+  <div class="panel tpanel">
+    <div class="row tme"><canvas id="pv" width="200" height="200" style="width:84px;height:84px;flex:none"></canvas><div class="col" style="flex:1;gap:4px"><input id="nm" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Your name"><div id="lvl" class="lvlbar"></div></div></div>
+    <div class="row" style="gap:8px;margin-top:10px"><button id="bHost" class="big" style="flex:1">🍺 Host</button><button id="bFind" class="big go" style="flex:1">🌐 Find game</button></div>
+    <div class="row" style="margin-top:10px"><input id="code" placeholder="CODE" maxlength="5" autocomplete="off" spellcheck="false"><button id="bJoin" class="go" style="font-size:24px;padding:10px 18px">Join</button></div>
+    <div class="row" style="gap:8px;margin-top:10px"><button id="bHub" class="big hubbtn" style="flex:1">🍻 Hub<span>hang out · chat</span></button><button id="bTCust" class="big custbtn" style="flex:1">🎨 Customize<span>hats · faces · tags</span></button></div>
+    <div class="row tsub" style="gap:8px;margin-top:10px"><button id="bSolo" class="ghost">🤖 Practice</button><button id="bStats" class="ghost">📊 Stats</button><button id="bLB" class="ghost">🏆 Leaders</button></div>
+    <div style="display:none"><div class="col">
+        
         <label>Color</label><div class="pick"><button data-p="c-1">◀</button><span id="cn"></span><button data-p="c1">▶</button></div>
         <label>Hat</label><div class="pick"><button data-p="h-1">◀</button><span id="hn"></span><button data-p="h1">▶</button></div>
         <label>Face</label><div class="pick"><button data-p="f-1">◀</button><span id="fnn"></span><button data-p="f1">▶</button></div>
@@ -143,10 +152,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
         <button class="maim keyonly" style="margin-top:6px;font-size:14px;padding:5px 8px"></button>
       </div>
     </div>
-    <div id="lvl" class="lvlbar"></div>
-    <div class="row" style="gap:8px"><button id="bHost" class="big" style="flex:1">🍺 Host</button><button id="bFind" class="big go" style="flex:1">🌐 Find game</button></div>
-    <div class="row" style="margin-top:12px"><input id="code" placeholder="CODE" maxlength="5" autocomplete="off" spellcheck="false"><button id="bJoin" class="go" style="font-size:24px;padding:10px 18px">Join</button></div>
-    <div class="row" style="gap:8px;margin-top:10px"><button id="bSolo" class="ghost" style="margin-top:0;flex:1">Practice vs bots</button><button id="bStats" class="ghost" style="margin-top:0;width:auto;padding:8px 14px">📊 Stats</button><button id="bLB" class="ghost" style="margin-top:0;width:auto;padding:8px 14px">🏆</button><button id="bHub" class="ghost" style="margin-top:0;width:auto;padding:8px 14px">🍻 Hub</button></div>
+</div>
   </div>
   <div class="foot">Drink responsibly. Water counts.</div>
 </div>
@@ -162,12 +168,8 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
     <div style="display:flex;gap:6px;margin-top:6px"><button id="bCopy" style="flex:1;font-size:16px">Copy invite</button></div>
     <div class="small" id="lhint" style="text-align:center;margin-top:6px">Share this code</div>
     <div class="lvlbar" id="lvlL" title="Your stats"></div><button id="bCust" class="go" style="margin-top:8px;width:100%;font-size:20px;padding:8px">🎨 Wardrobe</button>
-    <div id="ward"><div class="panel"><div class="rtitle" style="font-size:32px">🎨 Wardrobe</div><canvas id="wpv" width="240" height="240" style="width:170px;height:170px;display:block;margin:0 auto"></canvas><div id="wname" style="text-align:center;font:600 20px Fredoka,sans-serif;margin:-6px 0 6px;-webkit-text-stroke:0;text-shadow:-2px -2px 0 #2a1608,2px -2px 0 #2a1608,-2px 2px 0 #2a1608,2px 2px 0 #2a1608,0 2px 0 #2a1608;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
-    <div class="mebox" id="mebox">
-      <input id="lnm" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Your name" style="width:100%;box-sizing:border-box">
-      <div class="pick" style="margin-top:6px"><button data-l="c-1">◀</button><span id="lcn" style="font-size:16px"></span><button data-l="c1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="h-1">◀</button><span id="lhn" style="font-size:16px"></span><button data-l="h1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="f-1">◀</button><span id="lfn" style="font-size:16px"></span><button data-l="f1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="b-1">◀</button><span id="lbn" style="font-size:16px"></span><button data-l="b1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="i-1">◀</button><span id="lin" style="font-size:16px"></span><button data-l="i1">▶</button></div><input id="ltag" maxlength="4" autocomplete="off" spellcheck="false" placeholder="Clan tag (4 letters)" style="width:100%;box-sizing:border-box;margin-top:6px;text-transform:uppercase"><button class="maim keyonly" style="width:100%;margin-top:6px;font-size:14px;padding:5px 8px"></button>
-    </div><div class="small" id="wlock" style="text-align:center;margin-top:6px"></div><button id="bWard" class="big go">Done</button></div></div>
-    <ul class="plist" id="plist"></ul><div id="chat"><div id="clog"></div><input id="cin" maxlength="80" placeholder="💬 Chat (Enter)" autocomplete="off" spellcheck="false"></div>
+    
+    <ul class="plist" id="plist"></ul>
     <div class="small" id="linfo" style="text-align:center;font-weight:700"></div>
     <div id="hostOpts">
       <label>Mode</label>
@@ -205,7 +207,13 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
   <div class="bar"><i id="rbar"></i></div>
 </div></div>
 
-<div id="hub" class="screen"><div class="panel"><div class="rtitle" style="font-size:28px">🍻 The Hub</div><div class="small" id="hcount">Just you so far</div><div id="hlog"></div><input id="hin" maxlength="80" placeholder="💬 Chat (Enter)" autocomplete="off" spellcheck="false"><div class="small" style="margin-top:6px;opacity:.8">Walk into a glowing portal to join a match, or onto the 🍻 pad to host one.</div><button id="bHubLeave" class="ghost">Leave hub</button></div></div>
+<div id="ward"><div class="panel"><div class="rtitle" style="font-size:32px">🎨 Wardrobe</div><canvas id="wpv" width="240" height="240" style="width:170px;height:170px;display:block;margin:0 auto"></canvas><div id="wname" style="text-align:center;font:600 20px Fredoka,sans-serif;margin:-6px 0 6px;-webkit-text-stroke:0;text-shadow:-2px -2px 0 #2a1608,2px -2px 0 #2a1608,-2px 2px 0 #2a1608,2px 2px 0 #2a1608,0 2px 0 #2a1608;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+    <div class="mebox" id="mebox">
+      <input id="lnm" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Your name" style="width:100%;box-sizing:border-box">
+      <div class="pick" style="margin-top:6px"><button data-l="c-1">◀</button><span id="lcn" style="font-size:16px"></span><button data-l="c1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="h-1">◀</button><span id="lhn" style="font-size:16px"></span><button data-l="h1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="f-1">◀</button><span id="lfn" style="font-size:16px"></span><button data-l="f1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="b-1">◀</button><span id="lbn" style="font-size:16px"></span><button data-l="b1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="i-1">◀</button><span id="lin" style="font-size:16px"></span><button data-l="i1">▶</button></div><input id="ltag" maxlength="4" autocomplete="off" spellcheck="false" placeholder="Clan tag (4 letters)" style="width:100%;box-sizing:border-box;margin-top:6px;text-transform:uppercase"><button class="maim keyonly" style="width:100%;margin-top:6px;font-size:14px;padding:5px 8px"></button>
+    </div><div class="small" id="wlock" style="text-align:center;margin-top:6px"></div><button id="bWard" class="big go">Done</button></div></div>
+<div id="chatw"><div class="ch">💬 Chat</div><div id="clog"></div><input id="cin" maxlength="80" placeholder="Press Enter to chat" autocomplete="off" spellcheck="false"></div>
+<div id="hub" class="screen"><div class="panel"><div class="rtitle" style="font-size:28px">🍻 The Hub</div><div class="small" id="hcount">Just you so far</div><div class="small" style="margin-top:6px;opacity:.8">Walk into a glowing portal to join a match, or onto the 🍻 pad to host one.</div><button id="bHubLeave" class="ghost">Leave hub</button></div></div>
 <div id="lb" class="screen"><div class="panel"><div class="rtitle" style="font-size:34px">🏆 Leaderboard</div><div class="seg" id="lbTabs" style="margin:6px 0"><button data-k="lv" class="sel">Level</button><button data-k="w">Wins</button><button data-k="k">KOs</button><button data-k="pz">Deep End</button><button data-k="a">🏆</button></div><div id="lbList" class="rlist"></div><div class="small" id="lbNote" style="opacity:.7">Loading...</div><button id="bLBBack" class="ghost">Back</button></div></div>
 <div id="browse" class="screen"><div class="panel"><div class="rtitle" style="font-size:34px">🌐 Open rooms</div><button id="bQuick" class="big go" style="margin-top:6px">⚡ Quick match</button><div id="rlist" class="rlist"></div><button id="bBrBack" class="ghost">Back</button></div></div>
 <div id="stats" class="screen"><div class="panel"><div class="rtitle" style="font-size:34px">📊 <span id="stName" style="font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:30px"></span></div><div class="sgrid" id="sgrid"></div><div id="achs"></div><button id="bStBack" class="big">Back</button></div></div>
@@ -223,7 +231,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 <div id="toast"></div>
 <div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bVoice" title="Announcer voice (click to change)">🗣️</button><button id="bFull" title="Fullscreen">⛶</button><button id="bMenu" title="Menu (Esc)">☰</button></div>
 <div id="draft"><div class="dh">PICK A POWER-UP!</div><div class="ds">Losers get stronger. They stack.</div><div class="dc" id="dcards"></div><div class="dt"><i id="dbar"></i></div></div>
-<div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eLob" class="ghost">Back to lobby</button><div id="ePl"></div><button id="eSt" class="ghost">📊 My stats</button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
+<div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eLob" class="ghost">Back to lobby</button><div id="ePl"></div><button id="eSt" class="ghost">📊 My stats</button><button id="eBg" class="ghost"></button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
 
 <script>/*__PEERJS__*/</script>
 <script>
@@ -501,12 +509,12 @@ let voxI=store.get('vox',0)|0;
 function voxVoice(v,i){try{const vs=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang));if(!vs.length)return null;const loc=vs.filter(x=>x.localService);
  const m=(loc.find(x=>v.v.test(x.name)||v.v.test(x.lang)))||vs.find(x=>v.v.test(x.name)||v.v.test(x.lang));if(m)return m;const pool=loc.length?loc:vs;return pool[i%pool.length]}catch(e){return null}}
 try{speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
-function say(text,force){if(!voiceOn||!('speechSynthesis' in window))return;const t=performance.now();if(!force&&(speechSynthesis.speaking||t-lastSay<1200))return;
+function say(text,force){if(!voiceOn||!('speechSynthesis' in window))return;if(document.hidden&&!store.get('bgsnd',true))return;const t=performance.now();if(!force&&(speechSynthesis.speaking||t-lastSay<1200))return;
  lastSay=t;try{if(force)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);{const v=VOX[voxI]||VOX[0];u.rate=v.r;u.pitch=v.p;const vv=voxVoice(v,voxI);if(vv){u.voice=vv;u.lang=vv.lang}}u.volume=muted?0:vol/100;speechSynthesis.speak(u)}catch(e){}}
 
 // ============================================================ INPUT
 const keys={};let emoteQ=-1;
-addEventListener('keydown',e=>{if(e.code==='Enter'&&e.target.tagName!=='INPUT'&&curScreen==='hub'){e.preventDefault();for(const k in keys)keys[k]=false;$('#hin').focus();return}if(e.code==='Enter'&&e.target.tagName!=='INPUT'&&curScreen==='lobby'&&!$('#ward').classList.contains('on')){e.preventDefault();for(const k in keys)keys[k]=false;$('#cin').focus();return}if(e.code==='Escape'){if($('#ward').classList.contains('on'))$('#ward').classList.remove('on');else toggleEsc();return}if(e.target.tagName==='INPUT')return;keys[e.code]=true;initAudio();
+addEventListener('keydown',e=>{if(e.code==='Enter'&&e.target.tagName!=='INPUT'&&(curScreen==='lobby'||curScreen==='hub')&&!$('#ward').classList.contains('on')){e.preventDefault();for(const k in keys)keys[k]=false;$('#cin').focus();return}if(e.code==='Escape'){if($('#ward').classList.contains('on'))$('#ward').classList.remove('on');else toggleEsc();return}if(e.target.tagName==='INPUT')return;keys[e.code]=true;initAudio();
  if(/^Digit[1-4]$/.test(e.code)){if($('#draft').classList.contains('on')){pickPerk(+e.code.slice(5)-1);return}emoteQ=+e.code.slice(5)-1}
  if(e.code==='KeyM')toggleMute();
  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});
@@ -918,7 +926,7 @@ const BR={mqs:null,rooms:new Map(),tick:null};
 // ---- The Hub: big shared hangout. Everyone simulates themselves and shares position over the brokers.
 const HUBT='lcb1/hub/';const HUB={mqs:null,peers:new Map(),seen:new Set(),tick:null,ping:null,seq:0,t0:0,pads:[]};
 function hubStart(){if(NET.mode)return;NET.mode='host';NET.myId='host';S=newState('HUB');S.hub=1;S.map='hub';S.settings.map='hub';S.settings.pub=0;
- const p=newPlayer('host',me.name,me.color,me.hat,false);p.lv=myLv();p.fc=me.fc|0;p.bk=me.bk|0;p.tag=me.tag;p.ic=me.ic|0;S.players.push(p);placeRandom(p);S.rails=[];V=S;HUB.t0=performance.now();HUB.peers.clear();$('#hlog').innerHTML='';
+ const p=newPlayer('host',me.name,me.color,me.hat,false);p.lv=myLv();p.fc=me.fc|0;p.bk=me.bk|0;p.tag=me.tag;p.ic=me.ic|0;S.players.push(p);placeRandom(p);S.rails=[];V=S;HUB.t0=performance.now();HUB.peers.clear();$('#clog').innerHTML='';
  HUB.mqs=RELAYS.map(u=>{const mq=mqtt([u],(t,txt)=>hubRx(t,txt));mq.sub(HUBT+'p');mq.sub(HUBT+'c');return mq});
  showScreen('hub');startBrowse();HUB.ping=setInterval(()=>{if(BR.mqs)for(const m of BR.mqs)m.pub(LOBQ,'1')},4000);HUB.tick=setInterval(hubTx,125);toast('🍻 Welcome to the Hub!',3)}
 function hubStop(){if(!HUB.mqs&&!HUB.tick)return;clearInterval(HUB.tick);clearInterval(HUB.ping);HUB.tick=HUB.ping=null;if(HUB.mqs){const j=JSON.stringify({i:MYUID,bye:1});for(const m of HUB.mqs){m.pub(HUBT+'p',j);setTimeout(()=>m.close(),200)}}HUB.mqs=null;HUB.peers.clear();stopBrowse()}
@@ -926,7 +934,7 @@ function hubTx(){const p=S&&S.hub&&P('host');if(!p||!HUB.mqs)return;const j=JSON
 function hubRx(t,txt){let m;try{m=JSON.parse(txt)}catch(e){return}if(!m||typeof m.i!=='string'||m.i===MYUID)return;const id=m.i.replace(/[^a-z0-9]/gi,'').slice(0,16);
  if(t===HUBT+'p'){if(m.bye){HUB.peers.delete(id);return}const o=HUB.peers.get(id);if(o&&(m.s|0)<=o.s)return;const q=o||{id:'h_'+id,dx:+m.x||CX,dy:+m.y||CY};Object.assign(q,{s:m.s|0,name:String(m.n||'?').slice(0,24),color:clamp(m.c|0,0,COLORS.length-1),hat:m.h|0,fc:m.f|0,bk:m.b|0,ic:ICONS[m.ic]?m.ic|0:0,tag:cleanTag(m.tg),lv:m.lv|0,tx:+m.x||0,ty:+m.y||0,vx:+m.vx||0,vy:+m.vy||0,face:+m.fa||0,alive:!!m.a,emote:m.e|0,charge:clamp(+m.ch||0,0,1),dash:m.d?.1:0,seen:performance.now()});HUB.peers.set(id,q)}
  else if(t===HUBT+'c'){const k=id+':'+m.s;if(HUB.seen.has(k))return;HUB.seen.add(k);if(HUB.seen.size>300)HUB.seen.clear();hubLog(String(m.n||'?').slice(0,40),m.c|0,String(m.x||'').slice(0,80));const q=HUB.peers.get(id);if(q&&q.alive)addPop(q.dx,q.dy-60,String(m.x).slice(0,22),'#fff',18,2.2)}}
-function hubLog(n,c,x){const lg=$('#hlog');const d=document.createElement('div');d.innerHTML='<b style="color:'+shade(COLORS[c]||'#2a1608',-.35)+'">'+esc(n)+':</b> '+esc(x);lg.appendChild(d);while(lg.children.length>40)lg.firstChild.remove();lg.scrollTop=lg.scrollHeight;SFX.pop&&SFX.pop()}
+function hubLog(n,c,x){const lg=$('#clog');const d=document.createElement('div');d.innerHTML='<b style="color:'+shade(COLORS[c]||'#2a1608',-.35)+'">'+esc(n)+':</b> '+esc(x);lg.appendChild(d);while(lg.children.length>40)lg.firstChild.remove();lg.scrollTop=lg.scrollHeight;SFX.pop&&SFX.pop()}
 function hubChat(x){const p=P('host');if(!HUB.mqs)return;const n=dispName({ic:me.ic|0,tag:me.tag,name:me.name}).slice(0,40);const j=JSON.stringify({i:MYUID,s:++HUB.seq,n,c:me.color|0,x});for(const mq of HUB.mqs)mq.pub(HUBT+'c',j);hubLog(n,me.color|0,x);if(p)addPop(p.x,p.y-60,x.length>22?x.slice(0,21)+'…':x,'#fff',18,2.2)}
 function hubPads(){const rooms=liveRooms().filter(r=>r.p<6).slice(0,6);const pads=rooms.map((r,i)=>({x:CX-(rooms.length-1)*105+i*210,y:CY-290,r:62,room:r}));pads.push({x:CX,y:CY+300,r:70,host:1});return pads}
 function drawHubPads(c,t){HUB.pads=hubPads();for(const pd of HUB.pads){c.save();c.translate(pd.x,pd.y);const pu=1+Math.sin(t*3+pd.x)*.05;c.fillStyle=pd.host?'rgba(255,210,63,.35)':'rgba(43,210,255,.3)';c.beginPath();c.arc(0,0,pd.r*1.25*pu,0,TAU);c.fill();
@@ -1523,7 +1531,7 @@ let lastRec='';function recordStats(o){const key=(V&&V.code)+'|'+o.id+'|'+(V&&V.
 function showStats(inline){const st=getStats();$('#stName').textContent=me.name;const pct=st.games?Math.round(st.wins/st.games*100)+'%':'-';
  const cells=[['Level',lvFor(st.xp)],['XP',st.xp||0],['Games',st.games],['Wins',st.wins],['Win %',pct],['Rounds won',st.rounds],['KOs',st.kos],['Best KOs',st.bestKos],['Bumps',st.hits],['Parries',st.parries],['Glassings',st.glassed],['Falls',st.falls],['Self-yeets',st.selfs],['KO/fall',st.falls?(st.kos/st.falls).toFixed(1):st.kos],['Unlocks',(HATS.filter((h,i)=>HAT_LV[i]<=lvFor(st.xp)).length+FACES.filter((h,i)=>FACE_LV[i]<=lvFor(st.xp)).length+BACKS.filter((h,i)=>BACK_LV[i]<=lvFor(st.xp)).length+ICONS.filter((h,i)=>ICON_LV[i]<=lvFor(st.xp)).length)+'/'+(HATS.length+FACES.length+BACKS.length+ICONS.length)]];
  const h=cells.map(c=>'<div><b>'+c[1]+'</b><span>'+c[0]+'</span></div>').join('');if(inline){$('#eGrid').innerHTML=h;return}$('#sgrid').innerHTML=h;const ah=st.ach||{};$('#achs').innerHTML='<div id="achh" style="grid-column:1/-1;border:0;background:none;padding:0">🏆 Achievements '+ACH.filter(a=>ah[a[0]]).length+'/'+ACH.length+'</div>'+ACH.map(a=>{const got=ah[a[0]],hid=a[5]&&!got,rw=achReward(a[0]);return '<div class="'+(got?'':'no')+'"><i>'+(hid?'❔':a[1])+'</i><p style="margin:0"><b>'+(hid?'Secret':a[2])+'</b><span>'+(hid?'Keep exploring...':a[3])+(rw?' · 🎁 '+(hid?'???':rw):'')+'</span></p></div>'}).join('');showScreen('stats')}
-function showScreen(id){if(id!=='lobby')$('#ward').classList.remove('on');document.body.classList.toggle('ingame',id==='lobby'||id==='none'||id==='hub');if(id!=='lb')lbStop();['title','lobby','results','over','stats','browse','lb','hub'].forEach(s=>$('#'+s).classList.toggle('on',s===id));curScreen=id;if(id!=='browse'&&id!=='hub')stopBrowse();if(id==='title')lvBar()}
+function showScreen(id){if(id!=='lobby')$('#ward').classList.remove('on');document.body.classList.toggle('ingame',id==='lobby'||id==='none'||id==='hub');document.body.classList.toggle('chaton',id==='lobby'||id==='hub');if(id!=='lb')lbStop();['title','lobby','results','over','stats','browse','lb','hub'].forEach(s=>$('#'+s).classList.toggle('on',s===id));curScreen=id;if(id!=='browse'&&id!=='hub')stopBrowse();if(id==='title')lvBar()}
 let curScreen='title',uiKey='';
 function showLobby(){showScreen('lobby');uiKey='';lvBar()}
 function syncUI(){if(S&&S.hub){if(curScreen!=='hub'&&curScreen!=='stats'&&curScreen!=='lb')showScreen('hub');hubUI();return}if(!V||curScreen==='title')return;const ph=V.phase,isHost=NET.mode==='host';
@@ -1562,7 +1570,9 @@ document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{initAudio();SFX.
 {let tm2=0;$('#ltag').oninput=e=>{me.tag=cleanTag(e.target.value);e.target.value=me.tag;store.set('tag',me.tag);clearTimeout(tm2);tm2=setTimeout(sendMe,250)};$('#ltag').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()})}
 {let tmo=0;$('#lnm').oninput=e=>{me.name=e.target.value.trim()||'Mystery Drunk';store.set('name',me.name);$('#nm').value=me.name;clearTimeout(tmo);tmo=setTimeout(sendMe,250)}}
 $('#lnm').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});
-$('#bHub').onclick=()=>{SFX.pop&&SFX.pop();initAudio();hubStart()};$('#bHubLeave').onclick=()=>leaveToTitle(true);$('#hin').addEventListener('keydown',e=>{if(e.key==='Enter'){sendChat(e.target.value);e.target.value='';e.target.blur()}else if(e.key==='Escape')e.target.blur();e.stopPropagation()});
+let bgSound=store.get('bgsnd',true);const bgLbl=()=>{$('#eBg').textContent=bgSound?'🔊 Sound when tabbed out: ON':'🔇 Sound when tabbed out: OFF'};bgLbl();$('#eBg').onclick=()=>{bgSound=!bgSound;store.set('bgsnd',bgSound);bgLbl()};
+document.addEventListener('visibilitychange',()=>{if(!MG||!AC)return;const off=document.hidden&&!bgSound;MG.gain.setTargetAtTime(off||muted?0:vol/100,AC.currentTime,.05);if(off&&'speechSynthesis' in window)speechSynthesis.cancel()});
+$('#bTCust').onclick=()=>$('#bCust').click();$('#bHub').onclick=()=>{SFX.pop&&SFX.pop();initAudio();hubStart()};$('#bHubLeave').onclick=()=>leaveToTitle(true);
 $('#bLB').onclick=()=>{SFX.pop&&SFX.pop();showLB()};$('#bLBBack').onclick=()=>showScreen('title');document.querySelectorAll('#lbTabs button').forEach(b=>b.onclick=()=>{LB.k=b.dataset.k;document.querySelectorAll('#lbTabs button').forEach(x=>x.classList.toggle('sel',x===b));lbRender()});setTimeout(lbPublish,6000);
 $('#cin').addEventListener('keydown',e=>{if(e.key==='Enter'){sendChat(e.target.value);e.target.value='';e.target.blur()}else if(e.key==='Escape')e.target.blur();e.stopPropagation()});
 const maimTxt=()=>document.querySelectorAll('.maim').forEach(b=>b.textContent=mouseAim?'🖱️ Mouse aim: ON (left click bumps toward cursor)':'🖱️ Mouse aim: OFF (bump where you move)');maimTxt();
@@ -1587,7 +1597,7 @@ $('#segV').onclick=e=>{const v=e.target.dataset.v;if(v!==undefined&&S){S.setting
 $('#bFind').onclick=()=>{initAudio();SFX.pop();showBrowse()};$('#bBrBack').onclick=()=>{SFX.click();showScreen('title')};$('#bQuick').onclick=()=>{initAudio();SFX.pop();quickMatch()};
 $('#rlist').onclick=e=>{const c=e.target.dataset&&e.target.dataset.join;if(c){initAudio();SFX.pop();stopBrowse();joinStart(c)}};
 $('#segB').onclick=e=>{const v=e.target.dataset.v;if(v!==undefined&&S){S.settings.bots=+v;store.set('botlv',+v);SFX.click()}};
-$('#bCust').onclick=()=>{SFX.click();$('#ward').classList.add('on');{const l=myLv(),nx=nextUnlock(l);$('#wlock').textContent='Lv '+l+(nx?' · 🔒 '+nx[1]+' at Lv '+nx[0]:' · everything unlocked')}};document.body.appendChild($('#ward'));$('#bWard').onclick=()=>{SFX.pop();$('#ward').classList.remove('on')};$('#ward').onclick=e=>{if(e.target.id==='ward')$('#ward').classList.remove('on')};
+$('#bCust').onclick=()=>{SFX.click();$('#ward').classList.add('on');$('#lcn').textContent=CNAMES[me.color];$('#lhn').textContent=HNAMES[me.hat];refreshPick();if(document.activeElement!==$('#lnm'))$('#lnm').value=me.name;{const l=myLv(),nx=nextUnlock(l);$('#wlock').textContent='Lv '+l+(nx?' · 🔒 '+nx[1]+' at Lv '+nx[0]:' · everything unlocked')}};document.body.appendChild($('#ward'));$('#bWard').onclick=()=>{SFX.pop();$('#ward').classList.remove('on')};$('#ward').onclick=e=>{if(e.target.id==='ward')$('#ward').classList.remove('on')};
 function pickPerk(k){const o=V&&V.offers&&V.offers[NET.myId];if(!o||!o[k])return;SFX.pop();$('#draft').classList.remove('on');$('#dcards').innerHTML='';toast(PERKS[o[k]][0]+' '+PERKS[o[k]][1]+'!',2);if(NET.mode==='host'){const o=S.offers&&S.offers[NET.myId];if(o)givePerk(P(NET.myId),o[k])}else if(NET.hostConn)NET.hostConn.send({t:'pk',k})}
 $('#dcards').onclick=e=>{const b=e.target.closest('[data-pk]');if(b)pickPerk(+b.dataset.pk)};
 $('#bMenu').onclick=()=>{SFX.click();toggleEsc()};$('#eRes').onclick=()=>{SFX.click();toggleEsc(false)};$('#esc').onclick=e=>{if(e.target.id==='esc')toggleEsc(false)};
