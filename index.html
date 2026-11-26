@@ -150,7 +150,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 
 <div id="touch"><div id="tstick"><div id="tbase"><div id="tknob"></div></div><div class="hint">drag to move</div></div>
 <div class="tb2" id="tParry"><b>🛡️</b>PARRY</div><div class="tb2" id="tBump"><b>🍺</b>BUMP</div><div class="tb2" id="tThrow"><b>🥛</b>THROW</div><div class="tb2" id="tEmote">😂</div></div>
-<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 46<span id="netinfo"></span></div>
+<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 47<span id="netinfo"></span></div>
 <div id="rotate"><div>📱↻</div>Turn your phone sideways to brawl</div>
 <div id="lobby" class="screen">
   <div class="panel"><button class="mtog" id="bMini">▲ Hide menu (practice)</button>
@@ -945,7 +945,7 @@ let lastInp=null;function sendInput(dt){const inp=readInput();lastInp=inp;
 let parts=[],pops=[],rings=[],shake=0,zoom=1,zoomT=0,zx=CX,zy=CY,flash=0;const anim={};const bumpSq={};
 function A_(id){return anim[id]||(anim[id]={walk:0,px:0,py:0,pvx:0,pvy:0,lvx:0,lvy:0,sq:0})}
 function vp(id){return V&&V.players.find(p=>p.id===id)}
-function addPop(x,y,text,col,size,life){pops.push({x,y,text,col:col||'#fff',size:size||34,t:0,life:life||.9,rot:rnd(-.3,.3)})}
+function addPop(x,y,text,col,size,life,pr){size=size||34;pr=pr||1;if(size>=26){const big=pops.filter(q=>q.size>=26&&q.t<q.life-.12);if(big.some(q=>(q.pr||1)>pr))return;for(const q of big)q.life=q.t+.12}pops.push({x,y,text,col:col||'#fff',size,t:0,life:life||.9,rot:rnd(-.3,.3),pr});return;pops.push({x,y,text,col:col||'#fff',size:size||34,t:0,life:life||.9,rot:rnd(-.3,.3)})}
 function burst(x,y,n,cols,spd,sz,grav){for(let i=0;i<n;i++){const a=Math.random()*TAU,s=rnd(.3,1)*spd;parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,z:0,vz:rnd(100,350)*(grav?1:0),t:0,life:rnd(.4,.9),sz:rnd(.5,1)*sz,col:pick(cols),g:grav?1:0})}}
 function onEv(e){const p=e.id?vp(e.id):null;if(NET.myId&&(e.id===NET.myId||e.kid===NET.myId)){if(e.k==='hand')achEv('hand');else if(e.k==='flipped')achEv('stow');else if(e.k==='treasure')achEv('treasure');else if(e.k==='slap'&&e.at)achEv('slap');else if(e.k==='burp')achEv('burp');else if(e.k==='emote'&&e.em===2)achEv('dance');else if(e.k==='meme'&&e.kid&&/TRIPLE|RAMPAGE|UNSTOPPABLE/.test(e.t))achEv('triple')}const pitch=p?.8+((p.color*7)%8)/10:1;
  switch(e.k){
@@ -960,7 +960,7 @@ function onEv(e){const p=e.id?vp(e.id):null;if(NET.myId&&(e.id===NET.myId||e.kid
  case 'treasure':SFX.pop&&SFX.pop();SFX.choir();burst(e.x,e.y,30,['#ffd23f','#fff','#ffe9a8'],320,8,0);break;
  case 'flipped':SFX.whoosh(.9);shake=Math.max(shake,10);break;
  case 'splash':SFX.splash();if(e.self)setTimeout(()=>SFX.sad(),350);shake=Math.max(shake,8);burst(e.x,e.y,30,['#fff6e0','#ffe9a8','#f5a623','#fff'],260,9,1);rings.push({x:e.x,y:e.y,t:0,life:.8,r:80,col:'#fff6e0'});
-  addPop(e.x,e.y-40,e.self?pick(['WHOOPS','SKILL ISSUE','???','WHY','TRIPPED ON NOTHING','MAIN CHARACTER MOMENT','IT WAS LAG']):pick(['SPLOOSH!','F IN CHAT','GLUG GLUG','BYE!','TOUCH GRASS','RATIO\'D','NOT LIKE THIS','CERTIFIED SOAKED','GG GO NEXT']),'#fff',40,1.2);break;
+  addPop(e.x,e.y-40,e.self?pick(['WHOOPS','SKILL ISSUE','???','WHY','TRIPPED ON NOTHING','MAIN CHARACTER MOMENT','IT WAS LAG']):pick(['SPLOOSH!','F IN CHAT','GLUG GLUG','BYE!','TOUCH GRASS','RATIO\'D','NOT LIKE THIS','CERTIFIED SOAKED','GG GO NEXT']),'#fff',36,1.1);break;
  case 'boing':SFX.boing();bumpSq[e.i]=1;addPop(e.x,e.y-40,'BOING!','#ff7eb6',32);break;
  case 'boom':SFX.boom();shake=30;flash=.35;burst(e.x,e.y,60,['#ff5a5f','#ffd23f','#ff9f1c','#fff','#444'],700,12,0);rings.push({x:e.x,y:e.y,t:0,life:.6,r:220,col:'#ffd23f'});addPop(e.x,e.y-40,'KABOOM!','#ff5a5f',64,1.3);break;
  case 'pass':SFX.pass();if(p)addPop(p.x,p.y-70,e.first?'HOT SHOT!':'TAG!','#ff5a5f',26);break;
@@ -990,7 +990,7 @@ function onEv(e){const p=e.id?vp(e.id):null;if(NET.myId&&(e.id===NET.myId||e.kid
  case 'perfect':tone('square',880,1320,.12,.18);if(p)rings.push({x:p.x,y:p.y-8,t:0,life:.25,r:70,col:'#ffd23f'});break;
  case 'over':SFX.clang();shake=Math.max(shake,12);addPop(e.x,e.y-34,'OVERPOWERED!','#ff9f1c',36);burst(e.x,e.y,20,['#ff9f1c','#fff'],460,6,0);break;
  case 'lifelost':if(p&&e.n>0)addPop(p.x,p.y-70,e.n===1?'LAST LIFE!':e.n+' LIVES LEFT','#ff5a5f',24,1.1);else if(p)addPop(p.x,p.y-70,'OUT!','#ff5a5f',30,1.2);break;
- case 'meme':addPop(e.x,e.y-90,e.t,pick(['#ffd23f','#ff7eb6','#2bd2ff','#fff']),e.t.length>12?30:42,1.6);if(e.v)say(e.t.toLowerCase().replace(/!/g,''));shake=Math.max(shake,6);break;
+ case 'meme':addPop(e.x,e.y-90,e.t,pick(['#ffd23f','#ff7eb6','#2bd2ff','#fff']),e.t.length>12?28:38,1.3,2);if(e.v)say(e.t.toLowerCase().replace(/!/g,''));shake=Math.max(shake,6);break;
  case 'whiff':tone('triangle',300,150,.15,.2);if(p)addPop(p.x,p.y-55,pick(['whiff','air ball','swing and a miss','parried the air']),'#ccc',18,.6);break;
  case 'crate':SFX.pickup();burst(e.x,e.y,18,['#c98a4a','#8a5a2e','#ffd23f'],320,6,1);addPop(e.x,e.y-40,e.n,pick(['#ffd23f','#5be37d','#ff7eb6']),28,1.1);break;
  case 'corkup':SFX.pop();addPop(e.x,e.y-30,'+1 PINT','#ffe9a8',18,.6);break;
@@ -1417,9 +1417,10 @@ const ACH=[['win1','🍺',"First Round's On Me",'Win a match',s=>s.wins>=1],['wi
  ['donger','🌭','Big Donger Energy','Play on the Big Donger',s=>E(s,'donger')>=1],['disco','🪩','Night Fever','Play a disco round',s=>E(s,'disco')>=1],['hydro','💧','Hydrated','Win a Hydration Break',s=>E(s,'hydro')>=1],
  ['stow','🌀','Stowaway','Ride a floating coaster off the screen',s=>E(s,'stow')>=1],['treasure','🏅','Secret Mug','Find the secret golden mug',s=>E(s,'treasure')>=1],
  ['lv10','⭐','Seasoned','Reach Lv 10',s=>lvFor(s.xp)>=10],['lv20','🌟','Fixture','Reach Lv 20',s=>lvFor(s.xp)>=20]];
+const achQ=[];setInterval(()=>{if(!achQ.length||(V&&V.phase==='play'))return;const a=achQ.shift();SFX.pop&&SFX.pop();toast('🏆 '+a[1]+' '+a[2]+' · +30 XP',3.5)},1800);
 function E(s,k){return (s.ev&&s.ev[k])|0}
 function saveStats(st){try{localStorage.setItem('lcb_stats',JSON.stringify(st))}catch(e){}}
-function checkAch(st){st.ach=st.ach||{};const got=[];for(const a of ACH)if(!st.ach[a[0]]&&a[4](st)){st.ach[a[0]]=Date.now();st.xp=(st.xp||0)+30;got.push(a)}if(got.length){got.forEach((a,i)=>setTimeout(()=>{SFX.pop&&SFX.pop();toast('🏆 '+a[1]+' '+a[2]+' · +30 XP',4)},600+i*1800));setTimeout(lvBar,200)}return got.length}
+function checkAch(st){st.ach=st.ach||{};const got=[];for(const a of ACH)if(!st.ach[a[0]]&&a[4](st)){st.ach[a[0]]=Date.now();st.xp=(st.xp||0)+30;got.push(a)}if(got.length){achQ.push(...got);setTimeout(lvBar,200)}return got.length}
 function achEv(k,n){if(NET.mode==='host'&&S&&S.code==='SOLO'&&!['duck','dance','burp','stow','treasure'].includes(k))return;const st=getStats();st.ev=st.ev||{};st.ev[k]=(st.ev[k]|0)+(n||1);checkAch(st);saveStats(st)}
 let lastRec='';function recordStats(o){const key=(V&&V.code)+'|'+o.id+'|'+(V&&V.round)+'|'+(o.board||[]).map(b=>b[2]).join(',');if(key===lastRec)return;lastRec=key;const b=(o.board||[]).find(r=>r[7]===NET.myId);if(!b)return;const st=getStats();
  st.games++;const won=o.id===NET.myId||(o.tcol&&b[11]!=null&&(V.players.find(p=>p.id===o.id)||{}).team===b[11]);if(won)st.wins++;st.kos+=b[3];st.hits+=b[4];st.parries+=b[5];st.falls+=b[6];st.rounds+=b[8];st.glassed+=b[9];st.selfs+=b[10];st.bestKos=Math.max(st.bestKos,b[3]);
