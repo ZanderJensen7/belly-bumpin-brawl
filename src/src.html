@@ -107,6 +107,17 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 #rpick{display:flex;gap:8px;margin:8px 0}#rpick:empty{display:none}#rpick button{flex:1;margin:0;padding:8px 4px;font-size:13px;line-height:1.15}#rpick button b{display:block;font-size:30px}#rpick button i{display:block;font-style:normal;font-weight:700;font-size:15px}#rpick .pw{flex:1;text-align:center;font-weight:700;padding:8px}
 #ward{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(20,8,0,.55)}#ward.on{display:flex}#ward .panel{width:min(380px,92vw);max-height:94vh;overflow:auto;padding:12px 16px}#ward .pick span{font-size:18px!important}
 #esc{position:fixed;inset:0;z-index:45;display:none;align-items:center;justify-content:center;background:rgba(20,8,0,.55)}#esc.on{display:flex}#esc .panel{width:min(360px,92vw);max-height:94vh;overflow:auto;padding:12px 16px}#esc .ghost{width:100%;margin-top:8px}#esc .sgrid b{font-size:20px}#esc .sgrid span{font-size:10px}#lvlL{cursor:pointer;margin:8px 0 0}#ePl:empty{display:none}#ePl{margin-top:10px}#ePl div{display:flex;align-items:center;gap:6px;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:4px 8px;margin-top:4px;font-weight:700}#ePl div span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#ePl button{margin:0;padding:3px 10px;font-size:13px}#bMenu{display:none}body.inroom #bMenu{display:inline-block}
+#draft{position:fixed;inset:0;z-index:42;display:none;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(60,20,0,.55),rgba(20,8,0,.88));padding:12px;box-sizing:border-box}#draft.on{display:flex;animation:dpop .25s ease-out}
+@keyframes dpop{from{transform:scale(1.15);opacity:0}to{transform:none;opacity:1}}
+#draft .dh{font-family:'Luckiest Guy',Impact,sans-serif;font-size:clamp(34px,7vw,72px);color:#ffd23f;text-shadow:0 5px 0 #2a1608,0 0 30px rgba(255,200,60,.6);-webkit-text-stroke:2px #2a1608;animation:dwob 1s ease-in-out infinite}
+@keyframes dwob{50%{transform:scale(1.06) rotate(-2deg)}}
+#draft .ds{color:#fff6e0;font-weight:700;margin:4px 0 14px;font-size:clamp(13px,2vw,18px)}
+#draft .dc{display:flex;gap:clamp(8px,2vw,22px);width:min(900px,96vw)}
+#draft .dc button{flex:1;margin:0;padding:clamp(10px,2vh,22px) 8px;background:#fff6e0;font-size:clamp(12px,1.6vw,16px);line-height:1.2;box-shadow:0 8px 0 var(--ink);transition:transform .1s}
+#draft .dc button:hover{transform:translateY(-6px) rotate(-1deg);background:#ffe8a8}
+#draft .dc b{display:block;font-size:clamp(44px,8vw,86px);line-height:1.1}#draft .dc i{display:block;font-style:normal;font-size:clamp(18px,2.6vw,28px);margin:4px 0;color:#e8473f}
+#draft .dc kbd{display:inline-block;margin-top:6px;font-size:12px;opacity:.6}
+#draft .dt{width:min(600px,80vw);height:10px;border:3px solid #2a1608;border-radius:8px;background:#fff6e0;margin-top:18px;overflow:hidden}#draft .dt i{display:block;height:100%;background:#e8473f}
 .sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}.sgrid div{background:#fff;border:3px solid var(--ink);border-radius:12px;padding:6px;text-align:center}.sgrid b{display:block;font-family:'Luckiest Guy',Impact,sans-serif;font-size:28px;font-weight:400}.sgrid span{font-size:12px;font-weight:700;opacity:.65;text-transform:uppercase}
 </style>
 </head>
@@ -204,6 +215,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 
 <div id="toast"></div>
 <div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bVoice" title="Announcer voice (click to change)">🗣️</button><button id="bFull" title="Fullscreen">⛶</button><button id="bMenu" title="Menu (Esc)">☰</button></div>
+<div id="draft"><div class="dh">PICK A POWER-UP!</div><div class="ds">Losers get stronger. They stack.</div><div class="dc" id="dcards"></div><div class="dt"><i id="dbar"></i></div></div>
 <div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eLob" class="ghost">Back to lobby</button><div id="ePl"></div><button id="eSt" class="ghost">📊 My stats</button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
 
 <script>/*__PEERJS__*/</script>
@@ -451,7 +463,7 @@ function say(text,force){if(!voiceOn||!('speechSynthesis' in window))return;cons
 // ============================================================ INPUT
 const keys={};let emoteQ=-1;
 addEventListener('keydown',e=>{if(e.code==='Escape'){if($('#ward').classList.contains('on'))$('#ward').classList.remove('on');else toggleEsc();return}if(e.target.tagName==='INPUT')return;keys[e.code]=true;initAudio();
- if(/^Digit[1-4]$/.test(e.code))emoteQ=+e.code.slice(5)-1;
+ if(/^Digit[1-4]$/.test(e.code)){if($('#draft').classList.contains('on')){pickPerk(+e.code.slice(5)-1);return}emoteQ=+e.code.slice(5)-1}
  if(e.code==='KeyM')toggleMute();
  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});
 addEventListener('keyup',e=>{keys[e.code]=false});
@@ -1316,7 +1328,9 @@ function syncUI(){if(!V||curScreen==='title')return;const ph=V.phase,isHost=NET.
   $('#rround').textContent='ROUND '+c.round;$('#rtitle').textContent=c.title;$('#rtitle').style.color=c.team!=null?TEAMS[c.team].c:w?COLORS[w.color]:'#fff6e0';
   $('#rscores').innerHTML=V.settings.mode==='teams'?TEAMS.map((tt,i)=>{const m=V.players.find(p=>p.team===i);return '<div><span class="dot" style="display:inline-block;vertical-align:middle;width:16px;height:16px;background:'+tt.c+'"></span> '+tt.n+': '+(m?m.score:0)+'/'+V.settings.target+'</div>'}).join(''):[...V.players].sort((a,b)=>b.score-a.score).map(p=>'<div><span class="dot" style="display:inline-block;vertical-align:middle;width:16px;height:16px;background:'+COLORS[p.color]+'"></span> '+esc(p.name)+': '+p.score+'/'+V.settings.target+'</div>').join('');
   $('#rcardh').textContent=V.settings.drinks?'🍺 Drink card':'🧃 Commentary card';$('#rlines').innerHTML=c.lines.map(l=>'<p>'+l+'</p>').join('');$('#bNext').style.display=isHost?'':'none'}
-  {const o=V.offers&&V.offers[NET.myId],pkk=JSON.stringify(o||0)+(V.offers?Object.keys(V.offers).length:0);if(pkk!==syncUI.pk){syncUI.pk=pkk;$('#rpick').innerHTML=o?o.map((k,i)=>'<button data-pk="'+i+'"><b>'+PERKS[k][0]+'</b><i>'+PERKS[k][1]+'</i>'+PERKS[k][2]+'</button>').join(''):V.offers&&Object.keys(V.offers).length?'<div class="pw">Losers are picking power-ups...</div>':''}}
+  {const o=V.offers&&V.offers[NET.myId],pkk=JSON.stringify(o||0)+(V.offers?Object.keys(V.offers).length:0);if(pkk!==syncUI.pk){syncUI.pk=pkk;$('#rpick').innerHTML=!o&&V.offers&&Object.keys(V.offers).length?'<div class="pw">Losers are picking power-ups...</div>':'';$('#dcards').innerHTML=o?o.map((k,i)=>'<button data-pk="'+i+'"><b>'+PERKS[k][0]+'</b><i>'+PERKS[k][1]+'</i>'+PERKS[k][2]+'<br><kbd>'+(IS_TOUCH?'tap':'press '+(i+1))+'</kbd></button>').join(''):'';const was=$('#draft').classList.contains('on');$('#draft').classList.toggle('on',!!o);if(o&&!was){SFX.pickup&&SFX.pickup();say('Pick a power up!',0)}}}
+  if(isHost){const wait=V.offers&&Object.keys(V.offers).some(id=>{const p=V.players.find(q=>q.id===id);return p&&!p.bot});$('#bNext').disabled=!!wait;$('#bNext').textContent=wait?'Waiting for picks...':'Next round ▶'}
+  if(V.offers)$('#dbar').style.width=clamp(100-V.pt/15*100,0,100)+'%';
   $('#rbar').style.width=clamp(V.pt/(V.offers?15:10)*100,0,100)+'%'}
  if(ph==='over'&&V.over){const key='o'+V.over.id+isHost;if(key!==uiKey){uiKey=key;const o=V.over;$('#otitle').textContent=o.name;$('#otitle').style.color=o.tcol||COLORS[o.color];$('#oscores').innerHTML='<table class="stt"><tr><th></th><th>Pts</th><th>KOs</th><th>Bumps</th><th>Parries</th><th>Falls</th></tr>'+(o.board||[]).map(b=>'<tr'+(b[7]===NET.myId?' class="me"':'')+'><td><span class="dot" style="display:inline-block;vertical-align:middle;width:12px;height:12px;background:'+COLORS[b[1]]+'"></span> '+esc(b[0])+'</td><td><b>'+b[2]+'</b></td><td>'+b[3]+'</td><td>'+b[4]+'</td><td>'+b[5]+'</td><td>'+b[6]+'</td></tr>').join('')+'</table>';recordStats(o);$('#oaw').innerHTML=o.awards.map(a=>'<p>'+a+'</p>').join('');
   $('#ohost').style.display=isHost?'':'none';$('#owait').style.display=isHost?'none':''}
@@ -1355,7 +1369,8 @@ $('#bFind').onclick=()=>{initAudio();SFX.pop();showBrowse()};$('#bBrBack').oncli
 $('#rlist').onclick=e=>{const c=e.target.dataset&&e.target.dataset.join;if(c){initAudio();SFX.pop();stopBrowse();joinStart(c)}};
 $('#segB').onclick=e=>{const v=e.target.dataset.v;if(v!==undefined&&S){S.settings.bots=+v;store.set('botlv',+v);SFX.click()}};
 $('#bCust').onclick=()=>{SFX.click();$('#ward').classList.add('on');{const l=myLv(),nx=nextUnlock(l);$('#wlock').textContent='Lv '+l+(nx?' · 🔒 '+nx[1]+' at Lv '+nx[0]:' · everything unlocked')}};document.body.appendChild($('#ward'));$('#bWard').onclick=()=>{SFX.pop();$('#ward').classList.remove('on')};$('#ward').onclick=e=>{if(e.target.id==='ward')$('#ward').classList.remove('on')};
-$('#rpick').onclick=e=>{const b=e.target.closest('[data-pk]');if(!b)return;SFX.pop();const k=+b.dataset.pk;$('#rpick').innerHTML='';if(NET.mode==='host'){const o=S.offers&&S.offers[NET.myId];if(o)givePerk(P(NET.myId),o[k])}else if(NET.hostConn)NET.hostConn.send({t:'pk',k})};
+function pickPerk(k){const o=V&&V.offers&&V.offers[NET.myId];if(!o||!o[k])return;SFX.pop();$('#draft').classList.remove('on');$('#dcards').innerHTML='';toast(PERKS[o[k]][0]+' '+PERKS[o[k]][1]+'!',2);if(NET.mode==='host'){const o=S.offers&&S.offers[NET.myId];if(o)givePerk(P(NET.myId),o[k])}else if(NET.hostConn)NET.hostConn.send({t:'pk',k})}
+$('#dcards').onclick=e=>{const b=e.target.closest('[data-pk]');if(b)pickPerk(+b.dataset.pk)};
 $('#bMenu').onclick=()=>{SFX.click();toggleEsc()};$('#eRes').onclick=()=>{SFX.click();toggleEsc(false)};$('#esc').onclick=e=>{if(e.target.id==='esc')toggleEsc(false)};
 $('#eWard').onclick=()=>{toggleEsc(false);$('#bCust').click()};$('#eLob').onclick=()=>{toggleEsc(false);$('#bLob').onclick()};$('#ePl').onclick=e=>{const k=e.target.dataset&&e.target.dataset.ek;if(k){kickPlayer(k);escList()}};
 $('#eSt').onclick=()=>{SFX.click();const g=$('#eGrid'),o=g.style.display==='none';if(o)showStats(1);g.style.display=o?'':'none'};$('#lvlL').onclick=()=>{SFX.click();toggleEsc(true);showStats(1);$('#eGrid').style.display=''};
@@ -1363,7 +1378,7 @@ $('#eQuit').onclick=()=>{SFX.click();if(!quitArm){quitArm=1;$('#eQuit').textCont
 $('#segG').onclick=e=>{const v=e.target.dataset.v;if(v!==undefined&&S){S.settings.guns=+v;if(!+v){S.items=[];S.players.forEach(p=>p.gun=0)}SFX.click()}};
 $('#segP').onclick=e=>{const v=e.target.dataset.v;if(v&&S){S.settings.map=v;SFX.click();if(S.phase==='lobby'){S.map=v==='random'?'round':v;S.items=[];S.players.forEach(p=>{p.alive=true;p.fall=0;p.respawn=0;placeRandom(p)});S.rails=makeRails()}}};
 $('#bStart').onclick=()=>{if(S&&S.players.length>=2){SFX.pop();startMatch()}};
-$('#bNext').onclick=()=>{if(S&&S.phase==='results'){SFX.click();afterResults()}};
+$('#bNext').onclick=()=>{if(S&&S.offers&&Object.keys(S.offers).some(id=>{const p=P(id);return p&&!p.bot})){toast('Waiting for power-up picks...',2);return}if(S&&S.phase==='results'){SFX.click();afterResults()}};
 $('#bRe').onclick=()=>{if(S){SFX.pop();startMatch()}};
 $('#bLob').onclick=()=>{if(S){S.phase='lobby';S.mut=[];S.bumpers=[];S.kegs=[];S.bomb=null;S.zone=null;S.items=[];S.corks=[];S.loose=[];S.arenaR=BASE_R;S.rot=0;S.rotV=0;S.gx=S.gy=0;S.map=S.settings.map==='random'?'round':S.settings.map;S.players.forEach(p=>{p.alive=true;p.fall=0;p.respawn=0;p.gun=1;p.r=26;placeRandom(p)});S.rails=makeRails()}};
 function toggleMute(){muted=!muted;store.set('muted',muted);if(MG)MG.gain.value=muted?0:vol/100;$('#bMute').textContent=muted?'🔇':'🔊';if(muted&&'speechSynthesis' in window)speechSynthesis.cancel()}
