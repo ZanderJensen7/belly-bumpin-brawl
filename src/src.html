@@ -156,7 +156,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
       <button id="bStart" class="big go">Start the brawl!</button>
     </div>
     <div class="waitmsg" id="lwait">Waiting for the host to start. Waddle around and practice!</div>
-    <div class="ctrls"><div class="touchonly"><b>Touch:</b> drag the left side to move. Hold <b>BUMP</b> to charge, let go to launch. Tap <b>PARRY</b> right before a hit. <b>THROW</b> shows up when you grab Empty Pints. Turn your phone sideways and use fullscreen ⛶.</div><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch. Taps nudge, full charges YEET. Hold a full charge too long and you burp yourself stunned. Hit 'em from behind for a BUTT BUMP. Belly bump a flying pint to smash it back FASTER.<br><b>Empty Pints</b> (from crates, 2 throws): press <kbd>F</kbd> (or left click) to chug, then the aim swings across a cone in front of you. Press <kbd>F</kbd> again to time the throw. Missed pints can be picked back up.<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES pints. Parrying a bump knocks them back stunned, so punish them. Whiffing makes you wobble. It always works in place: charge a bump, then hit it mid-dash for a DASH PARRY that beats other bumps.<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in. Every hit you take makes you more <b>sloshed</b>, so you fly farther next time.<br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for Empty Pints (throwables), Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
+    <div class="ctrls"><div class="touchonly"><b>Touch:</b> drag the left side to move. Hold <b>BUMP</b> to charge, let go to launch. Tap <b>PARRY</b> right before a hit. <b>THROW</b> shows up when you grab Empty Pints. Turn your phone sideways and use fullscreen ⛶.</div><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch. Taps nudge, full charges YEET. Hold a full charge too long and you burp yourself stunned. Hit 'em from behind for a BUTT BUMP. Belly bump a flying pint to smash it back FASTER.<br><b>Empty Pints</b> (from crates, 2 throws): press <kbd>F</kbd> (or left click) to chug, then the aim swings across a cone in front of you. Press <kbd>F</kbd> again to time the throw. Missed pints can be picked back up.<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES pints. Parrying a bump knocks them back stunned, so punish them. Whiffing makes you wobble. It always works in place: charge a bump, then hit it mid-dash for a DASH PARRY that beats other bumps.<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in. <br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for Empty Pints (throwables), Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
   </div>
 </div>
 
@@ -418,7 +418,7 @@ const CRATE=[['gun',.4,'EMPTY PINTS! (F to throw)'],['armor',.2,'BELLY ARMOR!'],
 function openCrate(p,it){let r=Math.random(),c=CRATE[0];for(const q of CRATE){if(r<q[1]){c=q;break}r-=q[1]}
  if(c[0]==='gun'){p.gun=2;p.aiming=0}else if(c[0]==='armor')p.armor=1;else if(c[0]==='courage')p.courage=9;else{p.gulp=9;p.r=44}
  ev('crate',{id:p.id,x:it.x|0,y:it.y|0,c:c[0],n:c[2]})}
-function slosh(p){const m=.6+(p.slosh||0);p.slosh=Math.min(1.4,(p.slosh||0)+.15);return m}
+function slosh(p){return .85} // slosh meter disabled for now (was .6 + .15 per hit)
 function absorb(p){if(p.armor>0){p.armor=0;ev('armor',{id:p.id,x:p.x|0,y:p.y|0});return .25}return 1}
 function dropCork(c){if(S.loose.length<14&&onArena(c.x,c.y))S.loose.push({x:c.x,y:c.y})}
 function fireCork(p){const a=p.aimA!=null?p.aimA:p.face,dx=Math.cos(a),dy=Math.sin(a);
@@ -619,19 +619,47 @@ const ICE={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.googl
  {urls:['turn:eu-0.turn.peerjs.com:3478','turn:us-0.turn.peerjs.com:3478'],username:'peerjs',credential:'peerjsp'},
  {urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp','turns:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}],sdpSemantics:'unified-plan'};
 const PEEROPT=(()=>{const ps=QS.get('ps');if(!ps)return {debug:1,config:ICE};const [host,port]=ps.split(':');return {debug:1,host,port:+port,path:'/',secure:false}})();
+// ---- tiny MQTT 3.1.1 over WebSocket client (QoS 0), used as a relay when WebRTC can't connect
+const RELAYS=(QS.get('relay')?[QS.get('relay')]:['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt','wss://mqtt.eclipseprojects.io:443/mqtt','wss://test.mosquitto.org:8081/mqtt']);
+function mqtt(URLS,onMsg,onUp,onDown){const te=new TextEncoder(),td=new TextDecoder();let ws=null,buf=new Uint8Array(0),ping=null,idx=0,dead=false,up=false,pid=1,fails=0;const subs=[];
+ const str=s=>{const b=te.encode(s);const o=new Uint8Array(2+b.length);o[0]=b.length>>8;o[1]=b.length&255;o.set(b,2);return o};
+ const len=n=>{const o=[];do{let d=n%128;n=Math.floor(n/128);if(n>0)d|=128;o.push(d)}while(n>0);return o};
+ const pkt=(h,parts)=>{let L=0;for(const p of parts)L+=p.length;const l=len(L),o=new Uint8Array(1+l.length+L);o[0]=h;o.set(l,1);let k=1+l.length;for(const p of parts){o.set(p,k);k+=p.length}return o};
+ const send=b=>{try{if(ws&&ws.readyState===1)ws.send(b)}catch(e){}};
+ const subPkt=t=>pkt(0x82,[new Uint8Array([pid>>8&255,pid++&255]),str(t),new Uint8Array([0])]);
+ function parse(){while(buf.length>=2){let m=1,v=0,i=1,b;do{if(i>=buf.length)return;b=buf[i++];v+=(b&127)*m;m*=128}while(b&128);if(buf.length<i+v)return;
+   const type=buf[0]>>4,body=buf.subarray(i,i+v);
+   if(type===2){up=true;idx=0;for(const t of subs)send(subPkt(t));onUp&&onUp()}
+   else if(type===3){const tl=(body[0]<<8)|body[1],topic=td.decode(body.subarray(2,2+tl));let off=2+tl;if((buf[0]>>1)&3)off+=2;try{onMsg(topic,td.decode(body.subarray(off)))}catch(e){console.warn(e)}}
+   buf=buf.slice(i+v)}}
+ function go(){if(dead)return;const url=URLS[idx%URLS.length];try{ws=new WebSocket(url,['mqtt'])}catch(e){idx++;setTimeout(go,500);return}ws.binaryType='arraybuffer';
+  const to=setTimeout(()=>{if(!up){try{ws.close()}catch(e){}}},5000);
+  ws.onopen=()=>{send(pkt(0x10,[str('MQTT'),new Uint8Array([4,2,0,30]),str('lcb'+Math.random().toString(36).slice(2,12))]));clearInterval(ping);ping=setInterval(()=>send(new Uint8Array([0xC0,0])),20000)};
+  ws.onmessage=e=>{const d=new Uint8Array(e.data),n=new Uint8Array(buf.length+d.length);n.set(buf);n.set(d,buf.length);buf=n;parse()};
+  ws.onclose=()=>{clearTimeout(to);clearInterval(ping);const was=up;up=false;buf=new Uint8Array(0);if(dead)return;if(was){fails=0;onDown&&onDown()}else{idx++;fails++}setTimeout(go,was?300:Math.min(8000,400*Math.pow(1.6,Math.max(0,fails-URLS.length))))};ws.onerror=()=>{}}
+ go();
+ return {sub(t){subs.push(t);if(up)send(subPkt(t))},pub(t,s){if(up)send(pkt(0x30,[str(t),te.encode(s)]))},get up(){return up},close(){dead=true;clearInterval(ping);try{ws&&ws.close()}catch(e){}}}}
+const RT=c=>'lcb1/'+c+'/';
+const FORCE_RELAY=QS.has('forcerelay');
+function relayHost(code){if(NET.mqs)return;NET.mqs=RELAYS.map(u=>{const mq=mqtt([u],(topic,txt)=>onRelay(mq,txt));mq.sub(RT(code)+'h');return mq})}
+function onRelay(mq,txt){{if(!S)return;let m;try{m=JSON.parse(txt)}catch(e){return}if(!m||typeof m.f!=='string')return;const rid=m.f.replace(/[^a-z0-9]/gi,'').slice(0,16),id='r_'+rid;let c=NET.conns.get(id);
+  if(!c){if(m.d&&m.d.t==='bye')return;c={id,relay:1,open:true,rid,mq,send:d=>{if(d.t==='s')return;c.mq.pub(RT(S.code)+'c/'+rid,JSON.stringify(d))}};NET.conns.set(id,c)}c.seen=performance.now();c.mq=mq;
+  if(m.d&&m.d.t==='bye'){dropConn(id);return}hostMsg(c,m.d)}}
+function dropConn(id){if(!NET.conns.has(id))return;NET.conns.delete(id);if(!S)return;const q=P(id);if(q){S.players=S.players.filter(x=>x!==q);toast(q.name+' left the bar')}}
+setInterval(()=>{if(NET.mode==='client'&&NET.relay&&performance.now()-(NET.lastRx||0)>12000){toast('Lost the host. Party\'s over (for now).',6);leaveToTitle(true)}if(NET.mode!=='host')return;const n=performance.now();for(const c of [...NET.conns.values()])if(c.relay&&n-c.seen>15000)dropConn(c.id)},2000);
 function hostStart(offline){NET.mode='host';NET.myId='host';const code=offline?'SOLO':genCode();S=newState(code);
  const p=newPlayer('host',me.name,me.color,me.hat,false);S.players.push(p);placeRandom(p);S.rails=makeRails();
  if(offline){addBot();addBot();addBot();showLobby();return}
  if(LOCAL){NET.bc=new BroadcastChannel('lcb-'+code);NET.bc.onmessage=e=>{const m=e.data;if(m.to!=='host')return;let c=NET.conns.get(m.from);
    if(!c){c={id:m.from,send:d=>NET.bc.postMessage({to:m.from,from:'host',data:d})};NET.conns.set(m.from,c)}hostMsg(c,m.data)};showLobby();return}
  toast('Opening room...',8);
- const open=code=>{const peer=new Peer(PID(code),PEEROPT);NET.peer=peer;
-  peer.on('open',()=>{S.code=code;toast('Room '+code+' is open!');showLobby()});
+ const open=code=>{if(FORCE_RELAY){S.code=code;relayHost(code);toast('Room '+code+' is open (relay)!');showLobby();return}const peer=new Peer(PID(code),PEEROPT);NET.peer=peer;
+  peer.on('open',()=>{S.code=code;relayHost(code);toast('Room '+code+' is open!');showLobby()});
   peer.on('error',e=>{if(e.type==='unavailable-id'){peer.destroy();open(genCode())}else if(e.type!=='peer-unavailable'){toast('Network hiccup: '+e.type,4);console.warn(e)}});
   peer.on('disconnected',()=>{try{peer.reconnect()}catch(e){}});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&NET.peer===peer&&peer.disconnected&&!peer.destroyed){try{peer.reconnect();toast('Reconnected the room',2)}catch(e){}}});
   peer.on('connection',conn=>{conn.on('open',()=>{NET.conns.set(conn.peer,conn)});conn.on('data',d=>hostMsg(conn,d));
-   const drop=()=>{NET.conns.delete(conn.peer);const q=P(conn.peer);if(q){S.players=S.players.filter(x=>x!==q);toast(q.name+' left the bar')}};conn.on('close',drop);conn.on('error',drop)})};
+   const drop=()=>dropConn(conn.peer);conn.on('close',drop);conn.on('error',drop)})};
  open(code)}
 function connId(c){return c.peer||c.id}
 function applyMe(p,m){if(!p||!S||S.phase!=='lobby')return;const n=String(m.name||'').replace(/[<>]/g,'').trim().slice(0,24);if(n)p.name=n;
@@ -645,7 +673,7 @@ function hostMsg(c,m){if(!m||!S)return;const id=connId(c);let p=P(id);
  else if(m.t==='e'){emote(p,clamp(m.k|0,0,3))}
  else if(m.t==='me'){applyMe(p,m)}
  else if(m.t==='bye'){S.players=S.players.filter(x=>x!==p)}}
-function broadcast(){if(!S)return;const s=snapshot();for(const c of NET.conns.values()){try{if(c.open!==false)c.send({t:'s',s})}catch(e){}}S.evq=[]}
+function broadcast(){if(!S)return;const s=snapshot();const rl=new Set();for(const c of NET.conns.values()){if(c.relay){rl.add(c.mq);continue}try{if(c.open!==false)c.send({t:'s',s})}catch(e){}}if(rl.size){const j=JSON.stringify({t:'s',s});for(const mq of rl)mq.pub(RT(S.code)+'all',j)}S.evq=[]}
 const PK=['id','name','color','hat','bot','x','y','vx','vy','face','r','alive','fall','charge','dash','stun','buzz','score','emote','emoteT','teeter','kos','falls','team','inv','gun','armor','courage','gulp','aiming','aimA','aimC','thT','parry','wob','dodge','slosh','ctr','fullT','full'];
 const r2=v=>Math.round(v*100)/100;
 function snapshot(){return {code:S.code,phase:S.phase,pt:r2(S.pt),rt:r2(S.rt),round:S.round,mut:S.mut,arenaR:r2(S.arenaR),rot:r2(S.rot),gx:S.gx|0,gy:S.gy|0,sudden:S.sudden,
@@ -659,17 +687,23 @@ function joinStart(code){code=code.toUpperCase().replace(/[^A-Z0-9]/g,'');if(cod
  NET.mode='client';store.set('lastcode',code);
  if(LOCAL){NET.myId='c'+Math.random().toString(36).slice(2,8);NET.bc=new BroadcastChannel('lcb-'+code);const send=d=>NET.bc.postMessage({to:'host',from:NET.myId,data:d});
   NET.hostConn={send,open:true};NET.bc.onmessage=e=>{if(e.data.to===NET.myId||e.data.to==='*')clientMsg(e.data.data)};send({t:'h',name:me.name,color:me.color,hat:me.hat});showLobby();return}
- toast('Finding room '+code+'...',10);
- const peer=new Peer(PEEROPT);NET.peer=peer;let ok=false;
- const fail=setTimeout(()=>{if(!ok){toast('Could not reach room '+code+'. Check the code, or have the host refresh and re-host.',6);leaveToTitle(true)}},15000);
- peer.on('open',id=>{NET.myId=id;const conn=peer.connect(PID(code),{reliable:true,serialization:'json'});
-  conn.on('open',()=>{ok=true;NET.hostConn=conn;clearTimeout(fail);conn.send({t:'h',name:me.name,color:me.color,hat:me.hat});toast('Joined room '+code+'!');showLobby()});
-  conn.on('data',clientMsg);conn.on('close',()=>{toast('The host left. Party\'s over (for now).',6);leaveToTitle(true)})});
- peer.on('error',e=>{if(e.type==='peer-unavailable'){clearTimeout(fail);toast('No room called '+code+'. Typo? Drunk? Both?',5);leaveToTitle(true)}else{console.warn(e);toast('Network hiccup: '+e.type,4)}})}
+ toast('Finding room '+code+'...',10);let ok=false;
+ const fail=setTimeout(()=>{if(!ok){toast('Could not reach room '+code+'. Check the code, or have the host refresh and re-host.',6);leaveToTitle(true)}},22000);
+ let relayOn=false;const startRelay=()=>{if(ok||relayOn||NET.mode!=='client')return;relayOn=true;toast('Direct link failed, trying the relay...',10);const rid=Math.random().toString(36).slice(2,12);
+  const mq=mqtt(RELAYS,(topic,txt)=>{let m;try{m=JSON.parse(txt)}catch(e){return}if(!m)return;NET.lastRx=performance.now();
+   if(!ok){if(m.t==='w'){ok=true;clearTimeout(fail);clearInterval(hi);NET.relay=1;toast('Joined room '+code+'!');showLobby();clientMsg(m)}else if(m.t==='full')clientMsg(m);return}clientMsg(m)});
+  NET.mq=mq;mq.sub(RT(code)+'c/'+rid);mq.sub(RT(code)+'all');NET.hostConn={open:true,send:d=>mq.pub(RT(code)+'h',JSON.stringify({f:rid,d}))};
+  const hi=setInterval(()=>{if(ok||NET.mq!==mq){clearInterval(hi);return}NET.hostConn.send({t:'h',name:me.name,color:me.color,hat:me.hat})},800)};
+ if(FORCE_RELAY){startRelay();return}
+ const peer=new Peer(PEEROPT);NET.peer=peer;setTimeout(startRelay,6000);
+ peer.on('open',id=>{if(relayOn)return;NET.myId=id;const conn=peer.connect(PID(code),{reliable:true,serialization:'json'});
+  conn.on('open',()=>{if(ok||relayOn){try{conn.close()}catch(e){}return}ok=true;NET.hostConn=conn;clearTimeout(fail);conn.send({t:'h',name:me.name,color:me.color,hat:me.hat});toast('Joined room '+code+'!');showLobby()});
+  conn.on('data',clientMsg);conn.on('close',()=>{if(NET.hostConn!==conn)return;toast('The host left. Party\'s over (for now).',6);leaveToTitle(true)})});
+ peer.on('error',e=>{if(e.type==='peer-unavailable'&&!relayOn){clearTimeout(fail);toast('No room called '+code+'. Typo? Drunk? Both?',5);leaveToTitle(true)}else{console.warn(e);if(!ok)startRelay()}})}
 function clientMsg(m){if(!m)return;if(m.t==='w'){NET.myId=m.id;return}if(m.t==='full'){toast('Room is full (6 max)!',5);leaveToTitle(true);return}
  if(m.t==='s'){const s=m.s;for(const p of s.players){let d=disp[p.id];if(!d||!p.alive||hyp(d.x-p.x,d.y-p.y)>160){d=disp[p.id]={x:p.x,y:p.y}}d.tx=p.x;d.ty=p.y;d.vx=p.vx;d.vy=p.vy;d.age=0}
   V=s;for(const e of s.ev)onEv(e)}}
-function leaveToTitle(silent){try{if(NET.peer)NET.peer.destroy()}catch(e){}try{if(NET.bc)NET.bc.close()}catch(e){}NET.mode=null;NET.peer=null;NET.conns.clear();NET.hostConn=null;S=null;V=null;
+function leaveToTitle(silent){try{if(NET.mode==='client'&&NET.mq&&NET.hostConn)NET.hostConn.send({t:'bye'})}catch(e){}try{if(NET.mq)NET.mq.close()}catch(e){}NET.mq=null;try{(NET.mqs||[]).forEach(m=>m.close())}catch(e){}NET.mqs=null;NET.relay=0;try{if(NET.peer)NET.peer.destroy()}catch(e){}try{if(NET.bc)NET.bc.close()}catch(e){}NET.mode=null;NET.peer=null;NET.conns.clear();NET.hostConn=null;S=null;V=null;
  showScreen('title')}
 function sendInput(dt){const inp=readInput();
  if(NET.mode==='host'){const p=P('host');if(p)p.inp=inp;if(emoteQ>=0&&p)emote(p,emoteQ)}
@@ -883,7 +917,7 @@ function drawGuy(c,p,a,t,opts){opts=opts||{};const r=p.r,col=COLORS[p.color]||'#
 }
 function drawTag(c,p,isMe,t){if(!p.alive)return;const y=p.y-p.r*2.65-(isMe?6:0);c.font=(isMe?'18px ':'15px ')+FONT;c.textAlign='center';c.lineWidth=4;c.strokeStyle='#2a1608';const label=isMe?'▼ '+p.name:p.name;
  c.strokeText(label,p.x,y);c.fillStyle=isMe?'#fff':COLORS[p.color];c.fillText(label,p.x,y);
- if(p.slosh>0){const pc=Math.round(p.slosh*100);c.font='13px '+FONT;c.lineWidth=3;c.strokeStyle='#2a1608';c.strokeText(pc+'% sloshed',p.x,y+28);c.fillStyle=pc>=90?'#ff5a5f':pc>=45?'#ffd23f':'#fff6e0';c.fillText(pc+'% sloshed',p.x,y+28)}
+ if(false&&p.slosh>0){const pc=Math.round(p.slosh*100);c.font='13px '+FONT;c.lineWidth=3;c.strokeStyle='#2a1608';c.strokeText(pc+'% sloshed',p.x,y+28);c.fillStyle=pc>=90?'#ff5a5f':pc>=45?'#ffd23f':'#fff6e0';c.fillText(pc+'% sloshed',p.x,y+28)}
  const n=p.gun||0;for(let i=0;i<n;i++){const x=p.x-(n-1)*6+i*12;c.save();c.translate(x,y+11);c.scale(.4,.4);drawPint(c,1);c.restore()}}
 function drawBubble(c,p,t){if(!p.alive||p.emote<0||p.emoteT<=0)return;const txt=EMOTES[p.emote];const a=clamp(p.emoteT*3,0,1),s=p.emoteT>2?1+(p.emoteT-2)*2:1;
  c.save();c.globalAlpha=a;c.translate(p.x+p.r,p.y-p.r*2.6);c.scale(s,s);c.font='17px '+FONT;const w=c.measureText(txt).width+18;
