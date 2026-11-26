@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
-<title>Big Belly Bumpers</title>
+<title>Belly Bumpin' Brawl</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -107,7 +107,7 @@ body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;paddi
 <canvas id="c"></canvas>
 
 <div id="title" class="screen on">
-  <div class="logo"><span>BIG</span> <span>BELLY</span> <span>BUMPERS</span></div>
+  <div class="logo"><span>BELLY</span> <span>BUMPIN'</span> <span>BRAWL</span></div>
   <div class="tag">Belly-bump your friends off a floating bar table. Winners get drunker.</div>
   <div class="panel">
     <div class="row">
@@ -581,7 +581,7 @@ function endRound(){const al=alive();let w=null,wt=null;
  if(S.settings.mode==='teams'){S.card=buildTeamCard(wt);S.phase='results';S.pt=0;S.bomb=null;S.kegs=[];ev('say',{text:wt===null?'Double knockout! Everybody drinks.':TEAMS[wt].n+' wins the round!',force:1});ev('win',{id:wt===null?null:'team'});return}
  S.card=buildCard(w);S.phase='results';S.pt=0;S.bomb=null;S.kegs=[];
  if(w)ev('say',{text:pick([w.name+' wins the round!',w.name+' is the last one standing!',w.name+' rules the table!']),force:1});else ev('say',{text:'Nobody wins. Everybody drinks.',force:1});ev('win',{id:w?w.id:null})}
-function afterResults(){const champ=S.players.find(p=>p.score>=S.settings.target);if(champ){const tm=S.settings.mode==='teams'?TEAMS[champ.team].n:null;S.phase='over';S.pt=0;S.over=buildOver(champ,tm);ev('say',{text:(tm||champ.name)+' is the Big Belly Bumper champion!',force:1});ev('champ')}else nextRound()}
+function afterResults(){const champ=S.players.find(p=>p.score>=S.settings.target);if(champ){const tm=S.settings.mode==='teams'?TEAMS[champ.team].n:null;S.phase='over';S.pt=0;S.over=buildOver(champ,tm);ev('say',{text:(tm||champ.name)+' is the Belly Bumpin\' Brawl champion!',force:1});ev('champ')}else nextRound()}
 function nm(p){return p?'<b style="background:'+COLORS[p.color]+'">'+esc(p.name)+'</b>':'?'}
 function buildCard(w){const L=[],dr=S.settings.drinks,order=S.outOrder,ps=S.players.filter(p=>!(p.alive===false&&!order.find(o=>o.id===p.id)&&p!==w)),
  rp=()=>pick(S.players),lead=[...S.players].sort((a,b)=>b.score-a.score)[0],last=[...S.players].sort((a,b)=>a.score-b.score)[0];
@@ -1127,8 +1127,8 @@ $('#bHost').onclick=()=>{initAudio();SFX.pop();hostStart(false)};
 $('#bSolo').onclick=()=>{initAudio();SFX.pop();hostStart(true)};
 $('#bJoin').onclick=()=>{initAudio();SFX.pop();joinStart($('#code').value)};
 $('#code').addEventListener('keydown',e=>{if(e.key==='Enter')$('#bJoin').click()});
-$('#bCopy').onclick=()=>{const link=location.protocol.startsWith('http')?location.href.split('#')[0]+'#'+V.code:'';const txt=link?('Join my Big Belly Bumpers room! '+link+'  (code '+V.code+')'):('Big Belly Bumpers room code: '+V.code);
- if(IS_TOUCH&&navigator.share){navigator.share({title:'Big Belly Bumpers',text:txt}).catch(()=>{});return}
+$('#bCopy').onclick=()=>{const link=location.protocol.startsWith('http')?location.href.split('#')[0]+'#'+V.code:'';const txt=link?('Join my Belly Bumpin\' Brawl room! '+link+'  (code '+V.code+')'):('Belly Bumpin\' Brawl room code: '+V.code);
+ if(IS_TOUCH&&navigator.share){navigator.share({title:'Belly Bumpin\' Brawl',text:txt}).catch(()=>{});return}
  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('Copied! Paste it to your friends.')).catch(()=>toast('Room code: '+V.code))};
 $('#segT').onclick=e=>{const v=+e.target.dataset.v;if(v&&S){S.settings.target=v;SFX.click()}};
 $('#segD').onclick=e=>{const v=e.target.dataset.v;if(v!==undefined&&S){S.settings.drinks=+v;SFX.click()}};
