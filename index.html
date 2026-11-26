@@ -114,7 +114,7 @@ kbd{font-family:inherit;font-weight:700;background:var(--ink);color:var(--foam);
       <label>Map</label>
       <div class="seg wrap" id="segP"><button data-v="random">🎲 Random</button><button data-v="round">Round Table</button><button data-v="counter">Bar Counter</button><button data-v="pong">Beer Pong</button><button data-v="coasters">Coaster Hop</button><button data-v="donut">The Donut</button></div>
       <div id="tgtWrap"><label style="display:block;margin-top:8px">First to</label>
-      <div class="seg" id="segT"><button data-v="3">3</button><button data-v="5">5</button><button data-v="7">7</button></div></div>
+      <div class="seg" id="segT"><button data-v="5">5</button><button data-v="7">7</button><button data-v="10">10</button></div></div>
       <label style="display:block;margin-top:8px">Drink cards</label>
       <div class="seg" id="segD"><button data-v="1">🍺 On</button><button data-v="0">🧃 Off</button></div>
       <label style="display:block;margin-top:8px">Mystery crates (gun + powerups)</label>
@@ -123,7 +123,7 @@ kbd{font-family:inherit;font-weight:700;background:var(--ink);color:var(--foam);
       <button id="bStart" class="big go">Start the brawl!</button>
     </div>
     <div class="waitmsg" id="lwait">Waiting for the host to start. Waddle around and practice!</div>
-    <div class="ctrls"><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch. Taps nudge, full charges YEET.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in.<br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp; Gamepads work too.<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them. Cork Blaster (tap <kbd>Space</kbd> to fire, then pick your corks back up off the floor), Belly Armor, Liquid Courage (fast charge), or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
+    <div class="ctrls"><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch. Taps nudge, full charges YEET. Hit 'em from behind for a BUTT BUMP.<br><b>Cork:</b> hold <kbd>F</kbd> (or <kbd>L</kbd>) to aim, release to fire. You get 2. Pick them back up (or steal them).<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES corks. Whiffing makes you wobble. Hold a direction while you tap it to DODGE instead (also catches corks).<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in.<br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for +2 corks, Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
   </div>
 </div>
 
@@ -195,18 +195,18 @@ const MAPS={
  round:{n:'The Round Table',solids:[{t:'c',x:0,y:0,r:290}],holes:[],ext:300,rim:'#4a2810'},
  counter:{n:'The Bar Counter',solids:[{t:'s',x:0,y:0,w:920,h:250}],holes:[],ext:470,rim:'#d4a84a',noMut:['spin']},
  pong:{n:'Beer Pong Table',solids:[{t:'r',x:0,y:0,w:880,h:420}],holes:CUPS,ext:450,rim:'#f4efe4',noMut:['spin']},
- coasters:{n:'Coaster Hop',solids:[{t:'c',x:0,y:0,r:115},{t:'c',x:-240,y:-150,r:100},{t:'c',x:240,y:-150,r:100},{t:'c',x:-240,y:150,r:100},{t:'c',x:240,y:150,r:100}],holes:[],ext:350,rim:'#8a5a2e'},
+ coasters:{n:'Coaster Hop',solids:[{t:'c',x:0,y:0,r:115},{t:'c',x:-240,y:-150,r:100},{t:'c',x:240,y:-150,r:100},{t:'c',x:-240,y:150,r:100},{t:'c',x:240,y:150,r:100}],holes:[],ext:350,rim:'#8a5a2e',noMut:['rails']},
  donut:{n:'The Donut',solids:[{t:'c',x:0,y:0,r:295}],holes:[{t:'c',x:0,y:0,r:100}],ext:300,rim:'#a8652a'},
 };
 const MAP_TIPS={round:'Classic. Round. Wooden. Wobbly.',counter:'Long and skinny. Don\'t get pinned to the side.',pong:'Fall in a cup and you\'re SUNK.',coasters:'Belly bump to hop the gaps between coasters.',donut:'Watch the hole. Dash to jump across it.'};
 const MODES={
  classic:{n:'Last One Standing',d:'Knock everyone off. Last belly on the table wins the round.'},
  teams:{n:'Tag Team 2v2',d:'Two teams. Last team standing wins the round. Friendly fire is VERY on.'},
- happy:{n:'Happy Hour',d:'2:30 of nonstop respawning chaos. +1 per yeet, -1 if you fall off by yourself. New chaos rule every 30s.'},
- koth:{n:'King of the Coaster',d:'Stand ALONE on the golden coaster to score. First to 20. It keeps moving.'},
+ happy:{n:'Happy Hour',d:'3:30 of nonstop respawning chaos. +1 per yeet, -1 if you fall off by yourself. New chaos rule every 30s.'},
+ koth:{n:'King of the Coaster',d:'Stand ALONE on the golden coaster to score. First to 25. It keeps moving.'},
 };
 const TEAMS=[{n:'Team Lager',c:'#ffd23f'},{n:'Team Sangria',c:'#e0245e'}];
-const KOTH_T=20,HAPPY_T=150,KOTH_MAX=210;
+const KOTH_T=25,HAPPY_T=210,KOTH_MAX=270;
 function inShape(s,x,y){const dx=x-s.x,dy=y-s.y;if(s.t==='c')return dx*dx+dy*dy<=s.r*s.r;if(s.t==='r')return Math.abs(dx)<=s.w/2&&Math.abs(dy)<=s.h/2;
  const hw=s.w/2-s.h/2,cx=clamp(dx,-hw,hw);return (dx-cx)*(dx-cx)+dy*dy<=(s.h/2)*(s.h/2)}
 function toLocal(x,y,st){const sc=st.arenaR/BASE_R,c=Math.cos(-st.rot),sn=Math.sin(-st.rot),dx=x-CX,dy=y-CY;return [(dx*c-dy*sn)/sc,(dx*sn+dy*c)/sc]}
@@ -221,17 +221,18 @@ function boundaryPts(q,isHole){const P=[],step=64;
   for(let i=0;i<nA;i++){const a=-Math.PI/2+(i+.5)/nA*Math.PI;P.push([q.x+hw+Math.cos(a)*R,q.y+Math.sin(a)*R,Math.cos(a),Math.sin(a)])}for(let i=0;i<nL;i++)P.push([q.x+hw-(i+.5)/nL*2*hw,q.y+R,0,1]);
   for(let i=0;i<nA;i++){const a=Math.PI/2+(i+.5)/nA*Math.PI;P.push([q.x-hw+Math.cos(a)*R,q.y+Math.sin(a)*R,Math.cos(a),Math.sin(a)])}}
  if(isHole)P.forEach(p=>{p[2]=-p[2];p[3]=-p[3]});return P}
-function makeRails(){if(!(S.mut.includes('rails')||S.phase==='lobby'))return[];const m=MAPS[S.map]||MAPS.round,out=[];
- const shapes=m.solids.map(q=>[q,0]).concat(m.holes.filter(h=>h.r>50).map(h=>[h,1]));
- for(const [q,hole] of shapes){const P=boundaryPts(q,hole),ok=P.map(p=>onLocal(m,p[0]-p[2]*14,p[1]-p[3]*14)&&!onLocal(m,p[0]+p[2]*14,p[1]+p[3]*14));
-  let run=ri(0,2)?ri(2,4):0,gap=run?0:ri(1,2);for(let i=0;i<P.length;i++){const j=(i+1)%P.length;
-   if(run>0){if(ok[i]&&ok[j]){const a=P[i],b=P[j];out.push({la:[a[0]-a[2]*9,a[1]-a[3]*9],lb:[b[0]-b[2]*9,b[1]-b[3]*9],hp:2,ax:0,ay:0,bx:0,by:0})}run--;if(!run)gap=ri(1,2)}
-   else{gap--;if(gap<=0)run=ri(2,4)}}}
+let railG=0;
+function makeRails(){const m=MAPS[S.map]||MAPS.round;if(!(S.mut.includes('rails')||S.phase==='lobby')||(m.noMut||[]).includes('rails'))return[];const out=[];
+ for(const q of m.solids){const P=boundaryPts(q,0),N=P.length,ok=P.map(p=>onLocal(m,p[0]-p[2]*14,p[1]-p[3]*14)&&!onLocal(m,p[0]+p[2]*14,p[1]+p[3]*14));
+  const len=Math.max(2,Math.round(N/7)),off=ri(0,N-1);
+  for(let w=0;w<4;w++){const g=++railG,st=off+Math.round(w*N/4);for(let k=0;k<len;k++){const i=(st+k)%N,j=(i+1)%N;if(!ok[i]||!ok[j])continue;const a=P[i],b=P[j];
+   out.push({g,la:[a[0]-a[2]*9,a[1]-a[3]*9],lb:[b[0]-b[2]*9,b[1]-b[3]*9],hp:2,ax:0,ay:0,bx:0,by:0})}}}
  out.forEach(r=>{const a=toWorld(r.la[0],r.la[1],S),b=toWorld(r.lb[0],r.lb[1],S);r.ax=a[0];r.ay=a[1];r.bx=b[0];r.by=b[1]});return out}
+function dmgRail(r,n){const h=Math.max(0,r.hp-n);for(const q of S.rails)if(q.g===r.g)q.hp=h;return h}
 function segDist(px,py,r){const abx=r.bx-r.ax,aby=r.by-r.ay,l2=abx*abx+aby*aby||1,t=clamp(((px-r.ax)*abx+(py-r.ay)*aby)/l2,0,1),qx=r.ax+abx*t,qy=r.ay+aby*t;return [hyp(px-qx,py-qy),qx,qy]}
 function railHit(p){for(const r of S.rails){if(r.hp<=0)continue;const [d0,qx,qy]=segDist(p.x,p.y,r),rr=p.r+7;if(d0>=rr)continue;let dx=p.x-qx,dy=p.y-qy,d=d0;if(d<.01){dx=CX-p.x;dy=CY-p.y;d=hyp(dx,dy)||1}
   const nx=dx/d,ny=dy/d;p.x=qx+nx*rr;p.y=qy+ny*rr;const vn=p.vx*nx+p.vy*ny;if(vn<0){const imp=-vn;p.vx-=1.5*vn*nx;p.vy-=1.5*vn*ny;
-   if(imp>400||(p.stun>0&&imp>230)){r.hp--;p.dash=0;ev('glass',{x:qx|0,y:qy|0,hp:r.hp})}else if(imp>160)ev('bump',{x:qx|0,y:qy|0})}}}
+   if(imp>400||(p.stun>0&&imp>230)){const h=dmgRail(r,1);p.dash=0;ev('glass',{x:qx|0,y:qy|0,hp:h})}else if(imp>160)ev('bump',{x:qx|0,y:qy|0})}}}
 function isCont(){return S.settings.mode==='happy'||S.settings.mode==='koth'}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function shade(hex,amt){let n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;
@@ -323,24 +324,24 @@ addEventListener('keyup',e=>{keys[e.code]=false});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
 addEventListener('pointerdown',()=>initAudio());
 let padPrev={};
-function readInput(){let x=0,y=0,d=false;
+function readInput(){let x=0,y=0,d=false,f=false,pa=false;
  if(keys.KeyA||keys.ArrowLeft)x-=1;if(keys.KeyD||keys.ArrowRight)x+=1;if(keys.KeyW||keys.ArrowUp)y-=1;if(keys.KeyS||keys.ArrowDown)y+=1;
- if(keys.Space||keys.KeyJ||keys.ShiftLeft||keys.KeyK||keys.Enter)d=true;
+ if(keys.Space||keys.KeyJ||keys.Enter)d=true;if(keys.KeyF||keys.KeyL)f=true;if(keys.ShiftLeft||keys.ShiftRight||keys.KeyK)pa=true;
  const pads=navigator.getGamepads?navigator.getGamepads():[];
  for(const gp of pads){if(!gp)continue;const ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(hyp(ax,ay)>.2){x+=ax;y+=ay}
   if(gp.buttons[14]&&gp.buttons[14].pressed)x-=1;if(gp.buttons[15]&&gp.buttons[15].pressed)x+=1;if(gp.buttons[12]&&gp.buttons[12].pressed)y-=1;if(gp.buttons[13]&&gp.buttons[13].pressed)y+=1;
-  if((gp.buttons[0]&&gp.buttons[0].pressed)||(gp.buttons[7]&&gp.buttons[7].pressed))d=true;
-  [1,2,3,5].forEach((b,i)=>{const p=gp.buttons[b]&&gp.buttons[b].pressed;if(p&&!padPrev[gp.index+'_'+b])emoteQ=i;padPrev[gp.index+'_'+b]=p})}
+  const bt=i=>gp.buttons[i]&&gp.buttons[i].pressed;if(bt(0)||bt(7))d=true;if(bt(2)||bt(5))f=true;if(bt(1)||bt(4))pa=true;
+  {const p=bt(3);if(p&&!padPrev[gp.index+'_3'])emoteQ=ri(0,3);padPrev[gp.index+'_3']=p}}
  const l=hyp(x,y);if(l>1){x/=l;y/=l}
- return {x:Math.round(x*100)/100,y:Math.round(y*100)/100,d:d?1:0}}
+ return {x:Math.round(x*100)/100,y:Math.round(y*100)/100,d:d?1:0,f:f?1:0,p:pa?1:0}}
 
 // ============================================================ HOST SIMULATION
 let S=null; // authoritative state (host only)
 function newState(code){return {code,phase:'lobby',pt:0,rt:0,t:0,round:0,mut:[],arenaR:BASE_R,rot:0,rotV:0,tiltA:0,gx:0,gy:0,sudden:false,
- players:[],kegs:[],bumpers:[],bomb:null,bombNext:0,kegT:0,evq:[],outOrder:[],card:null,over:null,rails:[],railT:0,settings:{target:5,drinks:1,mode:'classic',map:'random',guns:1},endT:0,slowT:0,hs:0,lastMut:[],map:'round',zone:null,matchT:0,nextMutT:30,mutT:0,items:[],corks:[],loose:[],itemT:4}}
+ players:[],kegs:[],bumpers:[],bomb:null,bombNext:0,kegT:0,evq:[],outOrder:[],card:null,over:null,rails:[],railT:0,settings:{target:7,drinks:1,mode:'classic',map:'random',guns:1},endT:0,slowT:0,hs:0,lastMut:[],map:'round',zone:null,matchT:0,nextMutT:30,mutT:0,items:[],corks:[],loose:[],itemT:4}}
 function newPlayer(id,name,color,hat,bot){return {id,name:String(name||'???').slice(0,12),color,hat,bot:!!bot,x:CX,y:CY,vx:0,vy:0,face:Math.PI/2,r:26,alive:true,fall:0,
  charge:0,charging:0,full:0,dash:0,dpow:0,stun:0,buzz:0,score:0,emote:-1,emoteT:0,hitBy:null,hitT:-9,inp:{x:0,y:0,d:0},hicT:rnd(2,5),teeter:0,
- kos:0,falls:0,selfs:0,hics:0,wins:0,ph:Math.random()*TAU,respawn:0,emCd:0,inv:0,team:0,gun:0,pd:0,sx:CX,sy:CY}}
+ kos:0,falls:0,selfs:0,hics:0,wins:0,ph:Math.random()*TAU,respawn:0,emCd:0,inv:0,team:0,gun:2,pd:0,sx:CX,sy:CY}}
 function ev(k,o){const e=Object.assign({k},o||{});S.evq.push(e);onEv(e)}
 function P(id){return S.players.find(p=>p.id===id)}
 function uniqueColor(want){const used=S.players.map(p=>p.color);if(!used.includes(want))return want;for(let i=0;i<COLORS.length;i++)if(!used.includes(i))return i;return want}
@@ -354,10 +355,10 @@ function placeRandom(p){const av=S.players.filter(q=>q!==p&&q.alive).map(q=>[q.x
 function makeBumpers(){return S.mut.includes('bumpers')?safePoints(4,75,[[CX,CY]]).map(q=>({lx:q[2],ly:q[3],x:q[0],y:q[1],r:30})):[]}
 function pickMap(){const st=S.settings.map;if(st&&st!=='random'&&MAPS[st])return st;return pick(Object.keys(MAPS).filter(k=>k!==S.map))}
 function spawnRing(){const pts=safePoints(S.players.length,60,S.bumpers.map(b=>[b.x,b.y]));S.players.forEach((p,i)=>{p.x=pts[i][0];p.y=pts[i][1];p.sx=p.x;p.sy=p.y;
- p.vx=p.vy=0;p.face=Math.atan2(CY-p.y,CX-p.x);p.respawn=0;p.inv=0;p.gun=0;p.armor=0;p.courage=0;p.gulp=0;p.alive=true;p.fall=0;p.stun=0;p.dash=0;p.charge=0;p.charging=0;p.hitBy=null;p.teeter=0;p.r=S.mut.includes('big')?40:26;p.hicT=rnd(2,5)})}
+ p.vx=p.vy=0;p.face=Math.atan2(CY-p.y,CX-p.x);p.respawn=0;p.inv=0;p.gun=2;p.aiming=0;p.parry=0;p.wob=0;p.pcd=0;p.armor=0;p.courage=0;p.gulp=0;p.alive=true;p.fall=0;p.stun=0;p.dash=0;p.charge=0;p.charging=0;p.hitBy=null;p.teeter=0;p.r=S.mut.includes('big')?40:26;p.hicT=rnd(2,5)})}
 function startMatch(){S.round=0;S.players.forEach(p=>{p.score=0;p.buzz=0;p.kos=0;p.falls=0;p.selfs=0;p.hics=0;p.wins=0;p.gun=0});S.over=null;S.lastMut=[];S.map='';S.matchT=0;S.nextMutT=30;S.zone=null;
  if(S.settings.mode==='teams'&&(!S.players.some(p=>p.team===0)||!S.players.some(p=>p.team===1)))S.players.forEach((p,i)=>p.team=i%2);nextRound()}
-function chooseMuts(first){const r=S.round,mp=MAPS[S.map]||{};if(first)return['rails'];let pool=MUT_POOL.filter(m=>!S.lastMut.includes(m)&&!(mp.noMut||[]).includes(m));const a=pick(pool);
+function chooseMuts(first){const r=S.round,mp=MAPS[S.map]||{};if(first)return (mp.noMut||[]).includes('rails')?['none']:['rails'];let pool=MUT_POOL.filter(m=>!S.lastMut.includes(m)&&!(mp.noMut||[]).includes(m));const a=pick(pool);
  if(r>=3&&Math.random()<.4){const b=pick(pool.filter(m=>m!==a&&!(a==='reverse'&&m==='goggles')&&!(a==='goggles'&&m==='reverse')));if(b)return[a,b]}return[a]}
 function nextRound(){S.round++;S.arenaR=BASE_R;S.rot=0;S.map=pickMap();S.mut=chooseMuts(S.round===1);S.mutT=0;S.zone=null;S.items=[];S.corks=[];S.loose=[];S.itemT=rnd(3,6);S.lastMut=S.mut.slice();S.phase='intro';S.pt=0;S.rt=0;S.kegs=[];S.bomb=null;S.bombNext=2.5;S.kegT=1.5;
  S.arenaR=BASE_R;S.rot=0;S.rotV=0;S.tiltA=Math.random()*TAU;S.gx=S.gy=0;S.sudden=false;S.outOrder=[];S.card=null;S.endT=0;S.slowT=0;S.cd=0;
@@ -381,13 +382,13 @@ function knockOut(p,cause){p.alive=false;p.fall=1;p.charging=0;p.charge=0;p.gun=
  if(S.bomb&&S.bomb.h===p.id){const a=alive();S.bomb=a.length>1?{h:pick(a).id,fuse:Math.max(S.bomb.fuse,3),cd:.8}:null}
  if(!cont&&S.phase==='play'&&roundOver()){S.slowT=1.1;ev('final',{x:p.x|0,y:p.y|0})}}
 function roundOver(){const al=alive();if(S.settings.mode==='teams')return new Set(al.map(p=>p.team)).size<=1;return al.length<=1}
-const CRATE=[['gun',.4,'CORK BLASTER!'],['armor',.2,'BELLY ARMOR!'],['courage',.2,'LIQUID COURAGE!'],['gulp',.2,'BIG GULP!']];
+const CRATE=[['gun',.4,'+2 CORKS!'],['armor',.2,'BELLY ARMOR!'],['courage',.2,'LIQUID COURAGE!'],['gulp',.2,'BIG GULP!']];
 function openCrate(p,it){let r=Math.random(),c=CRATE[0];for(const q of CRATE){if(r<q[1]){c=q;break}r-=q[1]}
- if(c[0]==='gun'){if(!p.gun)p.pd=p.inp.d;p.gun=3}else if(c[0]==='armor')p.armor=1;else if(c[0]==='courage')p.courage=9;else{p.gulp=9;p.r=44}
+ if(c[0]==='gun'){p.gun=Math.min(5,(p.gun||0)+2)}else if(c[0]==='armor')p.armor=1;else if(c[0]==='courage')p.courage=9;else{p.gulp=9;p.r=44}
  ev('crate',{id:p.id,x:it.x|0,y:it.y|0,c:c[0],n:c[2]})}
 function absorb(p){if(p.armor>0){p.armor=0;ev('armor',{id:p.id,x:p.x|0,y:p.y|0});return .25}return 1}
 function dropCork(c){if(S.loose.length<14&&onArena(c.x,c.y))S.loose.push({x:c.x,y:c.y})}
-function fireCork(p){const l=hyp(p.inp.x,p.inp.y);let dx,dy;if(l>.2){dx=p.inp.x/l;dy=p.inp.y/l;if(S.mut.includes('reverse')){dx=-dx;dy=-dy}}else{dx=Math.cos(p.face);dy=Math.sin(p.face)}
+function fireCork(p){const a=p.aimA!=null?p.aimA:p.face,dx=Math.cos(a),dy=Math.sin(a);
  p.face=Math.atan2(dy,dx);S.corks.push({x:p.x+dx*(p.r+12),y:p.y-6+dy*(p.r+12),vx:dx*1000,vy:dy*1000,o:p.id,t:0});p.vx-=dx*260;p.vy-=dy*260;p.gun--;ev('shot',{id:p.id,x:p.x+dx*30|0,y:p.y+dy*30|0,last:p.gun?0:1})}
 function endMatchCont(){if(S.phase!=='play')return;const c=[...S.players].sort((a,b)=>b.score-a.score)[0];S.phase='over';S.pt=0;S.items=[];S.corks=[];S.over=buildOver(c);ev('say',{text:c.name+' wins '+MODES[S.settings.mode].n+'!',force:1});ev('champ')}
 function emote(p,k){if(p.emCd>0)return;p.emote=k;p.emoteT=2.2;p.emCd=.7;ev('emote',{id:p.id,k})}
@@ -401,13 +402,17 @@ function botThink(b,dt){if(b.ai&&b.ai.fire){b.inp.d=0;b.ai.fire=0}if(S.phase==='
  else if(T){mx=T.x-b.x;my=T.y-b.y}
  const ml=hyp(mx,my)||1;mx=mx/ml+ai.wx;my=my/ml+ai.wy;
  if(S.settings.mode==='koth'&&S.zone&&S.phase==='play'){const z=S.zone,dz=hyp(z.x-b.x,z.y-b.y);if(dz>z.r*.5||!T||hyp(T.x-z.x,T.y-z.y)>z.r*1.6){mx=z.x-b.x;my=z.y-b.y}}
- if(!b.gun&&S.items.length){let it=null,bd=260;for(const i of S.items){const d=hyp(i.x-b.x,i.y-b.y);if(d<bd){bd=d;it=i}}if(it){mx=it.x-b.x;my=it.y-b.y}}
+ if(S.items.length||(b.gun<2&&S.loose.length)){let it=null,bd=260;for(const i of S.items.concat(b.gun<2?S.loose:[])){const d=hyp(i.x-b.x,i.y-b.y);if(d<bd){bd=d;it=i}}if(it){mx=it.x-b.x;my=it.y-b.y}}
  let blocked=false;{const l2=hyp(mx,my)||1,base=Math.atan2(my/l2,mx/l2);let ok=null;for(let k=0;k<12;k++){const a=base+(k%2?1:-1)*Math.ceil(k/2)*.45,c=Math.cos(a),sn=Math.sin(a);
   if(onArena(b.x+c*45,b.y+sn*45)&&onArena(b.x+c*90,b.y+sn*90)){ok=[c,sn];if(k>2)blocked=true;break}}if(ok){mx=ok[0];my=ok[1]}else{blocked=true;mx=b.sx-b.x;my=b.sy-b.y}}
  if(ai.hop&&ai.hold>0){mx=ai.hop[0];my=ai.hop[1]}
- if(blocked&&T&&!ai.hold&&b.dash<=0&&b.stun<=0&&!b.gun&&(S.phase==='play'||S.phase==='lobby')&&hyp(T.x-b.x,T.y-b.y)<340&&Math.random()<dt*1.5){ai.hold=.5;ai.hop=[T.x-b.x,T.y-b.y]}
- if(b.gun&&T&&(S.phase==='play'||S.phase==='lobby')){const d=hyp(T.x-b.x,T.y-b.y);if(d<420){b.inp.x=(T.x-b.x)/d;b.inp.y=(T.y-b.y)/d;if(Math.random()<dt*1.6){b.inp.d=1;ai.fire=1}
-   if(S.mut.includes('reverse')){b.inp.x=-b.inp.x;b.inp.y=-b.inp.y}return}}
+ if(blocked&&T&&!ai.hold&&b.dash<=0&&b.stun<=0&&(S.phase==='play'||S.phase==='lobby')&&hyp(T.x-b.x,T.y-b.y)<340&&Math.random()<dt*1.5){ai.hold=.5;ai.hop=[T.x-b.x,T.y-b.y]}
+ b.inp.p=0;if((b.pcd||0)<=0&&b.stun<=0){for(const c of S.corks){if(c.o===b.id)continue;const dx=b.x-c.x,dy=b.y-c.y,d=hyp(dx,dy);if(d<170&&(c.vx*dx+c.vy*dy)>0&&Math.random()<dt*6){b.inp.p=1;break}}
+  if(!b.inp.p)for(const q of S.players){if(q===b||!q.alive||q.dash<=0)continue;const dx=b.x-q.x,dy=b.y-q.y,d=hyp(dx,dy);if(d<130&&(q.vx*dx+q.vy*dy)>0&&Math.random()<dt*4){b.inp.p=1;break}}}
+ if(b.gun>0&&T&&(S.phase==='play'||S.phase==='lobby')&&!(ai.hold>0)){const d=hyp(T.x-b.x,T.y-b.y);
+  if(ai.aimT>0){ai.aimT-=dt;const lead=d/1100;let ax=T.x+T.vx*lead-b.x,ay=T.y+T.vy*lead-b.y;const l=hyp(ax,ay)||1;b.inp.x=ax/l+ai.aimE;b.inp.y=ay/l+ai.aimE2;if(S.mut.includes('reverse')){b.inp.x=-b.inp.x;b.inp.y=-b.inp.y}b.inp.f=ai.aimT>0?1:0;b.inp.d=0;return}
+  if(d>130&&d<470&&Math.random()<dt*.8){ai.aimT=rnd(.25,.55);ai.aimE=rnd(-.2,.2);ai.aimE2=rnd(-.2,.2);b.inp.f=1;b.inp.d=0;return}}
+ b.inp.f=0;
  if(S.phase==='play'||S.phase==='lobby'){
   if(ai.hold>0){ai.hold-=dt;b.inp.d=ai.hold>0?1:0;if(ai.hold<=0)setTimeout(()=>{ai.hop=null},300)}
   else{b.inp.d=0;if(T&&b.dash<=0&&b.stun<=0){const d=hyp(T.x-b.x,T.y-b.y);const tEdge=hyp(T.x-CX,T.y-CY)/S.arenaR;if(d<240&&Math.random()<dt*(.55+tEdge*1.4))ai.hold=rnd(.1,.75)}}}
@@ -419,7 +424,7 @@ function botThink(b,dt){if(b.ai&&b.ai.fire){b.inp.d=0;b.ai.fire=0}if(S.phase==='
 function simStep(dt){
  S.t+=dt;S.pt+=dt;const M=S.mut,ph=S.phase,playing=ph==='play',free=ph==='lobby';
  if(ph==='intro'){const n=S.pt<1.2?4:S.pt<2?3:S.pt<2.8?2:S.pt<3.6?1:0;if(n!==S.cd){S.cd=n;if(n>0&&n<4)ev('cd',{n})}
-  if(S.pt>=3.6){S.phase='play';S.pt=0;ev('go')}}
+  if(S.pt>=3.6){S.phase='play';S.pt=0;S.players.forEach(p=>{if(p.alive)p.inv=1.2});ev('go')}}
  const cont=isCont();
  if(playing){S.rt+=dt;S.mutT+=dt;
   if(cont){S.matchT+=dt;S.nextMutT-=dt;if(S.nextMutT<=0){S.nextMutT=30;S.lastMut=S.mut.slice();S.mut=chooseMuts(false);S.mutT=0;S.bomb=null;S.bombNext=2;S.rotV=0;S.gx=S.gy=0;S.bumpers=makeBumpers();S.rails=makeRails();
@@ -445,11 +450,12 @@ function simStep(dt){
  if(S.settings.guns&&(playing||free)){S.itemT-=dt;if(S.itemT<=0){S.itemT=rnd(5,8);if(S.items.length<2){const q=safePoints(1,45,alive().map(p=>[p.x,p.y]).concat(S.items.map(i=>[i.x,i.y])),120)[0];S.items.push({lx:q[2],ly:q[3],x:q[0],y:q[1]});ev('item',{x:q[0]|0,y:q[1]|0})}}}
  for(const it of S.items){const w=toWorld(it.lx,it.ly,S);it.x=w[0];it.y=w[1]}
  for(const r of S.rails){const a=toWorld(r.la[0],r.la[1],S),b=toWorld(r.lb[0],r.lb[1],S);r.ax=a[0];r.ay=a[1];r.bx=b[0];r.by=b[1];
-  for(const k of S.kegs)if(k.warn<=0&&r.hp>0&&segDist(k.x,k.y,r)[0]<k.r+7){r.hp=0;ev('glass',{x:(r.ax+r.bx)/2|0,y:(r.ay+r.by)/2|0,hp:0})}
-  for(const c of S.corks)if(!c.dead&&r.hp>0&&segDist(c.x,c.y,r)[0]<12){r.hp--;c.dead=1;dropCork(c);ev('glass',{x:c.x|0,y:c.y|0,hp:r.hp})}}
+  for(const k of S.kegs)if(k.warn<=0&&r.hp>0&&segDist(k.x,k.y,r)[0]<k.r+7){dmgRail(r,2);ev('glass',{x:(r.ax+r.bx)/2|0,y:(r.ay+r.by)/2|0,hp:0})}
+  for(const c of S.corks)if(!c.dead&&r.hp>0&&segDist(c.x,c.y,r)[0]<12){const h=dmgRail(r,1);c.dead=1;dropCork(c);ev('glass',{x:c.x|0,y:c.y|0,hp:h})}}
  if(S.rails.some(r=>r.hp<=0))S.rails=S.rails.filter(r=>r.hp>0);
  if(free){if(!S.rails.length){S.railT+=dt;if(S.railT>6){S.railT=0;S.rails=makeRails()}}}
- for(const c of S.corks){c.t+=dt;const fr=Math.exp(-2.2*dt);c.vx*=fr;c.vy*=fr;c.x+=c.vx*dt;c.y+=c.vy*dt;for(const q of S.players){if(!q.alive||(q.id===c.o&&c.t<.25)||c.dead)continue;if(hyp(q.x-c.x,q.y-c.y)<q.r+10){const sp=hyp(c.vx,c.vy)||1,nx=c.vx/sp,ny=c.vy/sp,k=(q.inv>0?.35:1)*absorb(q);
+ for(const c of S.corks){c.t+=dt;const fr=Math.exp(-2.2*dt);c.vx*=fr;c.vy*=fr;c.x+=c.vx*dt;c.y+=c.vy*dt;for(const q of S.players){if(!q.alive||(q.id===c.o&&c.t<.25)||c.dead)continue;if(hyp(q.x-c.x,q.y-c.y)<q.r+10){if(q.parry>0){q.blocked=1;if(.22-q.parry<.1&&q.gun<5){q.gun++;c.dead=1;ev('catch',{id:q.id,x:c.x|0,y:c.y|0})}else{const o=P(c.o);let ax=-c.vx,ay=-c.vy;if(o&&o.alive){ax=o.x-c.x;ay=o.y-c.y}const l=hyp(ax,ay)||1,sp2=Math.max(750,hyp(c.vx,c.vy))*1.1;c.vx=ax/l*sp2;c.vy=ay/l*sp2;c.o=q.id;c.t=0;ev('deflect',{x:c.x|0,y:c.y|0})}continue}
+   const sp=hyp(c.vx,c.vy)||1,nx=c.vx/sp,ny=c.vy/sp,k=(q.inv>0?.35:1)*absorb(q);
    q.vx=nx*640*k+q.vx*.2;q.vy=ny*640*k+q.vy*.2;q.stun=.45;q.dash=0;q.charging=0;q.charge=0;q.hitBy=c.o;q.hitT=S.t;c.dead=1;dropCork(c);ev('bonk',{x:c.x|0,y:c.y|0,s:.8,id:q.id,cork:1})}}
   for(const b of S.bumpers)if(!c.dead&&hyp(b.x-c.x,b.y-c.y)<b.r+8){const nx=(c.x-b.x),ny=(c.y-b.y),l=hyp(nx,ny)||1,d=(c.vx*nx+c.vy*ny)/l;c.vx-=2*d*nx/l;c.vy-=2*d*ny/l;ev('boing',{x:b.x|0,y:b.y|0,i:S.bumpers.indexOf(b)})}}
  for(const c of S.corks)if(!c.dead&&c.t>=.75)dropCork(c);S.corks=S.corks.filter(c=>!c.dead&&c.t<.75);
@@ -459,32 +465,37 @@ function simStep(dt){
  for(const p of S.players){
   if(p.bot)botThink(p,dt);
   p.emoteT=Math.max(0,p.emoteT-dt);p.emCd=Math.max(0,p.emCd-dt);p.inv=Math.max(0,p.inv-dt);
-  if(!p.alive){if(p.fall>0)p.fall=Math.max(0,p.fall-dt*1.4);if(p.respawn>0){p.respawn-=dt;if(p.respawn<=0){p.alive=true;p.fall=0;placeRandom(p);p.stun=0;p.dash=0;p.inv=free?0:1.5;p.hitBy=null;p.r=S.mut.includes('big')?40:26}}continue}
+  if(!p.alive){if(p.fall>0)p.fall=Math.max(0,p.fall-dt*1.4);if(p.respawn>0){p.respawn-=dt;if(p.respawn<=0){p.alive=true;p.fall=0;placeRandom(p);p.stun=0;p.dash=0;p.inv=free?0:1.5;p.hitBy=null;p.gun=2;p.aiming=0;p.r=S.mut.includes('big')?40:26}}continue}
   const inp=p.inp;let ix=inp.x||0,iy=inp.y||0;const il=hyp(ix,iy);if(il>1){ix/=il;iy/=il}
   if(M.includes('reverse')){ix=-ix;iy=-iy}
   const sw=(.16+p.buzz*.07)*Math.sin(S.t*2.3+p.ph)+(.08+p.buzz*.04)*Math.sin(S.t*5.3+p.ph*2),cs=Math.cos(sw),sn=Math.sin(sw);
   const jx=ix*cs-iy*sn,jy=ix*sn+iy*cs;ix=jx;iy=jy;
   const canAct=(playing||free)&&p.stun<=0&&p.dash<=0;
-  if(p.gun>0){if(inp.d&&!p.pd&&p.stun<=0&&(playing||free))fireCork(p);p.pd=inp.d}
+  const act=playing||free;p.pcd=Math.max(0,(p.pcd||0)-dt);
+  if(inp.p&&!p.ppd&&p.pcd<=0&&p.stun<=0&&act){p.parry=.22;p.pcd=.9;p.blocked=0;const dl=hyp(ix,iy);if(dl>.5&&p.dash<=0){p.dodge=.2;p.blocked=1;p.vx=ix/dl*640;p.vy=iy/dl*640;p.charging=0;p.charge=0;p.aiming=0}ev('parry',{id:p.id,dodge:p.dodge>0?1:0})}
+  p.dodge=Math.max(0,(p.dodge||0)-dt);p.ppd=inp.p;
+  if(p.parry>0){p.parry-=dt;if(p.parry<=0){p.parry=0;if(!p.blocked){p.wob=.5;ev('whiff',{id:p.id})}}}p.wob=Math.max(0,(p.wob||0)-dt);
+  if(inp.f&&p.gun>0&&p.stun<=0&&p.dash<=0&&act){if(!p.aiming){p.aiming=1;p.aimA=p.face}if(hyp(ix,iy)>.3){const ta=Math.atan2(iy,ix);const da=((ta-p.aimA+Math.PI*3)%TAU)-Math.PI;p.aimA+=da*Math.min(1,dt*14)}p.face=p.aimA;p.charging=0;p.charge=0}
+  else if(p.aiming){if(!inp.f&&p.stun<=0&&p.gun>0&&act)fireCork(p);p.aiming=0}
+  if(p.aiming){}
   else if(inp.d&&canAct){p.charging=1;p.charge=Math.min(1,p.charge+dt*1.5*(p.courage>0?4:1));if(p.charge>=1&&!p.full){p.full=1;ev('full',{id:p.id})}}
   else if(p.charging){if(!inp.d&&canAct)doDash(p,p.charge);p.charging=0;p.charge=0;p.full=0}
-  if(!p.gun)p.pd=inp.d;
   for(let ii=0;ii<S.items.length;ii++){const it=S.items[ii];if(hyp(it.x-p.x,it.y-p.y)<p.r+24){S.items.splice(ii,1);openCrate(p,it);break}}
-  for(let li=0;li<S.loose.length;li++){const c=S.loose[li];if(hyp(c.x-p.x,c.y-p.y)<p.r+14&&(p.gun||0)<3){S.loose.splice(li,1);if(!p.gun)p.pd=inp.d;p.gun=(p.gun||0)+1;ev('corkup',{id:p.id,x:c.x|0,y:c.y|0});break}}
+  for(let li=0;li<S.loose.length;li++){const c=S.loose[li];if(hyp(c.x-p.x,c.y-p.y)<p.r+14&&(p.gun||0)<5){S.loose.splice(li,1);p.gun=(p.gun||0)+1;ev('corkup',{id:p.id,x:c.x|0,y:c.y|0});break}}
   p.courage=Math.max(0,(p.courage||0)-dt);if(p.gulp>0){p.gulp-=dt;if(p.gulp<=0){p.gulp=0;p.r=S.mut.includes('big')?40:26}}
   p.stun=Math.max(0,p.stun-dt);
   const ctrl=p.stun>0?.15:1,bombBoost=(S.bomb&&S.bomb.h===p.id)?1.12:1;
-  const maxS=(p.charging?105:255)*bombBoost*(p.r>30?.9:1);
+  const maxS=(p.charging?105:255)*bombBoost*(p.r>30?.9:1)*(p.aiming?0:1)*(p.wob>0?.35:1)*(p.parry>0&&!(p.dodge>0)?.5:1);
   let dvx=ix*maxS*ctrl,dvy=iy*maxS*ctrl;
   const rx=p.x-CX,ry=p.y-CY;
   if(S.rotV){dvx+=-ry*S.rotV;dvy+=rx*S.rotV}
-  let k=p.dash>0?.8:(p.stun>0?1.5:7);if(M.includes('spill'))k=p.dash>0?.25:(p.stun>0?.45:1.25);
+  let k=p.dodge>0?1.2:p.dash>0?.8:(p.stun>0?1.5:7);if(M.includes('spill'))k=p.dash>0?.25:(p.stun>0?.45:1.25);
   if(p.stun>0&&p.dash<=0){const sp0=hyp(p.vx,p.vy);if(sp0>1){const dot=-(ix*p.vx+iy*p.vy)/sp0;if(dot>.3)k+=3.2*dot;if(dot>.3&&Math.random()<dt*6)p.brace=1}}
   const f=1-Math.exp(-k*dt);p.vx+=(dvx-p.vx)*f;p.vy+=(dvy-p.vy)*f;
   if(playing&&(S.gx||S.gy)){p.vx+=S.gx*dt;p.vy+=S.gy*dt}
   if(S.rotV){p.vx+=rx*S.rotV*S.rotV*.6*dt;p.vy+=ry*S.rotV*S.rotV*.6*dt}
   p.x+=p.vx*dt;p.y+=p.vy*dt;p.dash=Math.max(0,p.dash-dt);
-  const sp=hyp(p.vx,p.vy);if(p.stun<=0&&sp>40&&p.dash<=0){const ta=Math.atan2(p.vy,p.vx);let da=((ta-p.face+Math.PI*3)%TAU)-Math.PI;p.face+=da*Math.min(1,dt*10)}
+  const sp=hyp(p.vx,p.vy);if(p.stun<=0&&sp>40&&p.dash<=0&&!p.aiming){const ta=Math.atan2(p.vy,p.vx);let da=((ta-p.face+Math.PI*3)%TAU)-Math.PI;p.face+=da*Math.min(1,dt*10)}
   if(M.includes('hic')&&playing){p.hicT-=dt;if(p.hicT<=0){p.hicT=rnd(2.2,5);p.hics++;ev('hic',{id:p.id});if(p.stun<=0&&p.dash<=0){const a=Math.random()*TAU;const s=p.inp;const ox=s.x,oy=s.y;s.x=Math.cos(a);s.y=Math.sin(a);doDash(p,.3);s.x=ox;s.y=oy;p.charging=0;p.charge=0}}}
   const on=onArena(p.x,p.y);if(on){p.sx=p.x;p.sy=p.y;p.teeter=clearAt(p.x,p.y,p.r*.7)?0:1}else p.teeter=1;
   if(playing||free){if(!on&&p.dash<=0)knockOut(p,'fall')}
@@ -499,9 +510,10 @@ function simStep(dt){
   if(vrel<=0)continue;
   const aD=a.dash>0,bD=b.dash>0,mx=(a.x+b.x)/2|0,my=(a.y+b.y)/2|0;
   if(aD&&bD){const imp=vrel*.6+380;a.vx-=nx*imp;a.vy-=ny*imp;b.vx+=nx*imp;b.vy+=ny*imp;a.stun=b.stun=.4;a.dash=b.dash=0;a.hitBy=b.id;b.hitBy=a.id;a.hitT=b.hitT=S.t;ev('clang',{x:mx,y:my});S.hs=.07}
-  else if(aD||bD){const Aa=aD?a:b,Bb=aD?b:a,sx=aD?nx:-nx,sy=aD?ny:-ny,pw=Aa.dpow;const dc=Aa.dc||0,kb=(190+880*dc*dc+380*dc+Math.abs(vrel)*.12)*(Bb.inv>0?.35:1)*absorb(Bb);Aa.inv=0;
-   Bb.vx=sx*kb+Bb.vx*.15;Bb.vy=sy*kb+Bb.vy*.15;Bb.stun=.12+.7*dc;Bb.hitBy=Aa.id;Bb.hitT=S.t;Bb.charging=0;Bb.charge=0;
-   Aa.vx*=.2;Aa.vy*=.2;Aa.dash=0;ev('bonk',{x:mx,y:my,s:Math.round(pw*100)/100,id:Bb.id});if(dc>.6)S.hs=.09}
+  else if(aD||bD){const Aa=aD?a:b,Bb=aD?b:a,sx=aD?nx:-nx,sy=aD?ny:-ny,pw=Aa.dpow;const dc=Aa.dc||0,kb=(190+880*dc*dc+380*dc+Math.abs(vrel)*.12)*(Bb.inv>0?.35:1)*(Bb.parry>0?1:absorb(Bb));Aa.inv=0;
+   if(Bb.parry>0){Bb.blocked=1;const k2=280+520*dc;Aa.vx=-sx*k2;Aa.vy=-sy*k2;Aa.stun=.3+.4*dc;Aa.dash=0;Aa.charging=0;Aa.hitBy=Bb.id;Aa.hitT=S.t;Bb.vx*=.2;Bb.vy*=.2;ev('deflect',{x:mx,y:my,bump:1});S.hs=.08}else{
+   const butt=(Math.cos(Bb.face)*sx+Math.sin(Bb.face)*sy)>.55&&dc>.15,kbF=kb*(butt?1.7:1);Bb.vx=sx*kbF+Bb.vx*.15;Bb.vy=sy*kbF+Bb.vy*.15;Bb.stun=.12+.7*dc;Bb.hitBy=Aa.id;Bb.hitT=S.t;Bb.charging=0;Bb.charge=0;
+   Aa.vx*=.2;Aa.vy*=.2;Aa.dash=0;ev('bonk',{x:mx,y:my,s:Math.round(pw*100)/100,id:Bb.id,butt:butt?1:0});if(dc>.6||butt)S.hs=.09}}
   else{const imp=vrel*1.15+90;a.vx-=nx*imp*.6;a.vy-=ny*imp*.6;b.vx+=nx*imp*.6;b.vy+=ny*imp*.6;if(vrel>110){ev('bump',{x:mx,y:my});a.hitBy=b.id;b.hitBy=a.id;a.hitT=b.hitT=S.t}}}
  for(const p of A){railHit(p);for(let bi=0;bi<S.bumpers.length;bi++){const b=S.bumpers[bi];const dx=p.x-b.x,dy=p.y-b.y,d=hyp(dx,dy)||1;if(d<p.r+b.r){const nx=dx/d,ny=dy/d;p.x=b.x+nx*(p.r+b.r);p.y=b.y+ny*(p.r+b.r);
    const sp=Math.max(hyp(p.vx,p.vy)*1.1,650);p.vx=nx*sp;p.vy=ny*sp;p.stun=Math.max(p.stun,.25);p.dash=0;ev('boing',{x:b.x|0,y:b.y|0,i:bi})}}
@@ -578,11 +590,11 @@ function hostMsg(c,m){if(!m||!S)return;const id=connId(c);let p=P(id);
  if(m.t==='h'){if(!p){if(S.players.length>=6){c.send({t:'full'});return}p=newPlayer(id,m.name,uniqueColor(m.color|0),m.hat|0,false);p.team=balTeam();placeRandom(p);if(S.phase!=='lobby'){p.alive=false;p.fall=0;if(S.phase==='play'&&isCont())p.respawn=1}S.players.push(p);
    toast(p.name+' stumbled in!');ev('emote',{id:p.id,k:2});}c.send({t:'w',id});return}
  if(!p)return;
- if(m.t==='i'){p.inp.x=clamp(+m.x||0,-1,1);p.inp.y=clamp(+m.y||0,-1,1);p.inp.d=m.d?1:0}
+ if(m.t==='i'){p.inp.x=clamp(+m.x||0,-1,1);p.inp.y=clamp(+m.y||0,-1,1);p.inp.d=m.d?1:0;p.inp.f=m.f?1:0;p.inp.p=m.p?1:0}
  else if(m.t==='e'){emote(p,clamp(m.k|0,0,3))}
  else if(m.t==='bye'){S.players=S.players.filter(x=>x!==p)}}
 function broadcast(){if(!S)return;const s=snapshot();for(const c of NET.conns.values()){try{if(c.open!==false)c.send({t:'s',s})}catch(e){}}S.evq=[]}
-const PK=['id','name','color','hat','bot','x','y','vx','vy','face','r','alive','fall','charge','dash','stun','buzz','score','emote','emoteT','teeter','kos','falls','team','inv','gun','armor','courage','gulp'];
+const PK=['id','name','color','hat','bot','x','y','vx','vy','face','r','alive','fall','charge','dash','stun','buzz','score','emote','emoteT','teeter','kos','falls','team','inv','gun','armor','courage','gulp','aiming','aimA','parry','wob','dodge'];
 const r2=v=>Math.round(v*100)/100;
 function snapshot(){return {code:S.code,phase:S.phase,pt:r2(S.pt),rt:r2(S.rt),round:S.round,mut:S.mut,arenaR:r2(S.arenaR),rot:r2(S.rot),gx:S.gx|0,gy:S.gy|0,sudden:S.sudden,
  card:S.card,over:S.over,settings:S.settings,lastWinner:S.lastWinner,map:S.map,matchT:r2(S.matchT),mutT:r2(S.mutT),
@@ -609,7 +621,7 @@ function leaveToTitle(silent){try{if(NET.peer)NET.peer.destroy()}catch(e){}try{i
  showScreen('title')}
 function sendInput(dt){const inp=readInput();
  if(NET.mode==='host'){const p=P('host');if(p)p.inp=inp;if(emoteQ>=0&&p)emote(p,emoteQ)}
- else if(NET.mode==='client'&&NET.hostConn){const k=inp.x+','+inp.y+','+inp.d;NET.inT-=dt;if(k!==NET.lastIn||NET.inT<=0){NET.lastIn=k;NET.inT=.1;try{NET.hostConn.send({t:'i',x:inp.x,y:inp.y,d:inp.d})}catch(e){}}
+ else if(NET.mode==='client'&&NET.hostConn){const k=inp.x+','+inp.y+','+inp.d+inp.f+inp.p;NET.inT-=dt;if(k!==NET.lastIn||NET.inT<=0){NET.lastIn=k;NET.inT=.1;try{NET.hostConn.send({t:'i',x:inp.x,y:inp.y,d:inp.d,f:inp.f,p:inp.p})}catch(e){}}
   if(emoteQ>=0)try{NET.hostConn.send({t:'e',k:emoteQ})}catch(e){}}
  emoteQ=-1}
 
@@ -623,7 +635,7 @@ function onEv(e){const p=e.id?vp(e.id):null;const pitch=p?.8+((p.color*7)%8)/10:
  switch(e.k){
  case 'dash':SFX.whoosh(e.c);burst(e.x,e.y,6+e.c*8,['#fff','#f0e0c0'],180,8,0);break;
  case 'bonk':SFX.bonk(e.s);shake=Math.max(shake,6+e.s*12);burst(e.x,e.y,14+e.s*10,['#fff','#ffd23f','#ff9f1c'],420+e.s*200,7,0);rings.push({x:e.x,y:e.y,t:0,life:.35,r:20+e.s*60,col:'#fff'});
-  addPop(e.x,e.y-30,e.cork?pick(['CORKED!','POP\'D!','BULLSEYE!']):e.keg?pick(['KEGGED!','BARREL\'D!','THUNK!']):pick(['BONK!','WHAM!','OOF!','BLAM!','THWUMP!','BOOP!','SMACK!']),pick(['#ffd23f','#fff','#ff9f1c']),26+e.s*22);if(e.s>1.05)flash=.12;
+  addPop(e.x,e.y-30,e.butt?'BUTT BUMP!':e.cork?pick(['CORKED!','POP\'D!','BULLSEYE!']):e.keg?pick(['KEGGED!','BARREL\'D!','THUNK!']):pick(['BONK!','WHAM!','OOF!','BLAM!','THWUMP!','BOOP!','SMACK!']),pick(['#ffd23f','#fff','#ff9f1c']),26+e.s*22);if(e.s>1.05)flash=.12;
   if(e.id){const a=A_(e.id);a.pvx+=rnd(-300,300);a.pvy+=rnd(-300,300)}break;
  case 'clang':SFX.clang();shake=Math.max(shake,14);burst(e.x,e.y,24,['#fff','#cfe8ff'],520,6,0);addPop(e.x,e.y-30,'CLANG!','#cfe8ff',48);rings.push({x:e.x,y:e.y,t:0,life:.4,r:90,col:'#cfe8ff'});break;
  case 'bump':SFX.bump();break;
@@ -647,6 +659,10 @@ function onEv(e){const p=e.id?vp(e.id):null;const pitch=p?.8+((p.color*7)%8)/10:
  case 'zone':SFX.ding(0);addPop(e.x,e.y-40,'NEW THRONE!','#ffd23f',30);rings.push({x:e.x,y:e.y,t:0,life:.6,r:110,col:'#ffd23f'});break;
  case 'chaos':SFX.horn();flash=.2;shake=Math.max(shake,8);break;
  case 'item':SFX.pop();rings.push({x:e.x,y:e.y,t:0,life:.5,r:60,col:'#fff'});break;
+ case 'parry':SFX.whoosh(e.dodge?.6:.2);if(p&&e.dodge)burst(p.x,p.y,8,['#fff','#e8f4ff'],160,6,0);if(p&&!e.dodge)rings.push({x:p.x,y:p.y-8,t:0,life:.22,r:55,col:'#ffd23f'});break;
+ case 'catch':SFX.pickup();if(p)addPop(p.x,p.y-60,'CAUGHT IT!','#5be37d',30);shake=Math.max(shake,5);break;
+ case 'deflect':SFX.clang();addPop(e.x,e.y-30,e.bump?'PARRIED!':'DEFLECTED!','#ffd23f',e.bump?36:30);burst(e.x,e.y,16,['#ffd23f','#fff'],380,5,0);shake=Math.max(shake,8);flash=.08;break;
+ case 'whiff':tone('triangle',300,150,.15,.2);if(p)addPop(p.x,p.y-55,'whiff','#ccc',18,.6);break;
  case 'crate':SFX.pickup();burst(e.x,e.y,18,['#c98a4a','#8a5a2e','#ffd23f'],320,6,1);addPop(e.x,e.y-40,e.n,pick(['#ffd23f','#5be37d','#ff7eb6']),28,1.1);break;
  case 'corkup':SFX.pop();addPop(e.x,e.y-30,'+1 CORK','#ffe9a8',18,.6);break;
  case 'armor':SFX.clang();addPop(e.x,e.y-50,'ARMOR SAVED YOU!','#ffd23f',22);burst(e.x,e.y,16,['#ffd23f','#fff'],350,5,0);break;
@@ -751,7 +767,7 @@ function drawHat(c,hat,r,t){c.save();c.lineWidth=3;c.strokeStyle='#2a1608';c.lin
  }c.restore()}
 function drawStar(c,x,y,r,col){c.fillStyle=col;c.beginPath();for(let i=0;i<10;i++){const rr2=i%2?r*.45:r,a=i/10*TAU-Math.PI/2;c.lineTo(x+Math.cos(a)*rr2,y+Math.sin(a)*rr2)}c.closePath();c.fill();c.strokeStyle='#2a1608';c.lineWidth=1.5;c.stroke()}
 function drawGuy(c,p,a,t,opts){opts=opts||{};const r=p.r,col=COLORS[p.color]||'#fff',dark=shade(col,-.45),light=shade(col,.45);
- const sp=hyp(p.vx,p.vy),flail=p.stun>0||p.teeter||!p.alive,charging=p.charge>0;
+ const sp=hyp(p.vx,p.vy),flail=p.stun>0||p.teeter||!p.alive||p.wob>0,charging=p.charge>0;
  c.save();c.translate(p.x,p.y);
  let sc=1;if(!p.alive){sc=Math.max(0,p.fall);c.globalAlpha=clamp(p.fall*1.5,0,1);c.translate(0,(1-p.fall)*20)}
  if(p.alive&&!opts.noShadow){c.fillStyle='rgba(30,10,0,.3)';c.beginPath();c.ellipse(0,r*.55,r*.95,r*.38,0,0,TAU);c.fill()}
@@ -800,7 +816,8 @@ function drawGuy(c,p,a,t,opts){opts=opts||{};const r=p.r,col=COLORS[p.color]||'#
  if(p.teeter&&!opts.noTag){c.fillStyle='#fff';c.font='22px '+FONT;c.textAlign='center';c.fillText('!!',p.x+Math.sin(t*20)*3,p.y-r*2.5)}
 }
 function drawTag(c,p,isMe,t){if(!p.alive)return;const y=p.y-p.r*2.65-(isMe?6:0);c.font=(isMe?'18px ':'15px ')+FONT;c.textAlign='center';c.lineWidth=4;c.strokeStyle='#2a1608';const label=isMe?'▼ '+p.name:p.name;
- c.strokeText(label,p.x,y);c.fillStyle=isMe?'#fff':COLORS[p.color];c.fillText(label,p.x,y)}
+ c.strokeText(label,p.x,y);c.fillStyle=isMe?'#fff':COLORS[p.color];c.fillText(label,p.x,y);
+ const n=p.gun||0;for(let i=0;i<n;i++){const x=p.x-(n-1)*6+i*12;c.fillStyle='#d9a066';c.strokeStyle='#2a1608';c.lineWidth=1.5;rr2(c,x-4,y+4,8,10,2.5);c.fill();c.stroke()}}
 function drawBubble(c,p,t){if(!p.alive||p.emote<0||p.emoteT<=0)return;const txt=EMOTES[p.emote];const a=clamp(p.emoteT*3,0,1),s=p.emoteT>2?1+(p.emoteT-2)*2:1;
  c.save();c.globalAlpha=a;c.translate(p.x+p.r,p.y-p.r*2.6);c.scale(s,s);c.font='17px '+FONT;const w=c.measureText(txt).width+18;
  c.fillStyle='#fff';c.strokeStyle='#2a1608';c.lineWidth=3;rr(0,-30,w,28,10);c.fill();c.stroke();c.beginPath();c.moveTo(6,-3);c.lineTo(-6,8);c.lineTo(16,-3);c.fill();
@@ -860,7 +877,10 @@ function drawWorld(t){drawSea(t);if(!V){drawArena({map:'round',arenaR:BASE_R,rot
   if(p.courage>0&&Math.random()<.5)parts.push({x:p.x+rnd(-p.r,p.r),y:p.y+rnd(-p.r,p.r*.3),vx:0,vy:-60,z:0,vz:0,t:0,life:.5,sz:rnd(3,6),col:pick(['#ff5a5f','#ff9f1c','#ffd23f']),g:0});
   ctx.save();if(p.inv>0)ctx.globalAlpha=Math.floor(t*12)%2?.45:.9;drawGuy(ctx,p,A_(p.id),t);ctx.restore();
   if(p.armor>0){ctx.strokeStyle='rgba(255,210,63,'+(.55+Math.sin(t*6)*.25)+')';ctx.lineWidth=4;ctx.beginPath();ctx.arc(p.x,p.y-p.r*.2,p.r+14,0,TAU);ctx.stroke();ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y-p.r*.2,p.r+14,t*3,t*3+1);ctx.stroke()}
-  if(p.gun>0){const a=p.face;ctx.save();ctx.translate(p.x+Math.cos(a)*p.r*.9,p.y-p.r*.15+Math.sin(a)*p.r*.5);if(Math.cos(a)<0){ctx.scale(-1,1);ctx.rotate(Math.PI-a)}else ctx.rotate(a);drawBlaster(ctx,p.gun);ctx.restore()}}
+  if(p.parry>0){const u=1-p.parry/.22;ctx.strokeStyle='rgba(255,210,63,'+(1-u)+')';ctx.lineWidth=7;ctx.beginPath();ctx.arc(p.x,p.y-p.r*.2,p.r+8+u*16,0,TAU);ctx.stroke();ctx.fillStyle='rgba(255,236,150,'+(.35*(1-u))+')';ctx.fill()}
+  if(p.aiming){const a=p.aimA,c=COLORS[p.color];ctx.save();ctx.setLineDash([10,9]);ctx.lineDashOffset=-t*60;ctx.strokeStyle=c;ctx.lineWidth=4;ctx.globalAlpha=.85;ctx.beginPath();ctx.moveTo(p.x+Math.cos(a)*(p.r+10),p.y-6+Math.sin(a)*(p.r+10));ctx.lineTo(p.x+Math.cos(a)*260,p.y-6+Math.sin(a)*260);ctx.stroke();ctx.setLineDash([]);
+   ctx.translate(p.x+Math.cos(a)*268,p.y-6+Math.sin(a)*268);ctx.rotate(a);ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(-6,-8);ctx.lineTo(-6,8);ctx.fill();ctx.restore()}
+  if(p.aiming){const a=p.face;ctx.save();ctx.translate(p.x+Math.cos(a)*p.r*.9,p.y-p.r*.15+Math.sin(a)*p.r*.5);if(Math.cos(a)<0){ctx.scale(-1,1);ctx.rotate(Math.PI-a)}else ctx.rotate(a);drawBlaster(ctx,p.gun);ctx.restore()}}
  for(const c of (V.corks||[])){const a=Math.atan2(c.vy,c.vx);ctx.save();ctx.translate(c.x,c.y);ctx.rotate(a);ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(-40,0);ctx.stroke();
   ctx.fillStyle='#d9a066';ctx.strokeStyle='#2a1608';ctx.lineWidth=2;rr2(ctx,-8,-6,16,12,4);ctx.fill();ctx.stroke();ctx.restore()}
  for(const k of V.kegs)if(k.warn>0)drawKeg(ctx,k,t);
