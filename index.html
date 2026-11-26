@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <title>Last Call Brawl</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
@@ -10,6 +11,7 @@
 :root{--ink:#2a1608;--amber:#f5a623;--foam:#fff6e0;--red:#ff5a5f;--panel:#fff3d6;--wood:#7a4520}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:#3b1d0a;font-family:Fredoka,system-ui,sans-serif;color:var(--ink);user-select:none;-webkit-user-select:none}
+html,body{touch-action:none;overscroll-behavior:none}
 canvas#c{cursor:crosshair;position:fixed;inset:0;width:100%;height:100%;display:block}
 .screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;z-index:5}
 .screen.on{display:flex}
@@ -75,6 +77,30 @@ kbd{font-family:inherit;font-weight:700;background:var(--ink);color:var(--foam);
 #tools button{font-size:16px;padding:4px 10px;box-shadow:0 3px 0 var(--ink)}
 #touch{position:fixed;inset:0;z-index:4;display:none}
 .waitmsg{font-weight:700;margin-top:10px;text-align:center}
+#touch{position:fixed;inset:0;z-index:4;display:none;touch-action:none}
+body.touch.ingame #touch{display:block}
+#tstick{position:absolute;left:0;top:0;bottom:0;width:50%}
+#tbase{position:absolute;width:130px;height:130px;margin:-65px 0 0 -65px;border-radius:50%;border:4px solid rgba(255,246,224,.55);background:rgba(42,22,8,.25);display:none;pointer-events:none}
+#tknob{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:rgba(255,246,224,.85);border:4px solid var(--ink)}
+#tstick .hint{position:absolute;left:24px;bottom:22px;color:rgba(255,246,224,.6);font-weight:700;font-size:13px;pointer-events:none}
+.tb2{position:absolute;border-radius:50%;border:4px solid var(--ink);box-shadow:0 5px 0 var(--ink);font-family:'Luckiest Guy',Impact,sans-serif;color:var(--ink);display:flex;align-items:center;justify-content:center;flex-direction:column;line-height:1;font-size:15px;opacity:.88;touch-action:none}
+.tb2 b{font-size:26px;font-weight:400;pointer-events:none}
+.tb2.on{transform:translateY(4px);box-shadow:0 1px 0 var(--ink);filter:brightness(1.2)}
+#tBump{right:calc(22px + env(safe-area-inset-right));bottom:22px;width:118px;height:118px;background:#ffd23f}
+#tParry{right:calc(152px + env(safe-area-inset-right));bottom:18px;width:84px;height:84px;background:#8fd3ff}
+#tThrow{right:calc(40px + env(safe-area-inset-right));bottom:156px;width:76px;height:76px;background:#ff9f1c;display:none}
+#tThrow.has{display:flex}
+#tEmote{right:calc(160px + env(safe-area-inset-right));bottom:116px;width:54px;height:54px;background:#fff6e0;font-size:22px}
+#rotate{position:fixed;inset:0;z-index:50;background:#3b1d0a;color:#fff6e0;display:none;align-items:center;justify-content:center;flex-direction:column;font-family:'Luckiest Guy',Impact,sans-serif;font-size:28px;text-align:center;padding:20px}
+#rotate div{font-size:70px;animation:wob 1.6s ease-in-out infinite}
+@media (orientation:portrait){body.touch.ingame #rotate{display:flex}}
+.mtog{display:none}
+body.touch .mtog{display:block;width:100%;margin-bottom:8px;font-size:15px;padding:6px}
+#lobby .panel.mini>*:not(.mtog):not(.codebox){display:none}
+#lobby .panel.mini{width:auto}
+.touchonly{display:none}body.touch .touchonly{display:block}body.touch .keyonly{display:none}
+#lobby .panel{touch-action:pan-y}#title{overflow:auto;touch-action:pan-y}
+@media (max-height:520px){#tools{transform:scale(.62);transform-origin:top right}body.touch #tools input[type=range],body.touch #tools .volbox span{display:none}.codebox{font-size:44px!important}#lobby{padding:8px}.logo{font-size:40px;margin-top:4px}.tag{margin-bottom:6px;font-size:13px}#title{justify-content:flex-start;padding:8px 0}.panel{padding:10px 14px}#pv{width:90px!important;height:90px!important}}
 </style>
 </head>
 <body>
@@ -99,8 +125,11 @@ kbd{font-family:inherit;font-weight:700;background:var(--ink);color:var(--foam);
   <div class="foot">For adults who choose to drink. Sips of water count. Nobody has to drink, everybody has to laugh.</div>
 </div>
 
+<div id="touch"><div id="tstick"><div id="tbase"><div id="tknob"></div></div><div class="hint">drag to move</div></div>
+<div class="tb2" id="tParry"><b>🛡️</b>PARRY</div><div class="tb2" id="tBump"><b>🍺</b>BUMP</div><div class="tb2" id="tThrow"><b>🥛</b>THROW</div><div class="tb2" id="tEmote">😂</div></div>
+<div id="rotate"><div>📱↻</div>Turn your phone sideways to brawl</div>
 <div id="lobby" class="screen">
-  <div class="panel">
+  <div class="panel"><button class="mtog" id="bMini">▲ Hide menu (practice)</button>
     <div class="small" style="text-align:center;font-weight:700">ROOM CODE</div>
     <div class="codebox" id="lcode">----</div>
     <div style="display:flex;gap:6px;margin-top:6px"><button id="bCopy" style="flex:1;font-size:16px">Copy invite</button></div>
@@ -127,7 +156,7 @@ kbd{font-family:inherit;font-weight:700;background:var(--ink);color:var(--foam);
       <button id="bStart" class="big go">Start the brawl!</button>
     </div>
     <div class="waitmsg" id="lwait">Waiting for the host to start. Waddle around and practice!</div>
-    <div class="ctrls"><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch. Taps nudge, full charges YEET. Hold a full charge too long and you burp yourself stunned. Hit 'em from behind for a BUTT BUMP. Belly bump a flying pint to smash it back FASTER.<br><b>Empty Pints</b> (from crates, 2 throws): press <kbd>F</kbd> (or left click) to chug, then the aim swings across a cone in front of you. Press <kbd>F</kbd> again to time the throw. Missed pints can be picked back up.<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES pints. Parrying a bump knocks them back stunned, so punish them. Whiffing makes you wobble. It always works in place: charge a bump, then hit it mid-dash for a DASH PARRY that beats other bumps.<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in. Every hit you take makes you more <b>sloshed</b>, so you fly farther next time.<br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for Empty Pints (throwables), Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
+    <div class="ctrls"><div class="touchonly"><b>Touch:</b> drag the left side to move. Hold <b>BUMP</b> to charge, let go to launch. Tap <b>PARRY</b> right before a hit. <b>THROW</b> shows up when you grab Empty Pints. Turn your phone sideways and use fullscreen ⛶.</div><b>Move:</b> <kbd>WASD</kbd>/<kbd>Arrows</kbd> &nbsp; <b>Belly Bump:</b> hold <kbd>Space</kbd>, release to launch. Taps nudge, full charges YEET. Hold a full charge too long and you burp yourself stunned. Hit 'em from behind for a BUTT BUMP. Belly bump a flying pint to smash it back FASTER.<br><b>Empty Pints</b> (from crates, 2 throws): press <kbd>F</kbd> (or left click) to chug, then the aim swings across a cone in front of you. Press <kbd>F</kbd> again to time the throw. Missed pints can be picked back up.<br><b>Belly Parry:</b> tap <kbd>Shift</kbd> (or <kbd>K</kbd>) right before a hit to bounce it back. Perfect timing CATCHES pints. Parrying a bump knocks them back stunned, so punish them. Whiffing makes you wobble. It always works in place: charge a bump, then hit it mid-dash for a DASH PARRY that beats other bumps.<br>Gamepad: A bump, X fire, B parry, Y emote.<br><b>Got bumped?</b> Hold the opposite direction to dig your heels in. Every hit you take makes you more <b>sloshed</b>, so you fly farther next time.<br><b>Emotes:</b> <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> &nbsp;<br><b>Glass railings:</b> bounce people into them. One hit cracks, two hits smash.<br><b>Mystery crates:</b> walk into them for Empty Pints (throwables), Belly Armor, Liquid Courage (fast charge) or Big Gulp (huge).<br>Knock everyone into the beer. Last one on the table wins the round.</div>
   </div>
 </div>
 
@@ -331,7 +360,8 @@ addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;keys[e.code]
 addEventListener('keyup',e=>{keys[e.code]=false});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
 addEventListener('pointerdown',()=>initAudio());
-let padPrev={};
+let padPrev={};const touch={x:0,y:0,d:0,f:0,p:0};
+const IS_TOUCH=matchMedia('(pointer:coarse)').matches||/[?&]touch/.test(location.search);if(IS_TOUCH)document.body.classList.add('touch');
 function readInput(){let x=0,y=0,d=false,f=false,pa=false;
  if(keys.KeyA||keys.ArrowLeft)x-=1;if(keys.KeyD||keys.ArrowRight)x+=1;if(keys.KeyW||keys.ArrowUp)y-=1;if(keys.KeyS||keys.ArrowDown)y+=1;
  if(keys.Space||keys.KeyJ||keys.Enter)d=true;if(keys.KeyF||keys.KeyL)f=true;if(keys.ShiftLeft||keys.ShiftRight||keys.KeyK)pa=true;
@@ -340,6 +370,7 @@ function readInput(){let x=0,y=0,d=false,f=false,pa=false;
   if(gp.buttons[14]&&gp.buttons[14].pressed)x-=1;if(gp.buttons[15]&&gp.buttons[15].pressed)x+=1;if(gp.buttons[12]&&gp.buttons[12].pressed)y-=1;if(gp.buttons[13]&&gp.buttons[13].pressed)y+=1;
   const bt=i=>gp.buttons[i]&&gp.buttons[i].pressed;if(bt(0)||bt(7))d=true;if(bt(2)||bt(5))f=true;if(bt(1)||bt(4))pa=true;
   {const p=bt(3);if(p&&!padPrev[gp.index+'_3'])emoteQ=ri(0,3);padPrev[gp.index+'_3']=p}}
+ if(touch.x||touch.y){x+=touch.x;y+=touch.y}if(touch.d)d=true;if(touch.f)f=true;if(touch.p)pa=true;
  const l=hyp(x,y);if(l>1){x/=l;y/=l}
  if(mouse.l)f=true;if(mouse.r)pa=true;let a=null;if(performance.now()-mouse.t<5000&&V){const mp=V.players.find(q=>q.id===NET.myId);if(mp){const w=mouseWorld();a=Math.round(Math.atan2(w[1]-(mp.y-6),w[0]-mp.x)*100)/100}}
  return {x:Math.round(x*100)/100,y:Math.round(y*100)/100,d:d?1:0,f:f?1:0,p:pa?1:0,a}}
@@ -659,7 +690,7 @@ function burst(x,y,n,cols,spd,sz,grav){for(let i=0;i<n;i++){const a=Math.random(
 function onEv(e){const p=e.id?vp(e.id):null;const pitch=p?.8+((p.color*7)%8)/10:1;
  switch(e.k){
  case 'dash':SFX.whoosh(e.c);burst(e.x,e.y,6+e.c*8,['#fff','#f0e0c0'],180,8,0);break;
- case 'bonk':if(e.s>1.3&&Math.random()<.5)SFX.airhorn();if(e.perf)addPop(e.x,e.y-70,'PERFECT!','#ffd23f',30,.8);SFX.bonk(e.s);shake=Math.max(shake,6+e.s*12);burst(e.x,e.y,14+e.s*10,['#fff','#ffd23f','#ff9f1c'],420+e.s*200,7,0);rings.push({x:e.x,y:e.y,t:0,life:.35,r:20+e.s*60,col:'#fff'});
+ case 'bonk':if(e.id===NET.myId&&navigator.vibrate)try{navigator.vibrate(e.s>1.2?[40,30,60]:35)}catch(_){}if(e.s>1.3&&Math.random()<.5)SFX.airhorn();if(e.perf)addPop(e.x,e.y-70,'PERFECT!','#ffd23f',30,.8);SFX.bonk(e.s);shake=Math.max(shake,6+e.s*12);burst(e.x,e.y,14+e.s*10,['#fff','#ffd23f','#ff9f1c'],420+e.s*200,7,0);rings.push({x:e.x,y:e.y,t:0,life:.35,r:20+e.s*60,col:'#fff'});
   addPop(e.x,e.y-30,e.butt?'BUTT BUMP!':e.cork?pick(['GLASSED!','BULLSEYE!','CLONK!']):e.keg?pick(['KEGGED!','BARREL\'D!','THUNK!']):(e.s>1.3?pick(['EMOTIONAL DAMAGE','YEET!','CRITICAL HIT','SENT TO THE SHADOW REALM','BONK!']):pick(['BONK!','WHAM!','OOF!','BLAM!','THWUMP!','BOOP!','SMACK!','bonk'])),pick(['#ffd23f','#fff','#ff9f1c']),26+e.s*22);if(e.s>1.05)flash=.12;
   if(e.id){const a=A_(e.id);a.pvx+=rnd(-300,300);a.pvy+=rnd(-300,300)}break;
  case 'clang':SFX.clang();shake=Math.max(shake,14);burst(e.x,e.y,24,['#fff','#cfe8ff'],520,6,0);addPop(e.x,e.y-30,'CLANG!','#cfe8ff',48);rings.push({x:e.x,y:e.y,t:0,life:.4,r:90,col:'#cfe8ff'});break;
@@ -708,7 +739,7 @@ function resize(){DPR=Math.min(window.devicePixelRatio||1,2);cv.width=innerWidth
 addEventListener('resize',resize);resize();
 const mouse={x:0,y:0,t:-1e9,l:0,r:0};
 cv.addEventListener('pointermove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;mouse.t=performance.now()});
-cv.addEventListener('pointerdown',e=>{mouse.x=e.clientX;mouse.y=e.clientY;mouse.t=performance.now();if(e.button===0)mouse.l=1;if(e.button===2)mouse.r=1});
+cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;mouse.x=e.clientX;mouse.y=e.clientY;mouse.t=performance.now();if(e.button===0)mouse.l=1;if(e.button===2)mouse.r=1});
 addEventListener('pointerup',e=>{if(e.button===0)mouse.l=0;if(e.button===2)mouse.r=0});
 addEventListener('blur',()=>{mouse.l=mouse.r=0});
 cv.addEventListener('contextmenu',e=>e.preventDefault());
@@ -1002,7 +1033,17 @@ function updateFX(dt){for(const q of parts){q.t+=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.
 let tickK=0;
 
 // ============================================================ UI
-function showScreen(id){['title','lobby','results','over'].forEach(s=>$('#'+s).classList.toggle('on',s===id));curScreen=id}
+(function(){const st=$('#tstick'),base=$('#tbase'),knob=$('#tknob');let sid=null,ox=0,oy=0;
+ st.addEventListener('pointerdown',e=>{e.preventDefault();initAudio();if(sid!==null)return;sid=e.pointerId;st.setPointerCapture(e.pointerId);ox=e.clientX;oy=e.clientY;base.style.display='block';base.style.left=ox+'px';base.style.top=oy+'px';knob.style.transform='';touch.x=touch.y=0});
+ st.addEventListener('pointermove',e=>{if(e.pointerId!==sid)return;let dx=e.clientX-ox,dy=e.clientY-oy;const l=hyp(dx,dy),R=58;if(l>R){ox+=dx/l*(l-R);oy+=dy/l*(l-R);base.style.left=ox+'px';base.style.top=oy+'px';dx=dx/l*R;dy=dy/l*R}
+  knob.style.transform='translate('+dx+'px,'+dy+'px)';const m=Math.min(1,l/R);touch.x=m>.18?dx/R:0;touch.y=m>.18?dy/R:0});
+ const end=e=>{if(e.pointerId!==sid)return;sid=null;base.style.display='none';touch.x=touch.y=0};st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end);
+ const btn=(id,k)=>{const b=$(id);const on=e=>{e.preventDefault();initAudio();b.setPointerCapture(e.pointerId);b.classList.add('on');if(k)touch[k]=1;else emoteQ=ri(0,3);if(navigator.vibrate)try{navigator.vibrate(12)}catch(_){}};
+  const off=e=>{b.classList.remove('on');if(k)touch[k]=0};b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',e=>{if(e.target===b)off(e)})};
+ btn('#tBump','d');btn('#tParry','p');btn('#tThrow','f');btn('#tEmote',null);
+ $('#touch').addEventListener('contextmenu',e=>e.preventDefault());
+ $('#bMini').onclick=()=>{const p=$('#lobby .panel');p.classList.toggle('mini');$('#bMini').textContent=p.classList.contains('mini')?'▼ Show menu':'▲ Hide menu (practice)'}})();
+function showScreen(id){document.body.classList.toggle('ingame',id==='lobby'||id==='none');['title','lobby','results','over'].forEach(s=>$('#'+s).classList.toggle('on',s===id));curScreen=id}
 let curScreen='title',uiKey='';
 function showLobby(){showScreen('lobby');uiKey=''}
 function syncUI(){if(!V||curScreen==='title')return;const ph=V.phase,isHost=NET.mode==='host';
@@ -1080,6 +1121,7 @@ function frame(now_){let dt=Math.min(.1,(now_-last)/1000);last=now_;gtime+=dt;
  if(NET.mode==='client'&&V){for(const p of V.players){const d=disp[p.id];if(!d)continue;d.age+=dt;if(d.age<.15){d.tx+=d.vx*dt;d.ty+=d.vy*dt}d.x+=(d.tx-d.x)*Math.min(1,dt*16);d.y+=(d.ty-d.y)*Math.min(1,dt*16);p.x=d.x;p.y=d.y}
   for(const k of V.kegs)if(k.warn<=0){k.x+=k.vx*dt;k.y+=k.vy*dt}for(const c of V.corks)c.x+=c.vx*dt,c.y+=c.vy*dt;if(V.phase==='play'){V.matchT+=dt;V.mutT+=dt}if(V.bomb&&V.phase==='play')V.bomb.fuse=Math.max(0,V.bomb.fuse-dt);V.pt+=dt;}
  updateFX(dt);render(dt);syncUI();
+ if(IS_TOUCH&&V){const mp=V.players.find(q=>q.id===NET.myId);$('#tThrow').classList.toggle('has',!!(mp&&mp.gun>0))}
  if(curScreen==='title')drawPreview();
  requestAnimationFrame(frame)}
 const pvc=$('#pv').getContext('2d');
