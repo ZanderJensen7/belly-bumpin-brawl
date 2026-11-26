@@ -1,4 +1,4 @@
-# Last Call Brawl 🍺
+# Big Belly Bumpers 🍺
 
 A wobbly, drunk-friendly party brawler for 2–6 friends online. Belly-bump each other off a floating bar table. Winners get drunker.
 
