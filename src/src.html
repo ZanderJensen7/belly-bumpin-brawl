@@ -180,7 +180,7 @@ body.touch #chatw{left:auto;right:calc(12px + env(safe-area-inset-right));top:62
       <div class="seg wrap" id="segM"><button data-v="classic">Last One Standing</button><button data-v="teams">Tag Team 2v2</button><button data-v="stock">Stock Brawl</button><button data-v="draft">Sore Losers</button><button data-v="happy">Happy Hour</button><button data-v="koth">King of the Coaster</button></div>
       <div class="small" id="mdesc" style="margin:4px 0 8px"></div>
       <label>Map</label>
-      <div class="seg wrap" id="segP"><button data-v="random">🎲 Random</button><button data-v="round">Round Table</button><button data-v="counter">Bar Counter</button><button data-v="pong">Beer Pong</button><button data-v="coasters">Coaster Hop</button><button data-v="donut">The Donut</button><button data-v="pool">Pool Table</button><button data-v="dance">Dance Floor</button><button data-v="bridge">Two Tables</button><button data-v="swiss">Swiss Cheese</button></div>
+      <div class="seg wrap" id="segP"><button data-v="random">🎲 Random</button><button data-v="round">Round Table</button><button data-v="counter">Bar Counter</button><button data-v="pong">Beer Pong</button><button data-v="coasters">Coaster Hop</button><button data-v="belt">Keg Line</button><button data-v="ice">Ice Bucket</button><button data-v="seesaw">Seesaw</button><button data-v="donut">The Donut</button><button data-v="pool">Pool Table</button><button data-v="dance">Dance Floor</button><button data-v="bridge">Two Tables</button><button data-v="swiss">Swiss Cheese</button></div>
       <div id="livesWrap"><label style="display:block;margin-top:8px">Lives</label>
       <div class="seg" id="segL"><button data-v="2">❤️❤️</button><button data-v="3">❤️❤️❤️</button></div></div>
       <div id="tgtWrap"><label style="display:block;margin-top:8px">First to</label>
@@ -299,9 +299,12 @@ const MAPS={
  swiss:{n:'Swiss Cheese',solids:[{t:'c',x:0,y:0,r:300}],holes:[{t:'c',x:-140,y:-95,r:50},{t:'c',x:125,y:-140,r:40},{t:'c',x:160,y:105,r:56},{t:'c',x:-95,y:160,r:42},{t:'c',x:5,y:5,r:34},{t:'c',x:-215,y:60,r:30}],ext:310,rim:'#b98a1c',noMut:['spin']},
  hub:{n:'The Hub',solids:[{t:'r',x:0,y:0,w:1700,h:1000}],holes:[],ext:880,rim:'#4a2810',noMut:['rails'],rare:1,hub:1},
  donger:{n:'The Big Donger',solids:[{t:'c',x:-135,y:190,r:132},{t:'c',x:135,y:190,r:132},{t:'r',x:0,y:-55,w:210,h:470},{t:'c',x:0,y:-300,r:122}],holes:[],ext:430,rim:'#7a2f3f',noMut:['rails','spin'],rare:1},
+ belt:{n:'The Keg Line',solids:[{t:'r',x:0,y:0,w:900,h:400}],holes:[],ext:460,rim:'#3a3f48',noMut:['spin','tilt'],belts:[{x:0,y:-112,w:900,h:150,vx:120},{x:0,y:112,w:900,h:150,vx:-120}]},
+ ice:{n:'The Ice Bucket',solids:[{t:'c',x:0,y:0,r:300}],holes:[],ext:310,rim:'#7fb6d9',noMut:['spill'],ice:1,grip:[{x:0,y:0,r:62},{x:-190,y:-120,r:44},{x:190,y:-120,r:44},{x:-190,y:125,r:44},{x:190,y:125,r:44}]},
+ seesaw:{n:'The Seesaw',solids:[{t:'r',x:0,y:0,w:1000,h:210}],holes:[],ext:510,rim:'#5c3a1c',noMut:['spin','tilt','rails']},
  bridge:{n:'Two Tables',solids:[{t:'c',x:-280,y:0,r:175},{t:'c',x:280,y:0,r:175},{t:'s',x:0,y:0,w:420,h:84}],holes:[],ext:460,rim:'#4a2810',noMut:['rails','spin']},
 };
-const MAP_TIPS={round:'',counter:'Long and skinny.',pong:'Mind the cups.',coasters:'Dash to hop the gaps.',donut:'Mind the hole.',pool:'Sink them in the pockets.',dance:'Show off your moves.',bridge:'Fight for the plank.',donger:'Don\'t ask.',swiss:'Holey moley.'};
+const MAP_TIPS={round:'',counter:'Long and skinny.',pong:'Mind the cups.',coasters:'Dash to hop the gaps.',donut:'Mind the hole.',pool:'Sink them in the pockets.',dance:'Show off your moves.',bridge:'Fight for the plank.',donger:'Don\'t ask.',swiss:'Holey moley.',belt:'Mind the belts.',ice:'Only the coasters grip.',seesaw:'Too many on one end? Wheee.'};
 const MODES={
  classic:{n:'Last One Standing',d:'Last belly on the table wins.'},
  teams:{n:'Tag Team 2v2',d:'2v2. Friendly fire is on.'},
@@ -751,6 +754,7 @@ function simStep(dt){
   S.waveHit=Math.max(0,(S.waveHit||0)-dt);
   if(M.includes('slosh')){if(S.waveWarn>0){S.waveWarn-=dt;if(S.waveWarn<=0){S.waveWarn=0;S.waveHit=.5;const ca=Math.cos(S.waveA),sa=Math.sin(S.waveA);for(const p of alive()){p.vx+=ca*270;p.vy+=sa*270}ev('wave',{a:r2(S.waveA)})}}
    else{S.waveT=(S.waveT||3)-dt;if(S.waveT<=0){S.waveT=rnd(6,9);S.waveA=Math.random()*TAU;S.waveWarn=1.7;ev('wavewarn',{a:r2(S.waveA)})}}}
+  if(S.map==='seesaw'&&S.phase==='play'){let tq=0;for(const q of S.players)if(q.alive&&!q.pz)tq+=(q.x-CX)*(q.r>30?1.5:1);const tg=clamp(tq/450*200,-320,320);S.gx+=(tg-S.gx)*Math.min(1,dt*1.4);S.gy=0}
   if(M.includes('tilt')){S.tiltA+=dt*.4;const g=210*clamp(S.mutT/2,0,1);S.gx=Math.cos(S.tiltA)*g;S.gy=Math.sin(S.tiltA)*g}
   if(M.includes('kegs')){S.kegT-=dt;if(S.kegT<=0){S.kegT=rnd(1.6,2.6)-(S.rt>20?.5:0);const a=Math.random()*TAU,sx=CX+Math.cos(a)*560,sy=CY+Math.sin(a)*560;
     const tx=CX+rnd(-120,120),ty=CY+rnd(-120,120),l=hyp(tx-sx,ty-sy),sp=rnd(300,400);S.kegs.push({x:sx,y:sy,vx:(tx-sx)/l*sp,vy:(ty-sy)/l*sp,a:0,warn:1,r:30})}}
@@ -820,6 +824,7 @@ function simStep(dt){
   const rx=p.x-CX,ry=p.y-CY;
   if(S.rotV){dvx+=-ry*S.rotV;dvy+=rx*S.rotV}
   let k=p.dodge>0?1.2:p.dash>0?.8:(p.stun>0?1.5:7);if(M.includes('spill'))k=p.dash>0?.4:(p.stun>0?.8:2.6);
+  const MP=MAPS[S.map];if(MP&&(MP.ice||MP.belts)&&!p.pz){const L=toLocal(p.x,p.y,S);if(MP.ice&&!MP.grip.some(g=>hyp(L[0]-g.x,L[1]-g.y)<g.r))k=p.dash>0?.35:(p.stun>0?.6:1.6);if(MP.belts&&p.alive)for(const b of MP.belts)if(Math.abs(L[0]-b.x)<b.w/2&&Math.abs(L[1]-b.y)<b.h/2){p.x+=b.vx*(S.arenaR/BASE_R)*dt;break}}
   if(p.stun>0&&p.dash<=0){const sp0=hyp(p.vx,p.vy);if(sp0>1){const dot=-(ix*p.vx+iy*p.vy)/sp0;if(dot>.3)k+=4.5*dot;if(dot>.3&&Math.random()<dt*6)p.brace=1}}
   const f=1-Math.exp(-k*dt);p.vx+=(dvx-p.vx)*f;p.vy+=(dvy-p.vy)*f;
   if(playing&&(S.gx||S.gy)){p.vx+=S.gx*dt;p.vy+=S.gy*dt}
@@ -1230,6 +1235,15 @@ function coaster(g,x,y,r,bg,fg,txt){g.fillStyle=bg;g.beginPath();g.arc(x,y,r,0,T
  g.globalAlpha=.28;const ws=txt.split(' ');ws.forEach((w,i)=>g.fillText(w,x,y+(i-(ws.length-1)/2)*r*.32));g.globalAlpha=1}
 function getTex(id){if(mapTex[id])return mapTex[id];const m=MAPS[id],E=Math.ceil(m.ext+10),c=document.createElement('canvas');c.width=c.height=E*2;const g=c.getContext('2d');g.translate(E,E);
  if(id==='round'){const k=290/300;g.drawImage(raft,-320*k,-320*k,640*k,640*k)}
+ else if(id==='belt'){g.fillStyle='#4a5060';g.fillRect(-E,-E,2*E,2*E);g.fillStyle='#6b3a1a';g.fillRect(-450,-37,900,74);g.strokeStyle='rgba(30,10,0,.45)';g.lineWidth=2;for(let x=-450;x<450;x+=40){g.beginPath();g.moveTo(x,-37);g.lineTo(x,37);g.stroke()}
+  for(const b of MAPS.belt.belts){g.fillStyle='#262a33';g.fillRect(b.x-b.w/2,b.y-b.h/2,b.w,b.h);g.fillStyle='rgba(255,255,255,.05)';for(let i=0;i<30;i++)g.fillRect(rnd(-450,450),b.y+rnd(-70,70),rnd(20,60),2)}
+  g.fillStyle='#9aa3b5';[-200,-37,37,200].forEach(y=>{g.fillRect(-450,y-3,900,6)});stains(g,4,380)}
+ else if(id==='ice'){const gr=g.createRadialGradient(-60,-80,30,0,0,300);gr.addColorStop(0,'#f2fbff');gr.addColorStop(1,'#b9dff2');g.fillStyle=gr;g.fillRect(-E,-E,2*E,2*E);g.strokeStyle='rgba(255,255,255,.7)';g.lineWidth=2;for(let i=0;i<26;i++){g.beginPath();const x=rnd(-250,250),y=rnd(-250,250),a=rnd(0,TAU),l=rnd(40,140);g.moveTo(x,y);g.quadraticCurveTo(x+Math.cos(a+.5)*l*.5,y+Math.sin(a+.5)*l*.5,x+Math.cos(a)*l,y+Math.sin(a)*l);g.stroke()}
+  g.strokeStyle='rgba(120,180,215,.35)';g.lineWidth=1.5;for(let i=0;i<14;i++){g.beginPath();let x=rnd(-220,220),y=rnd(-220,220);g.moveTo(x,y);for(let k=0;k<4;k++){x+=rnd(-40,40);y+=rnd(-40,40);g.lineTo(x,y)}g.stroke()}
+  const cs=[['#f3e3c3','#c0392b','GRIP'],['#ffd23f','#2a1608',''],['#ff9fbf','#7a1040',''],['#d9f2c4','#2f7a2f',''],['#bfe6ff','#1f5fbf','']];MAPS.ice.grip.forEach((q,i)=>coaster(g,q.x,q.y,q.r,cs[i][0],cs[i][1],cs[i][2]))}
+ else if(id==='seesaw'){const pc=['#b5733a','#a8672f','#bd7c40','#a05f2b'];for(let y=-105,i=0;y<105;y+=35,i++){g.fillStyle=pc[i%4];g.fillRect(-E,y,2*E,35);g.strokeStyle='rgba(60,25,5,.5)';g.lineWidth=2.5;g.beginPath();g.moveTo(-E,y);g.lineTo(E,y);g.stroke()}
+  g.fillStyle='#5c3a1c';for(const x of [-480,-240,0,240,480])for(const y of [-88,88]){g.beginPath();g.arc(x,y,5,0,TAU);g.fill()}
+  g.fillStyle='rgba(0,0,0,.18)';g.beginPath();g.moveTo(-36,105);g.lineTo(36,105);g.lineTo(0,40);g.closePath();g.fill();stains(g,5,420)}
  else if(id==='counter'||id==='hub'){const pc=['#6f3215','#622a10','#7a3a18','#5c2710'];for(let y=-E,i=0;y<E;y+=36,i++){g.fillStyle=pc[i%4];g.fillRect(-E,y,2*E,36);g.strokeStyle='rgba(25,8,0,.55)';g.lineWidth=2;g.beginPath();g.moveTo(-E,y);g.lineTo(E,y);g.stroke();
    for(let k=0;k<5;k++){g.strokeStyle='rgba(25,8,0,.2)';g.lineWidth=1.5;const oy=y+rnd(4,32);g.beginPath();g.moveTo(-E,oy);for(let x=-E;x<E;x+=40)g.quadraticCurveTo(x+20,oy+rnd(-3,3),x+40,oy+rnd(-1.5,1.5));g.stroke()}}
   stains(g,9,420);
@@ -1263,6 +1277,9 @@ function drawArena(st,t){const m=MAPS[st.map]||MAPS.round,sc=st.arenaR/BASE_R,te
  ctx.save();ctx.clip('nonzero');ctx.drawImage(tex,-tex.width/2,-tex.height/2);ctx.restore();
  if(st.map==='pong')for(const h of m.holes){const g=ctx.createRadialGradient(h.x,h.y,4,h.x,h.y,h.r);g.addColorStop(0,'#6b3208');g.addColorStop(1,'#c9781e');ctx.fillStyle=g;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,TAU);ctx.fill();
   ctx.fillStyle='rgba(255,246,224,.55)';ctx.beginPath();ctx.arc(h.x-5,h.y-5,h.r*.4+Math.sin(t*3+h.x)*2,0,TAU);ctx.fill();ctx.strokeStyle='#d62828';ctx.lineWidth=9;ctx.beginPath();ctx.arc(h.x,h.y,h.r+3,0,TAU);ctx.stroke();ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(h.x,h.y,h.r+7.5,0,TAU);ctx.stroke()}
+ if(st.map==='belt')for(const b of m.belts){ctx.save();ctx.beginPath();ctx.rect(b.x-b.w/2,b.y-b.h/2,b.w,b.h);ctx.clip();ctx.strokeStyle='rgba(255,210,63,.35)';ctx.lineWidth=8;const sp=Math.sign(b.vx),off=((t*b.vx)%60+60)%60;for(let x=b.x-b.w/2-60+off;x<b.x+b.w/2+60;x+=60){ctx.beginPath();ctx.moveTo(x-sp*14,b.y-28);ctx.lineTo(x+sp*14,b.y);ctx.lineTo(x-sp*14,b.y+28);ctx.stroke()}ctx.fillStyle='rgba(0,0,0,.25)';for(let x=b.x-b.w/2+off*0;x<b.x+b.w/2;x+=30){ctx.fillRect(x+((t*b.vx)%30+30)%30,b.y-b.h/2,2,b.h)}ctx.restore()}
+ if(st.map==='seesaw'){const g=st.gx||0,a=clamp(Math.abs(g)/320,0,1);if(a>.02){const gr=ctx.createLinearGradient(-500,0,500,0);gr.addColorStop(0,g>0?'rgba(255,255,255,'+(.25*a)+')':'rgba(0,0,0,'+(.4*a)+')');gr.addColorStop(.5,'rgba(0,0,0,0)');gr.addColorStop(1,g>0?'rgba(0,0,0,'+(.4*a)+')':'rgba(255,255,255,'+(.25*a)+')');ctx.fillStyle=gr;ctx.fillRect(-500,-105,1000,210)}
+  ctx.fillStyle='#2a1608';ctx.beginPath();ctx.moveTo(-18,0);ctx.lineTo(18,0);ctx.lineTo(0,-20);ctx.closePath();ctx.globalAlpha=.35;ctx.fill();ctx.globalAlpha=1}
  if(st.map==='donut'){const h=m.holes[0],g=ctx.createRadialGradient(0,0,20,0,0,h.r);g.addColorStop(0,'rgba(90,40,0,.45)');g.addColorStop(1,'rgba(90,40,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,h.r,0,TAU);ctx.fill()}
  ctx.restore();
  if(st.gx||st.gy){ctx.save();ctx.translate(CX,CY);ctx.rotate(Math.atan2(st.gy,st.gx));ctx.fillStyle='rgba(255,255,255,.18)';for(let i=0;i<3;i++){const x=((t*120+i*90)%270)-135;ctx.beginPath();ctx.moveTo(x+30,0);ctx.lineTo(x,-24);ctx.lineTo(x,24);ctx.fill()}ctx.restore()}}
