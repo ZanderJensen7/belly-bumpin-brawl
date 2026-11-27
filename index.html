@@ -163,7 +163,7 @@ body.touch #chatw{left:auto;right:calc(12px + env(safe-area-inset-right));top:62
 
 <div id="touch"><div id="tstick"><div id="tbase"><div id="tknob"></div></div><div class="hint">drag to move</div></div>
 <div class="tb2" id="tParry"><b>🛡️</b>PARRY</div><div class="tb2" id="tBump"><b>🍺</b>BUMP</div><div class="tb2" id="tThrow"><b>🥛</b>THROW</div><div class="tb2" id="tEmote">😂</div></div>
-<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 60<span id="netinfo"></span></div>
+<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 61<span id="netinfo"></span></div>
 <div id="rotate"><div>📱↻</div>Turn your phone sideways to brawl</div>
 <div id="lobby" class="screen">
   <div class="panel"><button class="mtog" id="bMini">▲ Hide menu (practice)</button>
@@ -346,6 +346,11 @@ function enterPz(p){p.pz={lv:0,cp:-1,t0:S.t,d:0};pzPut(p);ev('pzin',{id:p.id});e
 function pzProg(p){const L=PZL[p.pz.lv],ox=PZX,oy=p.pz.lv*PZY,lx=p.x-ox,ly=p.y-oy;
  L.cp.forEach((c,i)=>{if(i>p.pz.cp&&hyp(lx-c[0],ly-c[1])<70){p.pz.cp=i;ev('pzcp',{id:p.id,x:p.x|0,y:p.y|0})}});
  if(hyp(lx-L.g[0],ly-L.g[1])<70){if(p.pz.lv<PZL.length-1){p.pz.lv++;p.pz.cp=-1;pzPut(p);ev('pzlv',{id:p.id,lv:p.pz.lv})}else{const tm=S.t-p.pz.t0;ev('pzwin',{id:p.id,t:Math.round(tm*10)/10,d:p.pz.d});ev('say',{text:p.name+' conquered the Deep End!',force:1});p.pz=null;placeRandom(p);p.inv=1.5}}}
+function floatLane(r){const pts=(x,y,rr,vert)=>{for(const o of [-rr-14,-rr*.5,0,rr*.5,rr+14])if(vert?onArena(x+o,y):onArena(x,y+o))return true;return false};
+ const clearV=(x,rr)=>{for(let y=0;y<=H;y+=18)if(pts(x,y,rr,1))return false;return true},clearH=(y,rr,x0)=>{for(let x=x0-rr;x<=W+40;x+=18)if(pts(x,y,rr,0))return false;return true};
+ for(const rr of [r,66,54]){for(let x=CX+BASE_R+20+rr;x<=1050;x+=8)if(clearV(x,rr))return {x,y:-100,vx:0,vy:52,r:rr};
+  for(const ex of [600,760,900])for(const dir of [1,-1])for(let y=CY+dir*40;dir>0?y<=H-rr*.55:y>=rr*.6+50;y+=dir*8)if(clearH(y,rr,ex))return {x:W+120,y,vx:-52,vy:0,r:rr,ex}}
+ return {x:1046,y:-100,vx:0,vy:52,r:54}}
 function floaterAt(x,y){if(!S||!S.fl)return null;for(const f of S.fl)if(!f.flip&&hyp(x-f.x,y-f.y)<f.r)return f;return null}
 function onArena(x,y,st){st=st||S;const m=MAPS[st.map]||MAPS.round;const l=toLocal(x,y,st);return m.solids.some(q=>inShape(q,l[0],l[1]))&&!m.holes.some(h=>inShape(h,l[0],l[1]))}
 function clearAt(x,y,d,st){if(!onArena(x,y,st))return false;for(let i=0;i<8;i++){const a=i/8*TAU;if(!onArena(x+Math.cos(a)*d,y+Math.sin(a)*d,st))return false}return true}
@@ -779,9 +784,9 @@ function simStep(dt){
  for(const c of S.corks)if(!c.dead&&c.t>=1.1)dropCork(c);S.corks=S.corks.filter(c=>!c.dead&&c.t<1.1);
  for(const k of S.kegs){if(k.warn>0){k.warn-=dt;continue}k.x+=k.vx*dt;k.y+=k.vy*dt;k.a+=dt*8}
  if(free&&!S.hub){S.fl=S.fl||[];if(S.flT==null)S.flT=/[?&]deep/.test(location.search)?1:18;S.flT-=dt;
-  if(S.flT<=0){S.flT=rnd(55,65);S.fl.push({x:CX+BASE_R+92,y:-100,vx:0,vy:52,r:84,flip:0,gold:0,a:Math.random()*TAU});ev('meme',{t:'🌊 ...what is that?',x:CX+BASE_R+92,y:90})}
-  for(const f of S.fl){f.y+=f.vy*dt;f.a+=dt*.4;if(f.flip>0)f.flip+=dt*2.2;else if(f.y>H-46){f.flip=.01;for(const q of S.players){if(!q.alive||q.dash>0||q.pz||hyp(q.x-f.x,q.y-f.y)>f.r)continue;ev('flipped',{id:q.id,x:q.x|0,y:q.y|0});enterPz(q)}}}
-  S.fl=S.fl.filter(f=>f.flip<1&&f.y<H+120)}else{if(S.fl&&S.fl.length)S.fl=[];for(const q of S.players)if(q.pz)q.pz=null}
+  if(S.flT<=0){S.flT=rnd(55,65);const ln=floatLane(84);S.fl.push(Object.assign(ln,{flip:0,gold:0,a:Math.random()*TAU}));ev('meme',{t:'🌊 ...what is that?',x:ln.vx?W-150:ln.x,y:ln.vx?ln.y-60:90})}
+  for(const f of S.fl){f.y+=f.vy*dt;f.x+=(f.vx||0)*dt;f.a+=dt*.4;if(f.flip>0)f.flip+=dt*2.2;else if((f.vy>0&&f.y>H-46)||(f.vx<0&&f.x<f.ex)){f.flip=.01;for(const q of S.players){if(!q.alive||q.dash>0||q.pz||hyp(q.x-f.x,q.y-f.y)>f.r)continue;ev('flipped',{id:q.id,x:q.x|0,y:q.y|0});enterPz(q)}}}
+  S.fl=S.fl.filter(f=>f.flip<1&&f.y<H+120&&f.x>-200)}else{if(S.fl&&S.fl.length)S.fl=[];for(const q of S.players)if(q.pz)q.pz=null}
  S.kegs=S.kegs.filter(k=>k.warn>0||hyp(k.x-CX,k.y-CY)<620);
  // players
  for(const p of S.players){
