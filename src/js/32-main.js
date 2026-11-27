@@ -12,9 +12,20 @@ let fpsN=0,fpsT=0,FPS=60;function frame(now_){let dt=Math.min(.1,(now_-last)/100
  logic();
  if(NET.mode==='client'&&V){const L=Math.min(.45,(NET.rtt||.08)/2+(NET.relay?.06:.03));for(const p of V.players){const d=disp[p.id];if(!d)continue;
   if(p.id===NET.myId&&p.alive&&V.phase!=='intro'&&V.phase!=='results'&&V.phase!=='over'){const inp=lastInp||{x:0,y:0};let ix=inp.x||0,iy=inp.y||0;if(V.mut&&V.mut.includes('nolegs')&&V.phase==='play'){ix=0;iy=0}if(V.mut&&V.mut.includes('reverse')){ix=-ix;iy=-iy}
-   const free=p.stun<=0&&p.dash<=0&&!(p.fall>0&&!p.alive);if(d.pvx==null){d.pvx=p.vx;d.pvy=p.vy}
+   // Predict our own dash the moment Space is released, instead of waiting a round trip for the host.
+   // PD mirrors the host's rules: h = hold time, q = dash charges left (2, refill after .9s), t = predicted dash time left,
+   // w = window in which the host's (late) copy of this dash is ignored so it isn't applied twice.
+   const PD=d.pd||(d.pd={h:0,q:2,qt:0,t:0,w:0}),act=V.phase==='play'||V.phase==='lobby',rev=V.mut&&V.mut.includes('reverse');
+   if(PD.q<2&&PD.t<=0){PD.qt+=dt;if(PD.qt>=.9){PD.q=2;PD.qt=0}}PD.w=Math.max(0,PD.w-dt);if(p.stun>0||!p.alive){PD.t=0;PD.w=0;PD.h=0}
+   const canDash=act&&p.stun<=0&&PD.t<=0&&(p.dash<=0||PD.w>0)&&PD.q>0&&!p.aiming&&!p.pzv;
+   if(inp.d&&canDash)PD.h+=dt;else if(PD.h>0){const cm=p.courage>0?4:1,c=Math.min(1,PD.h*1.5*cm),burped=PD.h>(1/(1.5*cm))+1.4;
+    if(!inp.d&&canDash&&!burped){let dx,dy;const l=hyp(inp.x||0,inp.y||0);if(inp.m&&typeof inp.a==='number'){dx=Math.cos(inp.a);dy=Math.sin(inp.a)}else if(l>.2){dx=inp.x/l;dy=inp.y/l}else{dx=Math.cos(p.face)*(rev?-1:1);dy=Math.sin(p.face)*(rev?-1:1)}
+     if(rev){dx=-dx;dy=-dy}const sp=470+720*c;d.pvx=dx*sp;d.pvy=dy*sp;PD.t=.2+.25*c;PD.w=PD.t+L*2+.12;PD.q--;PD.qt=0}PD.h=0}
+   const mine=PD.t>0;if(mine)PD.t-=dt;
+   const free=(p.stun<=0&&(p.dash<=0||PD.w>0)&&!(p.fall>0&&!p.alive))&&!mine;if(d.pvx==null){d.pvx=p.vx;d.pvy=p.vy}
+   if(mine){const f=1-Math.exp(-.8*dt);d.pvx+=(ix*255-d.pvx)*f;d.pvy+=(iy*255-d.pvy)*f}else
    if(free){const sp=(p.charge>0?105:255)*(p.aiming?.5:1)*(p.wob>0?.35:1)*(p.parry>0?.3:1)*(p.r>30?.9:1),f=1-Math.exp(-7*dt);d.pvx+=(ix*sp-d.pvx)*f;d.pvy+=(iy*sp-d.pvy)*f}else{d.pvx=p.vx;d.pvy=p.vy}
-   d.x+=d.pvx*dt;d.y+=d.pvy*dt;d.age+=dt;const tx=d.tx+d.vx*(L-Math.min(d.age,L)*0),ty=d.ty+d.vy*L,cr=free?4:14;d.x+=(d.tx+d.vx*L-d.x)*Math.min(1,dt*cr);d.y+=(ty-d.y)*Math.min(1,dt*cr);p.x=d.x;p.y=d.y;continue}
+   d.x+=d.pvx*dt;d.y+=d.pvy*dt;d.age+=dt;const tx=d.tx+d.vx*(L-Math.min(d.age,L)*0),ty=d.ty+d.vy*L,cr=PD.w>0?(mine?.4:1.2):free?4:14;d.x+=(d.tx+d.vx*L-d.x)*Math.min(1,dt*cr);d.y+=(ty-d.y)*Math.min(1,dt*cr);p.x=d.x;p.y=d.y;continue}
   d.age+=dt;if(d.age<.15){d.tx+=d.vx*dt;d.ty+=d.vy*dt}d.x+=(d.tx-d.x)*Math.min(1,dt*16);d.y+=(d.ty-d.y)*Math.min(1,dt*16);p.x=d.x;p.y=d.y}
   for(const k of V.kegs)if(k.warn<=0){k.x+=k.vx*dt;k.y+=k.vy*dt}for(const c of V.corks)c.x+=c.vx*dt,c.y+=c.vy*dt;if(V.phase==='play'){V.matchT+=dt;V.mutT+=dt}if(V.bomb&&V.phase==='play')V.bomb.fuse=Math.max(0,V.bomb.fuse-dt);V.pt+=dt;}
  replayTick(dt);updateFX(dt);if(RPL.on&&RPL.v){const live=V;V=RPL.v;try{render(dt)}finally{V=live}}else render(dt);syncUI();
