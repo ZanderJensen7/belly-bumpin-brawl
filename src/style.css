@@ -1,3 +1,4 @@
+/*__FONTS__*/
 :root{--ink:#2a1608;--amber:#f5a623;--foam:#fff6e0;--red:#ff5a5f;--panel:#fff3d6;--wood:#7a4520}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:#3b1d0a;font-family:Fredoka,system-ui,sans-serif;color:var(--ink);user-select:none;-webkit-user-select:none}
@@ -21,7 +22,7 @@ input{font-family:inherit;font-size:20px;font-weight:500;padding:8px 12px;border
 input:focus{box-shadow:0 0 0 4px rgba(245,166,35,.5)}
 #code{text-transform:uppercase;letter-spacing:4px;text-align:center}
 .pick{display:flex;align-items:center;gap:6px}
-.pick span{flex:1;text-align:center;font-weight:500;font-size:18px}.maim{font-family:Fredoka,system-ui,sans-serif!important;font-weight:500;letter-spacing:0;text-transform:none}
+.pick span{flex:1;text-align:center;font-weight:500;font-size:18px}
 button{font-family:'Luckiest Guy',Impact,sans-serif;font-size:20px;letter-spacing:1px;cursor:pointer;border:3px solid var(--ink);border-radius:14px;background:#fff;color:var(--ink);padding:8px 14px;box-shadow:0 4px 0 var(--ink);transition:transform .06s}
 button:hover{transform:translateY(-2px) rotate(-1deg)}
 button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
@@ -140,3 +141,21 @@ body.touch #chatw{left:auto;right:calc(12px + env(safe-area-inset-right));top:62
 @media (max-height:480px){#wpv{width:84px!important;height:84px!important}#ward .rtitle{font-size:24px!important}}
 #esc .panel{max-height:calc(100vh - 20px)}
 body>.foot{position:fixed;left:50%;bottom:6px;transform:translateX(-50%);margin:0;z-index:4;pointer-events:none}body.ingame>.foot,body.inroom>.foot{display:none}
+#opts{position:fixed;inset:0;z-index:46;display:none;align-items:center;justify-content:center;background:rgba(20,8,0,.55)}#opts.on{display:flex}
+#opts .panel{width:min(400px,94vw);max-height:94vh;overflow:auto;padding:12px 16px}
+.orow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;font:600 16px Fredoka,sans-serif;color:#2a1608;text-align:left}
+.orow span{flex:1}.orow button{flex:0 0 150px;width:150px;margin:0;padding:6px 10px;font-size:15px}.orow button.go{color:#fff}
+.olbl{margin-top:12px;font:400 20px 'Luckiest Guy',Impact,sans-serif;color:#2a1608;text-align:left}
+.vrow{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:4px 0 8px}.vrow button{flex:1;min-width:104px;margin:0;font-size:14px;padding:6px 8px}.vrow button.go{color:#fff}.vrow b{background:#2a1608;color:#fff6e0;border-radius:9px;padding:0 6px;margin-left:3px}
+#daily{position:fixed;inset:0;z-index:46;display:none;align-items:center;justify-content:center;background:rgba(20,8,0,.55)}#daily.on{display:flex}
+#daily .panel{width:min(400px,94vw);max-height:94vh;overflow:auto;padding:12px 16px}
+.dq{margin-top:10px;padding:8px 10px;border:3px solid #2a1608;border-radius:12px;background:#fff6e0;text-align:left;color:#2a1608}.dq.dn{background:#d9f2c4}
+.dqt{display:flex;justify-content:space-between;gap:8px;font:600 16px Fredoka,sans-serif}.dqt span{white-space:nowrap;color:#b3541e}
+.dbar{height:10px;border:2px solid #2a1608;border-radius:6px;background:#fff;margin:6px 0 2px;overflow:hidden}.dbar i{display:block;height:100%;background:#f5a623}.dq.dn .dbar i{background:#4cd964}
+/* the top bar gained a Settings button: keep it on screen on narrow phones */
+@media (max-width:480px){#tools{gap:4px}#tools input[type=range]{width:50px}#tools button{padding:4px 8px}}
+.orow small{display:block;font:400 12px Fredoka,sans-serif;opacity:.75;line-height:1.2}
+.esep{height:8px}
+#opts .orow{margin-top:4px}#opts .olbl{margin-top:9px}
+#oKeys{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}#oKeys .orow{font-size:14px}#oKeys .orow button{flex:0 0 78px;width:78px;padding:6px 4px;font-size:14px}
+body.touch #oKeys{display:none}

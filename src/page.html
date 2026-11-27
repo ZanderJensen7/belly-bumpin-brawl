@@ -5,8 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <title>Belly Bumpin' Brawl</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="Bump your friends into the beer. A free, wobbly party brawler for 2-6 friends, right in your browser. No install.">
+<meta name="theme-color" content="#3b1d0a">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Belly Bumpin' Brawl"><meta property="og:title" content="Belly Bumpin' Brawl">
+<meta property="og:description" content="Bump your friends into the beer. A free party brawler for 2-6 friends, right in your browser.">
+<meta property="og:url" content="https://zanderjensen7.github.io/belly-bumpin-brawl/"><meta property="og:image" content="https://zanderjensen7.github.io/belly-bumpin-brawl/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2064%2064'%3E%3Crect%20width%3D'64'%20height%3D'64'%20rx%3D'14'%20fill%3D'%23f2a93b'%2F%3E%3Cpath%20d%3D'M21%2021%2032%203l11%2018z'%20fill%3D'%233fa7ff'%20stroke%3D'%232a1608'%20stroke-width%3D'3'%20stroke-linejoin%3D'round'%2F%3E%3Ccircle%20cx%3D'32'%20cy%3D'4.5'%20r%3D'3.5'%20fill%3D'%23ff5a5f'%20stroke%3D'%232a1608'%20stroke-width%3D'2'%2F%3E%3Cellipse%20cx%3D'32'%20cy%3D'39'%20rx%3D'19'%20ry%3D'20'%20fill%3D'%23ff5a5f'%20stroke%3D'%232a1608'%20stroke-width%3D'3.5'%2F%3E%3Ccircle%20cx%3D'25'%20cy%3D'33'%20r%3D'6.2'%20fill%3D'%23fff'%20stroke%3D'%232a1608'%20stroke-width%3D'2.5'%2F%3E%3Ccircle%20cx%3D'39'%20cy%3D'33'%20r%3D'6.2'%20fill%3D'%23fff'%20stroke%3D'%232a1608'%20stroke-width%3D'2.5'%2F%3E%3Ccircle%20cx%3D'26.5'%20cy%3D'34'%20r%3D'2.7'%20fill%3D'%23111'%2F%3E%3Ccircle%20cx%3D'40.5'%20cy%3D'34'%20r%3D'2.7'%20fill%3D'%23111'%2F%3E%3Cpath%20d%3D'M25%2046q7%207%2014%200'%20fill%3D'none'%20stroke%3D'%232a1608'%20stroke-width%3D'3'%20stroke-linecap%3D'round'%2F%3E%3C%2Fsvg%3E">
 <style>
 /*__CSS__*/
 </style>
@@ -23,13 +28,13 @@
     <div class="row" style="margin-top:10px"><input id="code" placeholder="CODE" maxlength="5" autocomplete="off" spellcheck="false"><button id="bJoin" class="go" style="font-size:24px;padding:10px 18px">Join</button></div>
     <div class="row" style="gap:8px;margin-top:10px"><button id="bHub" class="big hubbtn" style="flex:1">🍻 Hub<span>hang out · chat</span></button><button id="bTCust" class="big custbtn" style="flex:1">🎨 Customize<span>hats · faces · tags</span></button></div>
     <div class="row tsub" style="gap:8px;margin-top:10px"><button id="bSolo" class="ghost">🤖 Practice</button><button id="bStats" class="ghost">📊 Stats</button><button id="bLB" class="ghost">🏆 Leaders</button></div>
+    <div class="row tsub" style="margin-top:8px"><button id="bDaily" class="ghost" style="flex:1"></button></div>
     <div style="display:none"><div class="col">
         
         <label>Color</label><div class="pick"><button data-p="c-1">◀</button><span id="cn"></span><button data-p="c1">▶</button></div>
         <label>Hat</label><div class="pick"><button data-p="h-1">◀</button><span id="hn"></span><button data-p="h1">▶</button></div>
         <label>Face</label><div class="pick"><button data-p="f-1">◀</button><span id="fnn"></span><button data-p="f1">▶</button></div>
         <label>Back</label><div class="pick"><button data-p="b-1">◀</button><span id="bnn"></span><button data-p="b1">▶</button></div>
-        <button class="maim keyonly" style="margin-top:6px;font-size:14px;padding:5px 8px"></button>
       </div>
     </div>
 </div>
@@ -75,7 +80,7 @@
       <button id="bStart" class="big go">Start the brawl!<span class="padhint"> (START)</span></button>
     </div>
     <div class="waitmsg" id="lwait">Waiting for host...</div>
-    <div class="ctrls"><div class="touchonly">Drag left side to move. Hold <b>BUMP</b>, release to launch. <b>PARRY</b> right before a hit.</div><div class="keyonly"><kbd>WASD</kbd> move · hold <kbd>Space</kbd> bump · <kbd>Shift</kbd> parry · <kbd>F</kbd> throw (tap twice) · <kbd>1-4</kbd> emotes</div>Knock everyone into the beer. Hold full charge too long and you burp.</div>
+    <div class="ctrls"><div class="touchonly">Drag left side to move. Hold <b>BUMP</b>, release to launch. <b>PARRY</b> right before a hit.</div><div class="keyonly"><kbd>WASD</kbd> move · hold <kbd>Space</kbd> bump · <kbd>Shift</kbd> parry · <kbd>F</kbd> throw (tap twice) · <kbd>1-8</kbd> emotes</div>Knock everyone into the beer. Hold full charge too long and you burp.</div>
   </div>
 </div>
 
@@ -84,6 +89,7 @@
   <div class="rtitle" id="rtitle">X WINS</div>
   <div class="scores" id="rscores"></div>
   <div id="rpick"></div>
+  <div id="rvote"></div>
   <div class="card"><h3 id="rcardh">🍺 Drink card</h3><div id="rlines"></div></div>
   <button id="bNext" class="big go">Next round ▶</button>
   <div class="bar"><i id="rbar"></i></div>
@@ -92,7 +98,7 @@
 <div id="ward"><div class="panel"><div class="rtitle" style="font-size:32px">🎨 Wardrobe</div><canvas id="wpv" width="240" height="240" style="width:170px;height:170px;display:block;margin:0 auto"></canvas><div id="wname" style="text-align:center;font:600 20px Fredoka,sans-serif;margin:-6px 0 6px;-webkit-text-stroke:0;text-shadow:-2px -2px 0 #2a1608,2px -2px 0 #2a1608,-2px 2px 0 #2a1608,2px 2px 0 #2a1608,0 2px 0 #2a1608;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
     <div class="mebox" id="mebox">
       <input id="lnm" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Your name" style="width:100%;box-sizing:border-box">
-      <div class="pick" style="margin-top:6px"><button data-l="c-1">◀</button><span id="lcn" style="font-size:16px"></span><button data-l="c1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="h-1">◀</button><span id="lhn" style="font-size:16px"></span><button data-l="h1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="f-1">◀</button><span id="lfn" style="font-size:16px"></span><button data-l="f1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="b-1">◀</button><span id="lbn" style="font-size:16px"></span><button data-l="b1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="i-1">◀</button><span id="lin" style="font-size:16px"></span><button data-l="i1">▶</button></div><input id="ltag" maxlength="4" autocomplete="off" spellcheck="false" placeholder="Clan tag (4 letters)" style="width:100%;box-sizing:border-box;margin-top:6px;text-transform:uppercase"><button class="maim keyonly" style="width:100%;margin-top:6px;font-size:14px;padding:5px 8px"></button>
+      <div class="pick" style="margin-top:6px"><button data-l="c-1">◀</button><span id="lcn" style="font-size:16px"></span><button data-l="c1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="h-1">◀</button><span id="lhn" style="font-size:16px"></span><button data-l="h1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="f-1">◀</button><span id="lfn" style="font-size:16px"></span><button data-l="f1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="b-1">◀</button><span id="lbn" style="font-size:16px"></span><button data-l="b1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="i-1">◀</button><span id="lin" style="font-size:16px"></span><button data-l="i1">▶</button></div><input id="ltag" maxlength="4" autocomplete="off" spellcheck="false" placeholder="Clan tag (4 letters)" style="width:100%;box-sizing:border-box;margin-top:6px;text-transform:uppercase">
     </div><div class="small" id="wlock" style="text-align:center;margin-top:6px"></div><button id="bWard" class="big go">Done</button></div></div>
 <div id="chatw"><div class="ch">💬 Chat</div><div id="clog"></div><input id="cin" maxlength="80" placeholder="Press Enter to chat" autocomplete="off" spellcheck="false"></div>
 <div id="hub" class="screen"><div class="panel"><div class="rtitle" style="font-size:28px">🍻 The Hub</div><div class="small" id="hcount">Just you so far</div><div class="small" style="margin-top:6px;opacity:.8">Walk into a glowing portal to join a match, or onto the 🍻 pad to host one.</div><button id="bHubLeave" class="ghost">Leave hub</button></div></div>
@@ -101,7 +107,7 @@
 <div id="stats" class="screen"><div class="panel"><div class="rtitle" style="font-size:34px">📊 <span id="stName" style="font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:30px"></span></div><div class="sgrid" id="sgrid"></div><div id="achs"></div><button id="bStBack" class="big">Back</button></div></div>
 <div id="over" class="screen"><div class="panel">
   <div class="small H">CHAMPION</div>
-  <canvas id="champ" width="240" height="240" style="width:180px;height:180px"></canvas>
+  <canvas id="champ" width="440" height="280" style="width:330px;max-width:100%;aspect-ratio:440/280"></canvas>
   <div class="rtitle" id="otitle">X</div>
   <div class="scores" id="oscores"></div>
   <div class="oxp" id="oxp"></div>
@@ -111,11 +117,27 @@
 </div></div>
 
 <div id="toast"></div>
-<div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bVoice" title="Announcer voice (click to change)">🗣️</button><button id="bFull" title="Fullscreen">⛶</button><button id="bMenu" title="Menu (Esc)">☰</button></div>
+<div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bOpts" title="Settings">⚙️</button><button id="bFull" title="Fullscreen">⛶</button><button id="bMenu" title="Menu (Esc)">☰</button></div>
 <div id="draft"><div class="dh">PICK A POWER-UP!</div><div class="ds">Losers get stronger. They stack.</div><div class="dc" id="dcards"></div><div class="dt"><i id="dbar"></i></div></div>
 <div id="tut"><div class="ttx"></div></div>
 <div id="rpl"><b>▶ INSTANT REPLAY</b><span>any button to skip</span></div>
-<div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eLob" class="ghost">Back to lobby</button><div id="ePl"></div><button id="eSt" class="ghost">📊 My stats</button><button id="eBg" class="ghost"></button><button id="eTut" class="ghost">🎓 Show control tips again</button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
+<div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eSt" class="ghost">📊 My stats</button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eSet" class="ghost">⚙️ Settings</button><div id="ePl"></div><div class="esep"></div><button id="eLob" class="ghost">Back to lobby</button><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
+<div id="daily"><div class="panel"><div class="rtitle" style="font-size:34px">📅 Daily challenges</div><div id="dlist"></div><button id="dDone" class="big go" style="width:100%;margin-top:10px">Done</button></div></div>
+<div id="opts"><div class="panel"><div class="rtitle" style="font-size:34px">⚙️ Settings</div>
+<div class="olbl">Sound <span class="small">(volume is in the top bar)</span></div>
+<div class="orow"><span>Announcer voice</span><button id="bVoice" class="ghost" title="Click to change the voice"></button></div>
+<div class="orow"><span>Bar ambience</span><button id="oAmb" class="ghost"></button></div>
+<div class="orow"><span>Sound when tabbed out</span><button id="eBg" class="ghost"></button></div>
+<div class="olbl">Display</div>
+<div class="orow"><span>Screen shake</span><button id="oShake" class="ghost"></button></div>
+<div class="orow"><span>Flashes and disco lights</span><button id="oFlash" class="ghost"></button></div>
+<div class="orow"><span>Colour-blind shapes</span><button id="oCb" class="ghost"></button></div>
+<div class="olbl">Controls</div>
+<div class="orow keyonly"><span>Mouse aim<small>left click bumps toward the cursor, right click parries</small></span><button class="maim ghost"></button></div>
+<div class="orow"><span>Control tips</span><button id="eTut" class="ghost">Show again</button></div>
+<div class="orow keyonly" style="margin-top:10px"><span><b>Keyboard</b><small>click one, then press a key</small></span><button id="oReset" class="ghost">Reset keys</button></div>
+<div id="oKeys" class="keyonly"></div>
+<button id="oDone" class="big go" style="width:100%;margin-top:12px">Done</button></div></div>
 
 <script>/*__PEERJS__*/</script>
 <script>

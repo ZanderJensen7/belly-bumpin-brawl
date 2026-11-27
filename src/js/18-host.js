@@ -50,7 +50,8 @@ function hostMsg(c,m){if(!m||!S)return;const id=connId(c);if(NET.banned&&(NET.ba
    toast(p.name+' stumbled in!');ev('emote',{id:p.id,em:2});}c.send({t:'w',id});return}
  if(!p)return;
  if(m.t==='i'){p.inp.x=clamp(+m.x||0,-1,1);p.inp.y=clamp(+m.y||0,-1,1);p.inp.d=m.d?1:0;p.inp.f=m.f?1:0;p.inp.p=m.p?1:0;p.inp.a=(typeof m.a==='number'&&isFinite(m.a))?m.a:null;p.inp.m=m.m?1:0}
- else if(m.t==='e'){emote(p,clamp(m.k|0,0,3))}
+ else if(m.t==='e'){emote(p,clamp(m.k|0,0,EMOTES.length-1))}
+ else if(m.t==='mv'){castVote(p.id,m.k|0)}
  else if(m.t==='lj'){const k=clamp(m.k|0,1,3);if(S.players.length>=6){c.send({t:'gfull',k});return}hostGuest(id,k,m)}
  else if(m.t==='ll'){const gid=id+'~'+clamp(m.k|0,1,3);S.players=S.players.filter(q=>q.id!==gid)}
  else if(m.t==='gi'){const g=P(id+'~'+clamp(m.k|0,1,3));if(g){g.inp.x=clamp(+m.x||0,-1,1);g.inp.y=clamp(+m.y||0,-1,1);g.inp.d=m.d?1:0;g.inp.f=m.f?1:0;g.inp.p=m.p?1:0;g.inp.a=null;g.inp.m=0}}
@@ -63,12 +64,12 @@ function hostMsg(c,m){if(!m||!S)return;const id=connId(c);if(NET.banned&&(NET.ba
  else if(m.t==='pg'){c.send({t:'po',k:m.k})}
  else if(m.t==='bye'){S.players=S.players.filter(x=>x!==p&&x.owner!==id)}}
 function broadcast(){if(!S)return;const s=snapshot();const rl=new Set();for(const c of NET.conns.values()){if(c.relay){rl.add(c.mq);continue}try{if(c.open!==false)c.send({t:'s',s})}catch(e){}}if(rl.size){NET.rev=(NET.rev||[]).concat(s.ev);NET.rtick=(NET.rtick||0)+1;if(NET.rtick%(NET.rhalf?2:1)===0||NET.rev.length>12){const j=JSON.stringify({t:'s',s:Object.assign({},s,{ev:NET.rev})});NET.rev=[];for(const mq of rl)mq.pub(RT(S.code)+'all',j)}}S.evq=[]}
-const PROTO=19;const PKI=new Set(['x','y','vx','vy','ghx','ghy']);const PKB=new Set(['alive','bot']);
+const PROTO=20;const PKI=new Set(['x','y','vx','vy','ghx','ghy']);const PKB=new Set(['alive','bot']);
 const PK=['ghx','ghy','id','name','color','hat','bot','x','y','vx','vy','face','r','alive','fall','charge','dash','stun','buzz','score','emote','emoteT','teeter','kos','falls','team','inv','gun','armor','courage','gulp','aiming','aimA','aimC','thT','parry','wob','dodge','slosh','ctr','fullT','full','lives','lv','pks','fc','bk','spl','tag','ic','hand','pzv'];
 const r2=v=>Math.round(v*100)/100;
 let lastRails='',railsT=0;function snapshot(){const sn=snapshot0();const rj=JSON.stringify(sn.rails);railsT++;if(rj===lastRails&&railsT%30)delete sn.rails;else lastRails=rj;return sn}
 function snapshot0(){return {st:r2(S.t),fl:(S.fl||[]).map(f=>[f.x|0,f.y|0,f.r,r2(f.flip),f.gold,r2(f.a)]),code:S.code,phase:S.phase,pt:r2(S.pt),rt:r2(S.rt),round:S.round,mut:S.mut,arenaR:r2(S.arenaR),rot:r2(S.rot),gx:S.gx|0,gy:S.gy|0,sudden:S.sudden,
- card:S.card,over:S.over,settings:S.settings,lastWinner:S.lastWinner,map:S.map,matchT:r2(S.matchT),waveWarn:r2(S.waveWarn||0),disco:S.disco?1:0,hydro:S.hydro?1:0,waveA:r2(S.waveA||0),mutT:r2(S.mutT),
+ card:S.card,vote:S.vote&&S.phase==='results'?S.vote:null,over:S.over,settings:S.settings,lastWinner:S.lastWinner,map:S.map,matchT:r2(S.matchT),waveWarn:r2(S.waveWarn||0),disco:S.disco?1:0,hydro:S.hydro?1:0,waveA:r2(S.waveA||0),mutT:r2(S.mutT),
  zone:S.zone?{x:S.zone.x|0,y:S.zone.y|0,r:S.zone.r,own:S.zone.own,t:r2(S.zone.t)}:null,items:S.items.map(i=>({x:i.x|0,y:i.y|0})),loose:S.loose.map(c=>({x:c.x|0,y:c.y|0})),rails:S.rails.map(r=>({ax:r.ax|0,ay:r.ay|0,bx:r.bx|0,by:r.by|0,hp:r.hp})),corks:S.corks.map(c=>({x:c.x|0,y:c.y|0,vx:c.vx|0,vy:c.vy|0})),nuts:(S.nuts||[]).map(n=>[n.x|0,n.y|0,r2(n.t)]),
  pk:S.players.map(p=>PK.map(k=>{let v=p[k];if(typeof v==='number')v=(PKI.has(k)?Math.round(v):r2(v));else if(v===undefined)v=0;else if(v===false)v=0;else if(v===true)v=1;return v})),
  kegs:S.kegs.map(k=>({x:k.x|0,y:k.y|0,vx:k.vx|0,vy:k.vy|0,a:r2(k.a),warn:r2(k.warn),r:k.r})),bumpers:S.bumpers.map(b=>({x:b.x|0,y:b.y|0,r:b.r})),

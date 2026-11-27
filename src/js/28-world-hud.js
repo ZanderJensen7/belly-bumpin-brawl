@@ -23,7 +23,7 @@ function drawWorld(t){drawSea(t);if(!V){drawArena({map:'round',arenaR:BASE_R,rot
  for(const k of V.kegs)if(k.warn<=0)drawKeg(ctx,k,t);
  const teams=V.settings.mode==='teams'&&V.phase!=='lobby';
  for(const p of list)if(p.alive&&p.hand>0)drawHandArm(ctx,p.x,p.y,1-p.hand/1.15,t);
- for(const p of list)if(p.alive){if(teams){ctx.strokeStyle=TEAMS[p.team].c;ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(p.x,p.y+p.r*.55,p.r*1.15,p.r*.5,0,0,TAU);ctx.stroke()}
+ for(const p of list)if(p.alive){if(teams){ctx.strokeStyle=TEAMS[p.team].c;ctx.lineWidth=5;if(cbOn&&p.team)ctx.setLineDash([9,7]);ctx.beginPath();ctx.ellipse(p.x,p.y+p.r*.55,p.r*1.15,p.r*.5,0,0,TAU);ctx.stroke();ctx.setLineDash([])}
   if(p.courage>0&&Math.random()<.5)parts.push({x:p.x+rnd(-p.r,p.r),y:p.y+rnd(-p.r,p.r*.3),vx:0,vy:-60,z:0,vz:0,t:0,life:.5,sz:rnd(3,6),col:pick(['#ff5a5f','#ff9f1c','#ffd23f']),g:0});
   ctx.save();if(p.inv>0)ctx.globalAlpha=Math.floor(t*12)%2?.45:.9;drawGuy(ctx,p,A_(p.id),t);ctx.restore();
   if(p.armor>0){ctx.strokeStyle='rgba(255,210,63,'+(.55+Math.sin(t*6)*.25)+')';ctx.lineWidth=4;ctx.beginPath();ctx.arc(p.x,p.y-p.r*.2,p.r+14,0,TAU);ctx.stroke();ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y-p.r*.2,p.r+14,t*3,t*3+1);ctx.stroke()}
@@ -37,7 +37,7 @@ function drawWorld(t){drawSea(t);if(!V){drawArena({map:'round',arenaR:BASE_R,rot
   ctx.fillStyle='rgba(30,10,0,.25)';ctx.beginPath();ctx.ellipse(0,18,10,4,0,0,TAU);ctx.fill();ctx.rotate(gtime*14);drawPint(ctx,0);ctx.restore()}
  for(const k of V.kegs)if(k.warn>0)drawKeg(ctx,k,t);
  // particles
- for(const q of parts){const a=1-q.t/q.life;ctx.globalAlpha=clamp(a*1.5,0,1);ctx.fillStyle=q.col;ctx.beginPath();ctx.arc(q.x,q.y-q.z,q.sz*(.5+a*.5),0,TAU);ctx.fill()}ctx.globalAlpha=1;
+ for(const q of parts){const a=1-q.t/q.life;ctx.globalAlpha=clamp(a*1.5,0,1);ctx.fillStyle=q.col;ctx.beginPath();ctx.arc(q.x,q.y-q.z,q.sz*(q.d?1.6-a*.8:.5+a*.5),0,TAU);ctx.fill()}ctx.globalAlpha=1;
  for(const g of rings){const u=g.t/g.life;ctx.strokeStyle=g.col;ctx.globalAlpha=1-u;ctx.lineWidth=8*(1-u)+1;ctx.beginPath();ctx.arc(g.x,g.y,g.r*(.3+u),0,TAU);ctx.stroke()}ctx.globalAlpha=1;
  for(const p of list){const lg=LOC.size&&typeof p.id==='string'&&p.id.startsWith(NET.myId+'~');drawTag(ctx,p,p.id===NET.myId||lg,t,lg?'P'+(+p.id.split('~')[1]+1)+' ':LOC.size&&p.id===NET.myId?'P1 ':'');drawBubble(ctx,p,t)}
  if(V.settings&&V.settings.ghosts)for(const p of list)if(!p.alive&&p.ghx!=null){const bob=Math.sin(t*3+p.color)*6;ctx.save();ctx.globalAlpha=.45;const gp={...p,x:p.ghx,y:p.ghy+bob,alive:true,fall:1,stun:0,charge:0,dash:0,vx:0,vy:0,teeter:0,emote:-1,emoteT:0,hand:0,gun:0};drawGuy(ctx,gp,A_('g'+p.id),t);ctx.globalAlpha=.8;ctx.font='13px '+FONT;ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText('👻 '+p.name,p.ghx,p.ghy+bob-p.r*2.3);ctx.restore()}
@@ -109,6 +109,8 @@ function drawCrown(x,y){ctx.fillStyle='#ffd23f';ctx.strokeStyle='#2a1608';ctx.li
 function updateFX(dt){for(const q of parts){q.t+=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=Math.exp(-3*dt);q.vy*=Math.exp(-3*dt);if(q.g){q.vz-=900*dt;q.z=Math.max(0,q.z+q.vz*dt)}}parts=parts.filter(q=>q.t<q.life);if(parts.length>600)parts.splice(0,parts.length-600);
  for(const q of pops)q.t+=dt;pops=pops.filter(q=>q.t<q.life);for(const g of rings)g.t+=dt;rings=rings.filter(g=>g.t<g.life);for(const k in bumpSq)bumpSq[k]=Math.max(0,bumpSq[k]-dt*2);
  if(!V)return;for(const p of V.players){const a=A_(p.id);const sp=hyp(p.vx,p.vy);a.walk+=dt*sp*.06;
+  // dust: puffs at the feet when running, dashing, skidding after a hit, or teetering on an edge
+  if(p.alive&&!p.pzv&&V.phase!=='results'){a.dT=(a.dT||0)-dt;const skid=p.stun>0&&sp>180,dsh=p.dash>0,run=sp>170&&p.stun<=0&&!dsh;if(a.dT<=0&&(skid||dsh||run||(p.teeter&&sp>25))){a.dT=skid?.035:dsh?.03:run?.15:.13;for(let i=skid?2:1;i--;)parts.push({x:p.x+rnd(-p.r*.5,p.r*.5),y:p.y+p.r*.55+rnd(-3,3),vx:-p.vx*.12+rnd(-25,25),vy:-p.vy*.12+rnd(-22,4),z:0,vz:0,t:0,life:rnd(.28,.5),sz:rnd(3,skid?8:6)*(dsh?1.2:1),col:'rgba(255,246,224,.5)',g:0,d:1})}}
   const ax=(p.vx-a.lvx),ay=(p.vy-a.lvy);a.lvx=p.vx;a.lvy=p.vy;a.pvx-=ax*.25;a.pvy-=ay*.25;
   a.pvx+=(-a.px*160-a.pvx*5)*dt;a.pvy+=(-a.py*160-a.pvy*5)*dt;if(p.stun>0){a.pvx+=Math.cos(gtime*15)*400*dt;a.pvy+=Math.sin(gtime*15)*400*dt}a.px+=a.pvx*dt;a.py+=a.pvy*dt;
   a.px=clamp(a.px,-8,8);a.py=clamp(a.py,-8,8);a.sq=Math.max(0,a.sq-dt*3);

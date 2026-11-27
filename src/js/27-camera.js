@@ -2,14 +2,14 @@
 function render(dt){const t=gtime;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#3b1d0a';ctx.fillRect(0,0,cv.width,cv.height);
  if(zoomT>0){zoomT-=dt;if(zoomT<=0)zoom=1}const FZ=fitCam();const zt=zoomT>0?zoom*FZ[0]:FZ[0];camZ=lerp(camZ,zt,Math.min(1,dt*(zoomT>0?6:3)));const mpz=V&&V.phase==='lobby'&&V.players.find(p=>p.id===NET.myId&&(p.pzv||(S&&S.hub)));if(mpz){const tx=S&&S.hub?mpz.x-120:mpz.x-lobbyShift()*.6+140,ty=mpz.y;if(hyp(camX-tx,camY-ty)>1500){camX=tx;camY=ty}else{camX=lerp(camX,tx,Math.min(1,dt*4));camY=lerp(camY,ty,Math.min(1,dt*4))}}else{
  if(hyp(camX-CX,camY-CY)>1500){camX=CX;camY=CY}camX=lerp(camX,zoomT>0?zx:(V&&V.phase==='lobby'?CX-lobbyShift():CX),Math.min(1,dt*5));camY=lerp(camY,zoomT>0?zy:FZ[1],Math.min(1,dt*5))}
- shake=Math.max(0,shake-dt*40);const kd=Math.exp(-dt*14);kickX*=kd;kickY*=kd;const sx=rnd(-1,1)*shake+kickX,sy=rnd(-1,1)*shake+kickY;
+ shake=Math.max(0,shake-dt*40);const kd=Math.exp(-dt*14);kickX*=kd;kickY*=kd;const sk=SHK[shakeLv],sx=(rnd(-1,1)*shake+kickX)*sk,sy=(rnd(-1,1)*shake+kickY)*sk;
  const goggles=V&&V.mut&&V.mut.includes('goggles')&&(V.phase==='play'||V.phase==='intro');
  const world=()=>{ctx.translate(W/2+sx,H/2+sy);ctx.scale(camZ,camZ);ctx.translate(-camX,-camY);drawWorld(t)};
  ctx.setTransform(SC,0,0,SC,OX,OY);ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();
  if(goggles){ctx.save();world();ctx.restore();ctx.globalAlpha=.42;ctx.save();ctx.translate(Math.sin(t*1.3)*18,Math.cos(t*.9)*8);world();ctx.restore();ctx.globalAlpha=1}
  else{ctx.save();world();ctx.restore()}
- if(V&&V.disco&&V.phase!=='lobby')drawDisco(t);
- if(flash>0){ctx.fillStyle='rgba(255,255,255,'+flash+')';ctx.fillRect(0,0,W,H);flash=Math.max(0,flash-dt*1.5)}
+ if(V&&V.disco&&V.phase!=='lobby'&&flashOn)drawDisco(t);
+ if(flash>0){if(flashOn){ctx.fillStyle='rgba(255,255,255,'+flash+')';ctx.fillRect(0,0,W,H)}flash=Math.max(0,flash-dt*1.5)}
  // vignette
  const vg=ctx.createRadialGradient(W/2,H/2,H*.45,W/2,H/2,H*.95);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(40,10,0,.5)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
  if(V)drawHUD(t);ctx.restore()}

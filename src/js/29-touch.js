@@ -5,7 +5,7 @@
  st.addEventListener('pointermove',e=>{if(e.pointerId!==sid)return;let dx=e.clientX-ox,dy=e.clientY-oy;const l=hyp(dx,dy),R=58;if(l>R){ox+=dx/l*(l-R);oy+=dy/l*(l-R);base.style.left=ox+'px';base.style.top=oy+'px';dx=dx/l*R;dy=dy/l*R}
   knob.style.transform='translate('+dx+'px,'+dy+'px)';const m=Math.min(1,l/R);touch.x=m>.18?dx/R:0;touch.y=m>.18?dy/R:0});
  const end=e=>{if(e.pointerId!==sid)return;sid=null;base.style.display='none';touch.x=touch.y=0};st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end);
- const btn=(id,k)=>{const b=$(id);const on=e=>{e.preventDefault();initAudio();b.setPointerCapture(e.pointerId);b.classList.add('on');if(k)touch[k]=1;else emoteQ=ri(0,3);if(navigator.vibrate)try{navigator.vibrate(12)}catch(_){}};
+ const btn=(id,k)=>{const b=$(id);const on=e=>{e.preventDefault();initAudio();b.setPointerCapture(e.pointerId);b.classList.add('on');if(k)touch[k]=1;else emoteQ=ri(0,EMOTES.length-1);if(navigator.vibrate)try{navigator.vibrate(12)}catch(_){}};
   const off=e=>{b.classList.remove('on');if(k)touch[k]=0};b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',e=>{if(e.target===b)off(e)})};
  btn('#tBump','d');btn('#tParry','p');btn('#tThrow','f');btn('#tEmote',null);
  $('#touch').addEventListener('contextmenu',e=>e.preventDefault());
