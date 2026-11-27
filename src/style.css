@@ -144,7 +144,7 @@ body>.foot{position:fixed;left:50%;bottom:6px;transform:translateX(-50%);margin:
 #opts{position:fixed;inset:0;z-index:46;display:none;align-items:center;justify-content:center;background:rgba(20,8,0,.55)}#opts.on{display:flex}
 #opts .panel{width:min(400px,94vw);max-height:94vh;overflow:auto;padding:12px 16px}
 .orow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;font:600 16px Fredoka,sans-serif;color:#2a1608;text-align:left}
-.orow button{min-width:120px;margin:0;padding:6px 10px;font-size:15px}.orow button.go{color:#fff}
+.orow span{flex:1}.orow button{flex:0 0 150px;width:150px;margin:0;padding:6px 10px;font-size:15px}.orow button.go{color:#fff}
 .olbl{margin-top:12px;font:400 20px 'Luckiest Guy',Impact,sans-serif;color:#2a1608;text-align:left}
 .vrow{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:4px 0 8px}.vrow button{flex:1;min-width:104px;margin:0;font-size:14px;padding:6px 8px}.vrow button.go{color:#fff}.vrow b{background:#2a1608;color:#fff6e0;border-radius:9px;padding:0 6px;margin-left:3px}
 #daily{position:fixed;inset:0;z-index:46;display:none;align-items:center;justify-content:center;background:rgba(20,8,0,.55)}#daily.on{display:flex}
