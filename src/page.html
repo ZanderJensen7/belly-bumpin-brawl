@@ -35,7 +35,6 @@
         <label>Hat</label><div class="pick"><button data-p="h-1">◀</button><span id="hn"></span><button data-p="h1">▶</button></div>
         <label>Face</label><div class="pick"><button data-p="f-1">◀</button><span id="fnn"></span><button data-p="f1">▶</button></div>
         <label>Back</label><div class="pick"><button data-p="b-1">◀</button><span id="bnn"></span><button data-p="b1">▶</button></div>
-        <button class="maim keyonly" style="margin-top:6px;font-size:14px;padding:5px 8px"></button>
       </div>
     </div>
 </div>
@@ -99,7 +98,7 @@
 <div id="ward"><div class="panel"><div class="rtitle" style="font-size:32px">🎨 Wardrobe</div><canvas id="wpv" width="240" height="240" style="width:170px;height:170px;display:block;margin:0 auto"></canvas><div id="wname" style="text-align:center;font:600 20px Fredoka,sans-serif;margin:-6px 0 6px;-webkit-text-stroke:0;text-shadow:-2px -2px 0 #2a1608,2px -2px 0 #2a1608,-2px 2px 0 #2a1608,2px 2px 0 #2a1608,0 2px 0 #2a1608;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
     <div class="mebox" id="mebox">
       <input id="lnm" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Your name" style="width:100%;box-sizing:border-box">
-      <div class="pick" style="margin-top:6px"><button data-l="c-1">◀</button><span id="lcn" style="font-size:16px"></span><button data-l="c1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="h-1">◀</button><span id="lhn" style="font-size:16px"></span><button data-l="h1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="f-1">◀</button><span id="lfn" style="font-size:16px"></span><button data-l="f1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="b-1">◀</button><span id="lbn" style="font-size:16px"></span><button data-l="b1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="i-1">◀</button><span id="lin" style="font-size:16px"></span><button data-l="i1">▶</button></div><input id="ltag" maxlength="4" autocomplete="off" spellcheck="false" placeholder="Clan tag (4 letters)" style="width:100%;box-sizing:border-box;margin-top:6px;text-transform:uppercase"><button class="maim keyonly" style="width:100%;margin-top:6px;font-size:14px;padding:5px 8px"></button>
+      <div class="pick" style="margin-top:6px"><button data-l="c-1">◀</button><span id="lcn" style="font-size:16px"></span><button data-l="c1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="h-1">◀</button><span id="lhn" style="font-size:16px"></span><button data-l="h1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="f-1">◀</button><span id="lfn" style="font-size:16px"></span><button data-l="f1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="b-1">◀</button><span id="lbn" style="font-size:16px"></span><button data-l="b1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="i-1">◀</button><span id="lin" style="font-size:16px"></span><button data-l="i1">▶</button></div><input id="ltag" maxlength="4" autocomplete="off" spellcheck="false" placeholder="Clan tag (4 letters)" style="width:100%;box-sizing:border-box;margin-top:6px;text-transform:uppercase">
     </div><div class="small" id="wlock" style="text-align:center;margin-top:6px"></div><button id="bWard" class="big go">Done</button></div></div>
 <div id="chatw"><div class="ch">💬 Chat</div><div id="clog"></div><input id="cin" maxlength="80" placeholder="Press Enter to chat" autocomplete="off" spellcheck="false"></div>
 <div id="hub" class="screen"><div class="panel"><div class="rtitle" style="font-size:28px">🍻 The Hub</div><div class="small" id="hcount">Just you so far</div><div class="small" style="margin-top:6px;opacity:.8">Walk into a glowing portal to join a match, or onto the 🍻 pad to host one.</div><button id="bHubLeave" class="ghost">Leave hub</button></div></div>
@@ -118,20 +117,27 @@
 </div></div>
 
 <div id="toast"></div>
-<div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bVoice" title="Announcer voice (click to change)">🗣️</button><button id="bOpts" title="Settings">⚙️</button><button id="bFull" title="Fullscreen">⛶</button><button id="bMenu" title="Menu (Esc)">☰</button></div>
+<div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bOpts" title="Settings">⚙️</button><button id="bFull" title="Fullscreen">⛶</button><button id="bMenu" title="Menu (Esc)">☰</button></div>
 <div id="draft"><div class="dh">PICK A POWER-UP!</div><div class="ds">Losers get stronger. They stack.</div><div class="dc" id="dcards"></div><div class="dt"><i id="dbar"></i></div></div>
 <div id="tut"><div class="ttx"></div></div>
 <div id="rpl"><b>▶ INSTANT REPLAY</b><span>any button to skip</span></div>
-<div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eLob" class="ghost">Back to lobby</button><div id="ePl"></div><button id="eSt" class="ghost">📊 My stats</button><button id="eBg" class="ghost"></button><button id="eSet" class="ghost">⚙️ Settings</button><button id="eTut" class="ghost">🎓 Show control tips again</button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
+<div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eSt" class="ghost">📊 My stats</button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eSet" class="ghost">⚙️ Settings</button><div id="ePl"></div><div class="esep"></div><button id="eLob" class="ghost">Back to lobby</button><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
 <div id="daily"><div class="panel"><div class="rtitle" style="font-size:34px">📅 Daily challenges</div><div id="dlist"></div><button id="dDone" class="big go" style="width:100%;margin-top:10px">Done</button></div></div>
 <div id="opts"><div class="panel"><div class="rtitle" style="font-size:34px">⚙️ Settings</div>
+<div class="olbl">Sound <span class="small">(volume is in the top bar)</span></div>
+<div class="orow"><span>Announcer voice</span><button id="bVoice" class="ghost" title="Click to change the voice"></button></div>
+<div class="orow"><span>Bar ambience</span><button id="oAmb" class="ghost"></button></div>
+<div class="orow"><span>Sound when tabbed out</span><button id="eBg" class="ghost"></button></div>
+<div class="olbl">Display</div>
 <div class="orow"><span>Screen shake</span><button id="oShake" class="ghost"></button></div>
 <div class="orow"><span>Flashes and disco lights</span><button id="oFlash" class="ghost"></button></div>
-<div class="orow"><span>Bar ambience</span><button id="oAmb" class="ghost"></button></div>
 <div class="orow"><span>Colour-blind shapes</span><button id="oCb" class="ghost"></button></div>
-<button class="maim ghost keyonly" style="width:100%;margin-top:8px;font-size:14px;padding:6px 8px"></button>
-<div class="olbl keyonly">Keyboard <span class="small">(click one, then press a key)</span></div><div id="oKeys" class="keyonly"></div>
-<button id="oReset" class="ghost keyonly" style="width:100%;margin-top:8px">Reset keys</button><button id="oDone" class="big go" style="width:100%;margin-top:8px">Done</button></div></div>
+<div class="olbl">Controls</div>
+<div class="orow keyonly"><span>Mouse aim<small>left click bumps toward the cursor, right click parries</small></span><button class="maim ghost"></button></div>
+<div class="orow"><span>Control tips</span><button id="eTut" class="ghost">Show again</button></div>
+<div class="orow keyonly" style="margin-top:10px"><span><b>Keyboard</b><small>click one, then press a key</small></span><button id="oReset" class="ghost">Reset keys</button></div>
+<div id="oKeys" class="keyonly"></div>
+<button id="oDone" class="big go" style="width:100%;margin-top:12px">Done</button></div></div>
 
 <script>/*__PEERJS__*/</script>
 <script>

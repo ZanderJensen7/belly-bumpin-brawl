@@ -44,13 +44,13 @@ document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{initAudio();SFX.
 {let tm2=0;$('#ltag').oninput=e=>{me.tag=cleanTag(e.target.value);e.target.value=me.tag;store.set('tag',me.tag);clearTimeout(tm2);tm2=setTimeout(sendMe,250)};$('#ltag').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()})}
 {let tmo=0;$('#lnm').oninput=e=>{me.name=e.target.value.trim()||'Mystery Drunk';store.set('name',me.name);$('#nm').value=me.name;clearTimeout(tmo);tmo=setTimeout(sendMe,250)}}
 $('#lnm').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});
-let bgSound=store.get('bgsnd',true);const bgLbl=()=>{$('#eBg').textContent=bgSound?'🔊 Sound when tabbed out: ON':'🔇 Sound when tabbed out: OFF'};bgLbl();$('#eBg').onclick=()=>{bgSound=!bgSound;store.set('bgsnd',bgSound);bgLbl()};
-$('#eTut').onclick=()=>{store.set('ftue',0);TUT.cur=null;TUT.a=0;tutHide();toggleEsc(false);toast('Tips will pop up again in your next match',3)};
+let bgSound=store.get('bgsnd',true);const bgLbl=()=>{$('#eBg').textContent=bgSound?'On':'Off'};bgLbl();$('#eBg').onclick=()=>{bgSound=!bgSound;store.set('bgsnd',bgSound);bgLbl()};
+$('#eTut').onclick=()=>{store.set('ftue',0);TUT.cur=null;TUT.a=0;tutHide();toggleEsc(false);$('#opts').classList.remove('on');toast('Tips will pop up again in your next match',3)};
 document.addEventListener('visibilitychange',()=>{if(!MG||!AC)return;const off=document.hidden&&!bgSound;MG.gain.setTargetAtTime(off||muted?0:vol/100,AC.currentTime,.05);if(off&&'speechSynthesis' in window)speechSynthesis.cancel()});
 $('#bTCust').onclick=()=>$('#bCust').click();$('#bHub').onclick=()=>{SFX.pop&&SFX.pop();initAudio();hubStart()};$('#bHubLeave').onclick=()=>leaveToTitle(true);
 $('#bLB').onclick=()=>{SFX.pop&&SFX.pop();showLB()};$('#bLBBack').onclick=()=>showScreen('title');document.querySelectorAll('#lbTabs button').forEach(b=>b.onclick=()=>{LB.k=b.dataset.k;document.querySelectorAll('#lbTabs button').forEach(x=>x.classList.toggle('sel',x===b));lbRender()});setTimeout(lbPublish,6000);
 $('#cin').addEventListener('keydown',e=>{if(e.key==='Enter'){sendChat(e.target.value);e.target.value='';e.target.blur()}else if(e.key==='Escape')e.target.blur();e.stopPropagation()});
-const maimTxt=()=>document.querySelectorAll('.maim').forEach(b=>b.textContent=mouseAim?'🖱️ Mouse aim: ON (left click bumps toward cursor)':'🖱️ Mouse aim: OFF (bump where you move)');maimTxt();
+const maimTxt=()=>document.querySelectorAll('.maim').forEach(b=>b.textContent=mouseAim?'On':'Off');maimTxt();
 document.querySelectorAll('.maim').forEach(b=>b.onclick=()=>{initAudio();SFX.click();mouseAim=mouseAim?0:1;store.set('maim',mouseAim);maimTxt()});
 $('#nm').value=me.name;$('#nm').oninput=e=>{me.name=e.target.value.trim()||'Mystery Drunk';store.set('name',me.name)};
 $('#code').value=(location.hash.slice(1)||'').toUpperCase().slice(0,5);

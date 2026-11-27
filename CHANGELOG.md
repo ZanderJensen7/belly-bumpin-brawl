@@ -10,6 +10,7 @@ Newest first. Every change adds an entry. Format:
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
 ## 2026-11-27 · asked by Curt (build ?)
+- Menus tidied up: every option now lives in Settings, in three groups (Sound, Display, Controls). Mouse aim, the announcer voice, "sound when tabbed out" and "show control tips again" moved there from the title screen, Wardrobe, top bar and Esc menu. The Esc menu is now Resume, Wardrobe, My stats, Settings, then the player list and the leave buttons.
 - Settings (the gear button, or the Esc menu): turn screen shake down or off, turn off flashes and disco lights, switch the bar ambience off, show a shape next to each name for colour-blind players, and rebind your keys. Mouse aim is in there too.
 - When you join someone's room, your dash now launches the instant you let go, instead of waiting for the host to answer.
 - Vote for the next map on the results screen (when maps are set to Random).
