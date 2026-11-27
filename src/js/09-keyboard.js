@@ -4,7 +4,7 @@ const keys={};let emoteQ=-1;
 addEventListener('keydown',e=>{if(e.code==='Enter'&&e.target.tagName!=='INPUT'&&(curScreen==='lobby'||curScreen==='hub')&&!$('#ward').classList.contains('on')){e.preventDefault();for(const k in keys)keys[k]=false;$('#cin').focus();return}if(e.code==='Escape'){if($('#ward').classList.contains('on'))$('#ward').classList.remove('on');else toggleEsc();return}if(e.target.tagName==='INPUT')return;keys[e.code]=true;initAudio();
  if(/^Digit[1-8]$/.test(e.code)){const dn=+e.code.slice(5)-1;if($('#draft').classList.contains('on')){if(dn<4)pickPerk(dn);return}emoteQ=dn}
  if(e.code==='KeyM')toggleMute();
- if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});
+ if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)||KBU.has(e.code))e.preventDefault()});
 addEventListener('keyup',e=>{keys[e.code]=false});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
 addEventListener('pointerdown',()=>initAudio());

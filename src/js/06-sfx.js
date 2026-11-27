@@ -64,7 +64,7 @@ const SFX={
 };
 // ---- bar ambience: a quiet crowd murmur (three bands of noise, each "talking" at its own rhythm) and the odd glass clink.
 // Runs through the SFX bus, so the volume slider and mute cover it. Toggle in Settings ("Bar ambience").
-let ambOn=1;const Amb={g:null,t:0,
+let ambOn=store.get('amb',true)?1:0;const Amb={g:null,t:0,
  start(){if(!AC||this.g)return;this.g=AC.createGain();this.g.gain.value=0;this.g.connect(SG);
   [[320,2.3,.9],[640,3.4,1],[1150,4.6,.55]].forEach(([fq,lf,lv],i)=>{const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain(),l=AC.createOscillator(),lg=AC.createGain();s.buffer=NB;s.loop=true;s.loopStart=i*.31;f.type='bandpass';f.frequency.value=fq;f.Q.value=1.6;
    g.gain.value=.55*lv;l.frequency.value=lf;lg.gain.value=.4*lv;l.connect(lg);lg.connect(g.gain);s.connect(f);f.connect(g);g.connect(this.g);s.start(0,i*.4);l.start()});

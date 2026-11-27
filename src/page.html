@@ -111,11 +111,18 @@
 </div></div>
 
 <div id="toast"></div>
-<div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bVoice" title="Announcer voice (click to change)">🗣️</button><button id="bFull" title="Fullscreen">⛶</button><button id="bMenu" title="Menu (Esc)">☰</button></div>
+<div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bVoice" title="Announcer voice (click to change)">🗣️</button><button id="bOpts" title="Settings">⚙️</button><button id="bFull" title="Fullscreen">⛶</button><button id="bMenu" title="Menu (Esc)">☰</button></div>
 <div id="draft"><div class="dh">PICK A POWER-UP!</div><div class="ds">Losers get stronger. They stack.</div><div class="dc" id="dcards"></div><div class="dt"><i id="dbar"></i></div></div>
 <div id="tut"><div class="ttx"></div></div>
 <div id="rpl"><b>▶ INSTANT REPLAY</b><span>any button to skip</span></div>
-<div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eLob" class="ghost">Back to lobby</button><div id="ePl"></div><button id="eSt" class="ghost">📊 My stats</button><button id="eBg" class="ghost"></button><button id="eTut" class="ghost">🎓 Show control tips again</button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
+<div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eLob" class="ghost">Back to lobby</button><div id="ePl"></div><button id="eSt" class="ghost">📊 My stats</button><button id="eBg" class="ghost"></button><button id="eSet" class="ghost">⚙️ Settings</button><button id="eTut" class="ghost">🎓 Show control tips again</button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
+<div id="opts"><div class="panel"><div class="rtitle" style="font-size:34px">⚙️ Settings</div>
+<div class="orow"><span>Screen shake</span><button id="oShake" class="ghost"></button></div>
+<div class="orow"><span>Flashes and disco lights</span><button id="oFlash" class="ghost"></button></div>
+<div class="orow"><span>Bar ambience</span><button id="oAmb" class="ghost"></button></div>
+<div class="orow"><span>Colour-blind shapes</span><button id="oCb" class="ghost"></button></div>
+<div class="olbl">Keyboard <span class="small">(click one, then press a key)</span></div><div id="oKeys"></div>
+<button id="oReset" class="ghost" style="width:100%;margin-top:8px">Reset keys</button><button id="oDone" class="big go" style="width:100%;margin-top:8px">Done</button></div></div>
 
 <script>/*__PEERJS__*/</script>
 <script>

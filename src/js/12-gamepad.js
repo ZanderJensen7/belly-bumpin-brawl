@@ -2,7 +2,7 @@
 // ---- gamepad menu navigation (P1's controller)
 const NAV={el:null,t:0,held:0,prev:{}};
 function vis(e){if(!e||e.disabled)return false;const r=e.getBoundingClientRect();if(r.width<4||r.height<4)return false;const cs=getComputedStyle(e);return cs.visibility!=='hidden'&&cs.display!=='none'&&e.offsetParent!==null}
-function navBox(){if($('#ward').classList.contains('on'))return $('#ward');if($('#esc').classList.contains('on'))return $('#esc');for(const id of ['over','results','stats','lb','browse','title']){const e=$('#'+id);if(e&&e.classList.contains('on'))return e}return null}
+function navBox(){if($('#opts').classList.contains('on'))return $('#opts');if($('#ward').classList.contains('on'))return $('#ward');if($('#esc').classList.contains('on'))return $('#esc');for(const id of ['over','results','stats','lb','browse','title']){const e=$('#'+id);if(e&&e.classList.contains('on'))return e}return null}
 function navItems(box){return [...box.querySelectorAll('button,input:not([type=range]),select,[data-nav]')].filter(e=>vis(e)&&!e.closest('[hidden]'))}
 function navMark(e){document.querySelectorAll('.gpf').forEach(x=>x.classList.remove('gpf'));NAV.el=e;if(e){e.classList.add('gpf');e.scrollIntoView({block:'nearest',inline:'nearest'})}}
 function navMove(dx,dy){const box=navBox();if(!box)return;const it=navItems(box);if(!it.length)return;if(!NAV.el||!it.includes(NAV.el)){navMark((box.id!=='ward'&&box.id!=='esc'&&it.find(e=>e.classList.contains('go')))||it[0]);return}
@@ -24,8 +24,8 @@ function gpNav(dt){const pads=navigator.getGamepads?navigator.getGamepads():[];c
  if(st&&!P_.st&&box.id==='esc')$('#eRes').click();
  NAV.prev={a,b,st}}
 function readInput(){let x=0,y=0,d=false,f=false,pa=false;
- if(keys.KeyA||keys.ArrowLeft)x-=1;if(keys.KeyD||keys.ArrowRight)x+=1;if(keys.KeyW||keys.ArrowUp)y-=1;if(keys.KeyS||keys.ArrowDown)y+=1;
- if(keys.Space||keys.KeyJ||keys.Enter)d=true;if(keys.KeyF||keys.KeyL)f=true;if(keys.ShiftLeft||keys.ShiftRight||keys.KeyK)pa=true;
+ if(keys[KB.left]||altKey('ArrowLeft'))x-=1;if(keys[KB.right]||altKey('ArrowRight'))x+=1;if(keys[KB.up]||altKey('ArrowUp'))y-=1;if(keys[KB.down]||altKey('ArrowDown'))y+=1;
+ if(keys[KB.bump]||altKey('KeyJ')||altKey('Enter'))d=true;if(keys[KB.throw]||altKey('KeyL'))f=true;if(keys[KB.parry]||altKey('ShiftRight')||altKey('KeyK'))pa=true;
  const pads=navigator.getGamepads&&!navBox()?navigator.getGamepads():[];
  for(const gp of pads){if(!gp||(PADS[gp.index]!==undefined&&PADS[gp.index]!=='p1')||(PADS[gp.index]===undefined&&Object.values(PADS).includes('p1')))continue;const ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(hyp(ax,ay)>.2){x+=ax;y+=ay}
   if(gp.buttons[14]&&gp.buttons[14].pressed)x-=1;if(gp.buttons[15]&&gp.buttons[15].pressed)x+=1;if(gp.buttons[12]&&gp.buttons[12].pressed)y-=1;if(gp.buttons[13]&&gp.buttons[13].pressed)y+=1;
