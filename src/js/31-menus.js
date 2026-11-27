@@ -25,8 +25,14 @@ function syncUI(){if(S&&S.hub){if(curScreen!=='hub'&&curScreen!=='stats'&&curScr
   $('#rbar').style.width=clamp(V.pt/(V.offers?15:10)*100,0,100)+'%'}
  if(ph==='over'&&V.over){const key='o'+V.over.id+isHost;if(key!==uiKey){uiKey=key;const o=V.over;$('#otitle').textContent=o.name;$('#otitle').style.color=o.tcol||COLORS[o.color];$('#oscores').innerHTML='<table class="stt"><tr><th></th><th>Pts</th><th>KOs</th><th>Bumps</th><th>Parries</th><th>Falls</th></tr>'+(o.board||[]).map(b=>'<tr'+(b[7]===NET.myId?' class="me"':'')+'><td><span class="dot" style="display:inline-block;vertical-align:middle;width:12px;height:12px;background:'+COLORS[b[1]]+'"></span> '+esc(b[0])+lvB(b[12])+'</td><td><b>'+b[2]+'</b></td><td>'+b[3]+'</td><td>'+b[4]+'</td><td>'+b[5]+'</td><td>'+b[6]+'</td></tr>').join('')+'</table>';recordStats(o);$('#oaw').innerHTML=o.awards.map(a=>'<p>'+a+'</p>').join('');
   $('#ohost').style.display=isHost?'':'none';$('#owait').style.display=isHost?'none':''}
-  const cc=$('#champ'),g=cc.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,240,240);g.setTransform(2.4,0,0,2.4,120,150);const o=V.over;
-  drawGuy(g,{x:0,y:0,vx:0,vy:Math.sin(gtime*8)*120,face:Math.PI/2,r:26,alive:true,fall:1,charge:0,dash:0,stun:0,buzz:4,teeter:0,color:o.pcolor!=null?o.pcolor:o.color,hat:o.hat,ph:0},A_('champ'),gtime,{noTag:1});
+  // podium: the top three on blocks (just the champion for team matches or 2-player games), with confetti
+  const cc=$('#champ'),g=cc.getContext('2d'),o=V.over,CW=440,CH=250;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,CW,CH);
+  const guy=(x,y,sc,q,i)=>{g.setTransform(sc,0,0,sc,x,y);drawGuy(g,{x:0,y:0,vx:0,vy:i?0:Math.sin(gtime*8)*120,gun:1,face:Math.PI/2+(i?Math.sin(gtime*1.3+i)*.25:0),r:26,alive:true,fall:1,charge:0,dash:0,stun:0,buzz:i?1:4,teeter:0,color:q.color,hat:q.hat,fc:q.fc,bk:q.bk,ph:i,emote:-1,emoteT:0},A_('champ'+i),gtime,{noTag:1})};
+  const pod=o.tcol?[]:o.board.slice(0,3).map(b=>V.players.find(p=>p.id===b[7])).filter(Boolean);
+  if(pod.length<3)guy(CW/2,160,2.4,{color:o.pcolor!=null?o.pcolor:o.color,hat:o.hat},0);
+  else [[CW/2,74,2,'#ffd23f','1'],[96,50,1.6,'#cfd6dd','2'],[CW-96,36,1.6,'#d08a4e','3']].forEach(([x,h,sc,col,n],i)=>{const top=CH-h-6;g.setTransform(1,0,0,1,0,0);g.fillStyle=col;g.strokeStyle='#2a1608';g.lineWidth=4;rr2(g,x-58,top,116,h+20,8);g.fill();g.stroke();
+    g.fillStyle='rgba(42,22,8,.55)';g.font="26px 'Luckiest Guy',Impact,sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText(n,x,top+h/2+3);guy(x,top-26*sc*.66,sc,pod[i],i)});
+  g.setTransform(1,0,0,1,0,0);const CC=['#ff5a5f','#3fa7ff','#ffd23f','#4cd964','#c77dff','#ff9f1c','#fff6e0'];for(let i=0;i<46;i++){const u=((gtime*(.16+(i%5)*.03)+i*.137)%1),x=((i*97)%CW)+Math.sin(gtime*2+i)*12,y=u*(CH+20)-10;g.save();g.translate(x,y);g.rotate(gtime*(2+i%3)+i);g.fillStyle=CC[i%CC.length];g.globalAlpha=.9;g.fillRect(-4,-2.5,8,5*Math.abs(Math.cos(gtime*3+i))+1);g.restore()}
   }
 }
 // title preview & pickers

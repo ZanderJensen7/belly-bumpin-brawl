@@ -35,6 +35,11 @@ function buildOver(c,title){const by=(f)=>[...S.players].sort((a,b)=>f(b)-f(a))[
  const fl=by(p=>p.falls);if(fl&&fl.falls>0)A.push('🐟 Fish food: '+nm(fl)+' ('+fl.falls+')');
  const sf=by(p=>p.selfs);if(sf&&sf.selfs>0)A.push('🤡 Self-yeets: '+nm(sf)+' ('+sf.selfs+')');
  const hc=by(p=>p.hics);if(hc&&hc.hics>0)A.push('😵 Hiccups: '+nm(hc)+' ('+hc.hics+')');
+ const gl=by(p=>p.glassed||0);if(gl&&gl.glassed>0)A.push("🎯 Bartender's arm: "+nm(gl)+' ('+gl.glassed+')');
+ const pr=by(p=>p.parries||0);if(pr&&pr.parries>0)A.push('🛡️ Not today: '+nm(pr)+' ('+pr.parries+' parries)');
+ const hb=by(p=>p.taken||0);if(hb&&hb.taken>2)A.push('🥴 Human piñata: '+nm(hb)+' (hit '+hb.taken+'×)');
+ if(S.players.length>2){const pc=S.players.filter(p=>!(p.hits>0)&&!(p.kos>0));if(pc.length===1)A.push('🕊️ Pacifist: '+nm(pc[0])+' (0 bumps landed)');const ut=S.players.filter(p=>!(p.falls>0));if(ut.length===1)A.push('🧲 Glued to the table: '+nm(ut[0])+' (never fell)')}
+ while(A.length>6)A.splice(ri(2,A.length-1),1);
  A.push(S.settings.drinks?(isCont()?'🍻 1 sip per point behind the champ (max 5).':'🍻 Losers finish their drinks.'):'👑 Champ picks the snack.');
  const fmt=p=>S.settings.mode==='koth'?Math.floor(p.score)+'/'+KOTH_T:String(p.score);
  return {id:c.id,name:title||c.name,color:title?null:c.color,tcol:title?TEAMS[c.team].c:null,hat:c.hat,pcolor:c.color,awards:A,board:[...S.players].sort((a,b)=>b.score-a.score).map(p=>[p.name,p.color,fmt(p),p.kos||0,p.hits||0,p.parries||0,p.falls||0,p.id,p.wins||0,p.glassed||0,p.selfs||0,p.team,p.bot?0:p.lv|0])}}
