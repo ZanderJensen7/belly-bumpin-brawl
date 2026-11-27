@@ -3,11 +3,11 @@
 Newest first. Every change adds an entry. Format:
 
 ```
-## YYYY-MM-DD · asked by <Name> (build 67)
+## YYYY-MM-DD · asked by <Name> (build ?)
 - plain-language bullet a player would understand
 ```
 
-Write `(build 67)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
+Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
 ## 2026-11-27 · asked by Zander (build 66)
 - Set up the repo for two people working through Claude: a `CLAUDE.md` workflow, this changelog, and an Action that builds and publishes the game automatically.
