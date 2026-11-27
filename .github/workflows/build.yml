@@ -1,13 +1,13 @@
 name: Build game
 
 # PRs: build + syntax check, and attach the built game as a downloadable artifact.
-# main: bump the build number, rebuild index.html and publish it (Pages serves main).
+# main: bump the build number, fill it into CHANGELOG.md, rebuild index.html and publish it (Pages serves main).
 on:
   push:
     branches: [main]
-    paths: ['src/**', '.github/workflows/build.yml']
+    paths: ['src/**', 'CHANGELOG.md', '.github/workflows/build.yml']
   pull_request:
-    paths: ['src/**', '.github/workflows/build.yml']
+    paths: ['src/**', 'CHANGELOG.md', '.github/workflows/build.yml']
   workflow_dispatch:
 
 concurrency:
@@ -47,9 +47,11 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           cp src/last-call-brawl.html index.html
+          N=$(cat src/buildnum.txt)
+          if [ -f CHANGELOG.md ]; then sed -i "s/(build ?)/(build $N)/g" CHANGELOG.md; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html src/buildnum.txt
+          git add index.html src/buildnum.txt CHANGELOG.md
           if git diff --cached --quiet; then echo "nothing to publish"; exit 0; fi
           git commit -m "Build $(cat src/buildnum.txt)"
           for i in 1 2 3; do git pull --rebase origin main && git push && exit 0; sleep 5; done

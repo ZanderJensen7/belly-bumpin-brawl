@@ -4,6 +4,18 @@ Two friends build this game together, and **neither uses git by hand**. They tal
 
 Live game: https://zanderjensen7.github.io/belly-bumpin-brawl/ (GitHub Pages, served from the root of `main`).
 
+**Nobody reviews PRs by hand.** The two of them judge changes by playing the live game. So Claude carries every change all the way to `main` without waiting for a human approval.
+
+## "What's changed since my last session?"
+
+When someone asks this, or something like "what did my friend do?":
+1. Sync (`git pull`).
+2. Find the newest `CHANGELOG.md` entry asked by that person. Everything above it is new to them.
+3. Cross-check with `git log` since that person's last change, for anything missing from the changelog.
+4. Reply with a short plain-language summary grouped by who asked. Give the current build number, which shows bottom-right in the game. Mention anything half-finished, such as open PRs or open issues.
+
+If you don't know who you're talking to, ask once at the start of the session ("Zander or <friend>?"). Use that name on the changelog entries.
+
 ## The workflow (do this every session)
 
 1. **Sync first.** Before reading or changing code, run `git fetch origin && git checkout main && git pull`. The whole game is one big file, so working from an old copy is how conflicts happen.
@@ -14,14 +26,17 @@ Live game: https://zanderjensen7.github.io/belly-bumpin-brawl/ (GitHub Pages, se
    - **Never edit or commit `index.html` or `src/buildnum.txt`.** The GitHub Action builds and publishes them.
    - `src/last-call-brawl.html` is local build output and is gitignored.
 6. **Check it builds:** run `node src/build.js && node src/check.js`. If the user wants to see it, open `src/last-call-brawl.html?local` in a browser and take a screenshot.
-7. **Open a PR** into `main`.
-   - Give it a plain-English title and a short description: what changed, and how to try it.
+7. **Add a `CHANGELOG.md` entry** at the top in the same branch. Include today's date, who asked, `(build ?)`, and plain bullets a player would understand. This is required for every change.
+8. **Open a PR** into `main`.
+   - Give it a plain-English title and a short description of what changed.
    - Add `Closes #N` if it finishes an issue.
-   - The PR check builds the game and attaches the built file as a downloadable artifact named `game-build`. It's a single self-contained HTML file that opens in any browser.
-8. **Merge when the user says so.** Use a squash merge.
-   - Within about 2 minutes the Action bumps the build number, rebuilds `index.html` and pushes it.
-   - Tell the user which build number to look for: it shows bottom-right in the game as "build N". Hard refresh with Ctrl+Shift+R.
-9. **Direct pushes to `main`** are fine only when the user explicitly asks for them, such as for a tiny fix. Sync first, and still never commit `index.html`.
+   - The PR check builds the game, makes sure it parses, and attaches the built file as a downloadable artifact named `game-build`.
+9. **Merge it yourself once the check is green.** Don't wait for a human review.
+   - Rebase on the latest `main` first if `main` moved, then squash merge.
+   - If the check fails, fix it. Don't merge a red PR.
+   - Within about 2 minutes the Action bumps the build number, fills it into the changelog, rebuilds `index.html` and publishes it.
+   - Tell the user which build to look for. It shows bottom-right in the game as "build N". Hard refresh with Ctrl+Shift+R.
+10. **Tiny fixes** (a typo, a one-line number tweak) may go straight to `main` instead. Sync right before pushing, include the changelog entry, and never commit `index.html`.
 
 **Conflicts:**
 - Before opening a PR and before merging, rebase on the latest `main`.
