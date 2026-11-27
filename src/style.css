@@ -1,3 +1,4 @@
+/*__FONTS__*/
 :root{--ink:#2a1608;--amber:#f5a623;--foam:#fff6e0;--red:#ff5a5f;--panel:#fff3d6;--wood:#7a4520}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:#3b1d0a;font-family:Fredoka,system-ui,sans-serif;color:var(--ink);user-select:none;-webkit-user-select:none}
