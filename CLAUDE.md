@@ -14,13 +14,17 @@ When someone asks this, or something like "what did my friend do?":
 3. Cross-check with `git log` since that person's last change, for anything missing from the changelog.
 4. Reply with a short plain-language summary grouped by who asked. Give the current build number, which shows bottom-right in the game. Mention anything half-finished, such as open PRs or open issues.
 
-If you don't know who you're talking to, ask once at the start of the session ("Zander or <friend>?"). Use that name on the changelog entries.
+**The two people:**
+- **Zander** (GitHub `ZanderJensen7`, owns the repo)
+- **Curt** (GitHub `AllGutterNoBarlic`)
+
+If you don't know which of them you're talking to, ask once at the start of the session ("Zander or Curt?"). Use exactly that name on changelog entries ("asked by Zander" or "asked by Curt"). Their GitHub logins also show who authored past commits and PRs.
 
 ## The workflow (do this every session)
 
 1. **Sync first.** Before reading or changing code, run `git fetch origin && git checkout main && git pull`. The whole game is one big file, so working from an old copy is how conflicts happen.
 2. **See what the other person is doing.** Look at the open pull requests and the open GitHub Issues. The issues are the shared to-do list. If the task overlaps with someone's open PR, say so before starting.
-3. **Branch.** Create a branch named `<who>/<short-topic>` (for example `zander/seesaw-tweak`). Ask who you're working with if you don't know.
+3. **Branch.** Create a branch named `<who>/<short-topic>` (for example `zander/seesaw-tweak` or `curt/new-hat`). Ask who you're working with if you don't know.
 4. **Keep changes small.** Make one feature or fix per branch. Small PRs merge cleanly, and big ones collide in the single source file.
 5. **Edit only `src/src.html`** (plus `src/build.js` if needed).
    - **Never edit or commit `index.html` or `src/buildnum.txt`.** The GitHub Action builds and publishes them.
