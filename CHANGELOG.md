@@ -9,6 +9,18 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
+## 2026-11-27 · asked by Curt (build ?)
+- Settings (the gear button, or the Esc menu): turn screen shake down or off, turn off flashes and disco lights, switch the bar ambience off, show a shape next to each name for colour-blind players, and rebind your keys. Mouse aim is in there too.
+- When you join someone's room, your dash now launches the instant you let go, instead of waiting for the host to answer.
+- Vote for the next map on the results screen (when maps are set to Random).
+- Daily challenges: three a day for XP, on the title screen.
+- End of match: a podium for the top three, confetti, and five new awards (Bartender's arm, Not today, Human piñata, Pacifist, Glued to the table).
+- Four new emotes on keys 5–8: HA HA HA, *sob*, CHEERS! and GG.
+- Sound: a quiet bar crowd in the background, the crowd reacts to big hits, near-falls and knockouts, and everyone grunts when hit.
+- Dust puffs when you run, dash, skid after a hit or teeter on an edge.
+- Sharing the link now shows a preview card, and the tab has an icon. Fonts are built into the game, so there's no flash of the wrong font and it works offline.
+- Phones stay awake during a match.
+
 ## 2026-11-27 · asked by Zander (build 69)
 - Behind the scenes: the game's code is now split into separate files by area (maps, bots, network, menus, sounds and so on), so Zander and Curt can work at the same time without stepping on each other. Nothing changes in the game.
 

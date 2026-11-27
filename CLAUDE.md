@@ -59,6 +59,7 @@ If you don't know which of them you're talking to, ask once at the start of the 
   - `src/style.css`: all CSS.
   - `src/js/*.js`: the game script. The build joins these **in file-name order into one `<script>`**, so they share one global scope and order matters: something defined with `const`/`let` must come from an earlier file than any code that runs it at load time. Keep the number prefixes. To add a file, give it a number that puts it in the right place (for example `13b-hats.js`).
   - The JS is dense, mostly one-line code. Follow the existing style. Use grep across `src/js/` to find a function by name.
+  - `src/fonts/*.woff2`: the two fonts. The build inlines them as data URIs at the `/*__FONTS__*/` line in `style.css`, so the game loads nothing from Google Fonts.
   - Then the build inlines `src/peerjs.min.js` at `/*__PEERJS__*/` and the build number at `__BUILD__`. If an old `src/src.html` turns up (from a stale branch), the build refuses to run: move that change into the split files and delete it.
 
 **Which file holds what** (`src/js/`):
@@ -70,6 +71,7 @@ If you don't know which of them you're talking to, ask once at the start of the 
 | `03-deep-end.js` | the secret Deep End puzzle levels, the giant coaster's lane (`floatLane`) |
 | `04-arena.js` | "is this spot on the table" checks (`onArena`), glass railings, `esc`, `shade`, `toast` |
 | `05-settings.js` | `store` (localStorage `lcb_*`), your profile `me`, volume settings |
+| `05b-options.js` | player options: screen shake, flashes, colour-blind shapes, key bindings (`KB`) |
 | `06-sfx.js` | audio setup and every sound effect (`SFX`) |
 | `07-music.js` | procedural music |
 | `08-announcer.js` | speech announcer (`say`) |
@@ -81,6 +83,7 @@ If you don't know which of them you're talking to, ask once at the start of the 
 | `14-bots.js` | bot AI (`botThink`, `BOTLV`) |
 | `15-sim.js` | `simStep`: the 60 Hz host simulation (movement, dashes, hits, mutators, belts, ice, seesaw) |
 | `16-results.js` | end of round and match, scorecards, awards |
+| `16b-vote.js` | map vote on the results screen (`S.vote`, `startVote`, `voteWinner`) |
 | `17-net-relay.js` | `NET`, ICE servers, the MQTT relay client, room announcements, Esc menu (`toggleEsc`) |
 | `18-host.js` | WebRTC signalling, `hostStart`, host-side messages (`hostMsg`), chat, `PROTO`, `PK`, `snapshot0` |
 | `19-hub.js` | The Hub |
@@ -95,13 +98,17 @@ If you don't know which of them you're talking to, ask once at the start of the 
 | `28-world-hud.js` | `drawWorld`, disco, `drawHUD`, `updateFX` |
 | `29-touch.js` | on-screen touch controls |
 | `30-progress.js` | levels and XP, cosmetic unlocks, stats, achievements (`ACH`) |
+| `30b-daily.js` | daily challenges (`dailyList`, `dailyProgress`) |
 | `31-menus.js` | screens (`showScreen`), lobby UI (`syncUI`), all button wiring |
+| `31b-options.js` | the Settings panel (`#opts`) and the screen wake lock |
 | `32-main.js` | main loop (`logic`, `frame`), title preview |
 
 Common jobs: a new map touches `02-rules.js` (shape), `24-map-art.js` (texture) and the `#segP` buttons in `page.html`. A new sound goes in `06-sfx.js` and gets played from `onEv` in `22-events-fx.js`. A new hat goes in `01-utils-data.js` (catalogue) and `25-draw-things.js` (`drawHat`).
 
 - `src/check.js` makes sure every inline script in the built file parses.
 - `b25.html` is an old build kept for A/B testing. Leave it alone.
+- `og.png` (repo root) is the link preview image named in the `og:image` tag in `page.html`. Pages serves it next to `index.html`.
+- `.gitattributes` keeps Unix line endings on every machine. The build splits `page.html` on `\n`, so don't remove it.
 
 **Main pieces of the code:**
 - **Host-authoritative networking.** One player's browser hosts and runs the simulation (`simStep`) at 60 Hz. Clients send inputs and receive snapshots about 30 times a second.
@@ -117,9 +124,11 @@ Common jobs: a new map touches `02-rules.js` (shape), `24-map-art.js` (texture) 
   - Controller ownership lives in `PADS`, and guest state in `LOC`.
   - Gamepad menu navigation is in `gpNav`.
 - **Maps.** The `MAPS` object holds shapes (`c` circle, `r`/`s` rect) plus optional `belts`, `ice`/`grip` and `holes`. Textures are drawn in `getTex(id)`, and lobby map buttons live in `#segP`. The camera auto-fits each map (`fitCam`).
+- **Client prediction.** A joined player predicts their own walking and dash locally (`32-main.js`, the `disp`/`PD` block) and is corrected toward the host. If you change movement or dash rules in `15-sim.js` or `doDash`, mirror them there.
 - **Saved data.** Settings and progress live in localStorage under `lcb_*` keys, read and written through `store.get/set`. Stats live in `lcb_stats`.
 - **URL test flags.**
   - `?local` lets two tabs on one machine play together.
+  - `?lag=200` fakes a 200 ms round trip for a joined player (use with `?local`). Test anything that touches client prediction with it.
   - `?forcerelay` and `?nortc` force the relay connection path.
   - `?deep`, `?donger`, `?hand`, `?disco`, `?hydro` force rare events.
   - `?touch` shows the mobile controls.
