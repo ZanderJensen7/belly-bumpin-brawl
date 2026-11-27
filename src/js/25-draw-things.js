@@ -88,7 +88,7 @@ const S_hfx=[];function drawHandArm(c,x,y,u,t){const rise=Math.min(1,u/.22),e=1-
 function drawSlapFx(c,dt){for(const h of S_hfx){h.t+=dt;const u=h.t/.45;c.save();c.globalAlpha=Math.max(0,1-u);c.translate(h.x,h.y);c.rotate(h.a-Math.PI/2+(1-u)*1.4);c.strokeStyle='#2a1608';c.lineWidth=4;c.fillStyle='#f2c79b';c.beginPath();c.ellipse(0,-50,40,52,0,0,TAU);c.fill();c.stroke();
  for(const fx of [-28,-10,8,26]){c.beginPath();c.ellipse(fx,-110,9,24,0,0,TAU);c.fill();c.stroke()}c.restore()}for(let i=S_hfx.length-1;i>=0;i--)if(S_hfx[i].t>.45)S_hfx.splice(i,1)}
 function drawGuy(c,p,a,t,opts){opts=opts||{};const r=p.r,col=COLORS[p.color]||'#fff',dark=shade(col,-.45),light=shade(col,.45);
- const sp=hyp(p.vx,p.vy),flail=p.stun>0||p.teeter||!p.alive||p.wob>0,charging=p.charge>0,em=(p.alive&&p.emoteT>0&&!flail)?p.emote:-1,dance=em===2,taunt=em===1;
+ const sp=hyp(p.vx,p.vy),flail=p.stun>0||p.teeter||!p.alive||p.wob>0,charging=p.charge>0,em=(p.alive&&p.emoteT>0&&!flail)?p.emote:-1,dance=em===2,taunt=em===1||em===4||em===6;
  c.save();c.translate(p.x,p.y);
  let sc=1;if(!p.alive){sc=Math.max(0,p.fall);c.globalAlpha=clamp(p.fall*1.5,0,1);c.translate(0,(1-p.fall)*20)}
  if(p.alive&&!opts.noShadow){c.fillStyle='rgba(30,10,0,.3)';c.beginPath();c.ellipse(0,r*.55,r*.95,r*.38,0,0,TAU);c.fill()}

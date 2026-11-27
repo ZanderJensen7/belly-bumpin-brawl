@@ -22,5 +22,5 @@ function hasAch(k){const a=getStats().ach;return !!(a&&a[k])}
 const cleanTag=t=>String(t||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);function dispName(p){return (p.ic?ICONS[p.ic]+' ':'')+(p.tag?'['+p.tag+'] ':'')+p.name}
 const HAT_LV=[1,1,1,1,1,1,1,1,1,2,3,4,5,7,9,12,6,1,1];const HAT_ACH={17:'duck',18:'deep'};
 const HNAMES=['Lampshade','Traffic Cone','Top Hat','Party Hat','Viking','Cowboy','Propeller','Chef','Bald','Beanie','Beer Helmet','Devil Horns','Pirate','Wizard','Halo','Crown','Glizzy','Rubber Duck','Golden Mug'];
-const EMOTES=['HIC!','COME AT ME','♪ DANCE ♪','*BUUURP*'];
+const EMOTES=['HIC!','COME AT ME','♪ DANCE ♪','*BUUURP*','HA HA HA','*sob*','CHEERS! 🍻','GG'];
 const BUZZ=['Sober-ish','Tipsy','Buzzed','Sloshed','Hammered','Legendary','Gone','Ascended'];

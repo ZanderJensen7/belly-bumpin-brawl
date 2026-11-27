@@ -50,7 +50,7 @@ function hostMsg(c,m){if(!m||!S)return;const id=connId(c);if(NET.banned&&(NET.ba
    toast(p.name+' stumbled in!');ev('emote',{id:p.id,em:2});}c.send({t:'w',id});return}
  if(!p)return;
  if(m.t==='i'){p.inp.x=clamp(+m.x||0,-1,1);p.inp.y=clamp(+m.y||0,-1,1);p.inp.d=m.d?1:0;p.inp.f=m.f?1:0;p.inp.p=m.p?1:0;p.inp.a=(typeof m.a==='number'&&isFinite(m.a))?m.a:null;p.inp.m=m.m?1:0}
- else if(m.t==='e'){emote(p,clamp(m.k|0,0,3))}
+ else if(m.t==='e'){emote(p,clamp(m.k|0,0,EMOTES.length-1))}
  else if(m.t==='lj'){const k=clamp(m.k|0,1,3);if(S.players.length>=6){c.send({t:'gfull',k});return}hostGuest(id,k,m)}
  else if(m.t==='ll'){const gid=id+'~'+clamp(m.k|0,1,3);S.players=S.players.filter(q=>q.id!==gid)}
  else if(m.t==='gi'){const g=P(id+'~'+clamp(m.k|0,1,3));if(g){g.inp.x=clamp(+m.x||0,-1,1);g.inp.y=clamp(+m.y||0,-1,1);g.inp.d=m.d?1:0;g.inp.f=m.f?1:0;g.inp.p=m.p?1:0;g.inp.a=null;g.inp.m=0}}
