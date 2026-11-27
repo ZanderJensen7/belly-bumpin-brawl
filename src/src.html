@@ -70,6 +70,7 @@ kbd{font-family:inherit;font-weight:700;background:var(--ink);color:var(--foam);
 .awards{text-align:left;font-size:18px;font-weight:600}
 #toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:20;background:var(--ink);color:var(--foam);font-weight:700;padding:10px 18px;border-radius:14px;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.on{opacity:1}
+body:not(.haspad) .padhint{display:none}.gpf{outline:4px solid #ffd23f!important;outline-offset:3px;box-shadow:0 0 0 7px rgba(42,22,8,.85),0 0 18px 6px rgba(255,210,63,.7)!important;position:relative;z-index:2}
 #tut{position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:19;background:rgba(30,14,4,.82);color:#fff6e0;border:3px solid #2a1608;border-radius:16px;padding:8px 16px;text-align:center;display:none;max-width:min(560px,calc(100vw - 32px));pointer-events:none;font-weight:600;font-size:18px;transition:background .2s}#tut.on{display:block}#tut kbd{font-family:inherit;background:#fff6e0;color:#2a1608;border-radius:7px;padding:1px 7px;font-size:15px;font-weight:700;box-shadow:0 2px 0 #b9a27f}#tut b{color:#ffd23f}#tut.ok{background:rgba(40,140,60,.9)}#tut.pop{animation:tpop .35s}@keyframes tpop{40%{transform:translateX(-50%) scale(1.08)}}
 #tools{position:fixed;right:12px;top:12px;z-index:21;display:flex;gap:6px}
 #tools .volbox{display:flex;align-items:center;gap:4px;background:var(--panel);border:3px solid var(--ink);border-radius:14px;padding:2px 8px 2px 2px;box-shadow:0 3px 0 var(--ink)}
@@ -192,7 +193,7 @@ body.touch #chatw{left:auto;right:calc(12px + env(safe-area-inset-right));top:62
       <label style="display:block;margin-top:8px">Bots</label>
       <div class="seg" id="segB"><button data-v="0">😴 Easy</button><button data-v="1">🍺 Normal</button><button data-v="2">💀 Hard</button></div>
       <div class="seg" style="margin-top:6px"><button id="bBot">+ Add bot</button></div>
-      <button id="bStart" class="big go">Start the brawl!</button>
+      <button id="bStart" class="big go">Start the brawl!<span class="padhint"> (START)</span></button>
     </div>
     <div class="waitmsg" id="lwait">Waiting for host...</div>
     <div class="ctrls"><div class="touchonly">Drag left side to move. Hold <b>BUMP</b>, release to launch. <b>PARRY</b> right before a hit.</div><div class="keyonly"><kbd>WASD</kbd> move · hold <kbd>Space</kbd> bump · <kbd>Shift</kbd> parry · <kbd>F</kbd> throw (tap twice) · <kbd>1-4</kbd> emotes</div>Knock everyone into the beer. Hold full charge too long and you burp.</div>
@@ -569,18 +570,42 @@ function couchPads(dt){const pads=navigator.getGamepads?navigator.getGamepads():
  for(const gp of pads){if(!gp)continue;const i=gp.index;seen.add(i);const st=gp.buttons[9]&&gp.buttons[9].pressed,sel=gp.buttons[8]&&gp.buttons[8].pressed,stE=st&&!padPrev2[i+'s'],selE=sel&&!padPrev2[i+'b'];padPrev2[i+'s']=st;padPrev2[i+'b']=sel;
   const own=PADS[i];
   if(own===undefined){if(stE&&couchOk()&&Object.values(PADS).includes('p1')){couchJoin(i);continue}if(stE&&couchOk()&&curScreen==='lobby'&&performance.now()-(window.lastKbT||-1e9)<30000){couchJoin(i);continue}if(padActive(gp)&&!Object.values(PADS).includes('p1'))PADS[i]='p1'}
-  else if(own==='p1'){if(stE&&NET.mode)toggleEsc()}
+  else if(own==='p1'){if(stE&&NET.mode&&!navBox())padStart();if(selE&&NET.mode)toggleEsc()}
   else{const g=LOC.get(own);if(!g){delete PADS[i];continue}if(selE){couchLeave(own);continue}g.inp=readPad(gp);if(gp.buttons[3]&&gp.buttons[3].pressed&&!padPrev2[i+'y'])g.em=ri(0,3);padPrev2[i+'y']=gp.buttons[3]&&gp.buttons[3].pressed}}
  for(const i in PADS)if(!seen.has(+i)){const o=PADS[i];delete PADS[i];if(o!=='p1')couchLeave(o)}
  if(!couchOk()){if(LOC.size)couchReset();return}
  for(const [k,g] of LOC){if(NET.mode==='host'){const p=P(guestId(k));if(p){p.inp=g.inp;if(g.em>=0){emote(p,g.em)}}else if(S&&S.players.length<6&&!S.hub)hostGuest('host',k,g)}
   else{const q=v=>Math.round(v*20)/20,ii=g.inp,key=q(ii.x)+','+q(ii.y)+ii.d+ii.f+ii.p;g.t-=dt;if(key!==g.bk||g.t<=0){g.bk=key;g.t=.25;try{NET.hostConn.send({t:'gi',k,x:q(ii.x),y:q(ii.y),d:ii.d,f:ii.f,p:ii.p})}catch(e){}}if(g.em>=0)try{NET.hostConn.send({t:'ge',k,e:g.em})}catch(e){}}
   g.em=-1}}
-addEventListener('keydown',()=>{window.lastKbT=performance.now()},true);setInterval(()=>{const el=$('#couchHint');if(!el)return;const n=navigator.getGamepads?[...navigator.getGamepads()].filter(Boolean).length:0;el.style.display=n&&couchOk()&&LOC.size<3?'block':'none'},700);addEventListener('mousedown',()=>{window.lastKbT=performance.now()},true);
+addEventListener('keydown',()=>{window.lastKbT=performance.now()},true);setInterval(()=>{const el=$('#couchHint');if(!el)return;const n=navigator.getGamepads?[...navigator.getGamepads()].filter(Boolean).length:0;document.body.classList.toggle('haspad',n>0);el.style.display=n&&couchOk()&&LOC.size<3?'block':'none'},700);addEventListener('mousedown',()=>{window.lastKbT=performance.now()},true);
+// ---- gamepad menu navigation (P1's controller)
+const NAV={el:null,t:0,held:0,prev:{}};
+function vis(e){if(!e||e.disabled)return false;const r=e.getBoundingClientRect();if(r.width<4||r.height<4)return false;const cs=getComputedStyle(e);return cs.visibility!=='hidden'&&cs.display!=='none'&&e.offsetParent!==null}
+function navBox(){if($('#ward').classList.contains('on'))return $('#ward');if($('#esc').classList.contains('on'))return $('#esc');for(const id of ['over','results','stats','lb','browse','title']){const e=$('#'+id);if(e&&e.classList.contains('on'))return e}return null}
+function navItems(box){return [...box.querySelectorAll('button,input:not([type=range]),select,[data-nav]')].filter(e=>vis(e)&&!e.closest('[hidden]'))}
+function navMark(e){document.querySelectorAll('.gpf').forEach(x=>x.classList.remove('gpf'));NAV.el=e;if(e){e.classList.add('gpf');e.scrollIntoView({block:'nearest',inline:'nearest'})}}
+function navMove(dx,dy){const box=navBox();if(!box)return;const it=navItems(box);if(!it.length)return;if(!NAV.el||!it.includes(NAV.el)){navMark((box.id!=='ward'&&box.id!=='esc'&&it.find(e=>e.classList.contains('go')))||it[0]);return}
+ const a=NAV.el.getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2;let best=null,bs=1e9;
+ for(const e of it){if(e===NAV.el)continue;const r=e.getBoundingClientRect();const along=dx>0?r.left-a.right:dx<0?a.left-r.right:dy>0?r.top-a.bottom:a.top-r.bottom;const ac=dx?(r.left+r.width/2-ax)*dx:(r.top+r.height/2-ay)*dy;if(ac<=4||along<-a.height*.5)continue;const gap=dx?Math.max(0,r.top-a.bottom,a.top-r.bottom):Math.max(0,r.left-a.right,a.left-r.right);const al=Math.max(0,along);if(gap>Math.max(al,30)*1.5)continue;const sc=al+gap*2+Math.abs(dx?(r.top+r.height/2-ay):(r.left+r.width/2-ax))*.05;if(sc<bs){bs=sc;best=e}}
+ if(best){navMark(best);SFX.click&&SFX.click()}}
+function navBack(box){const ids={ward:'#bWard',esc:'#eRes',stats:'#bStBack',lb:'#bLBBack',browse:'#bBrBack'};const b=ids[box.id]&&$(ids[box.id]);if(b&&vis(b))b.click()}
+function padStart(){const b=$('#bStart');if(curScreen==='lobby'&&b&&vis(b)){b.click();return}toggleEsc()}
+function gpNav(dt){const pads=navigator.getGamepads?navigator.getGamepads():[];const box=navBox();
+ if(!box){if(NAV.el)navMark(null);let st=0,a=0,b=0;for(const gp of pads){if(!gp)continue;const o=PADS[gp.index];if(o!==undefined&&o!=='p1')continue;st|=!!(gp.buttons[9]&&gp.buttons[9].pressed);a|=!!(gp.buttons[0]&&gp.buttons[0].pressed);b|=!!(gp.buttons[1]&&gp.buttons[1].pressed)}NAV.prev={a,b,st};return}
+ if(document.activeElement&&document.activeElement.tagName==='INPUT'&&NAV.el===document.activeElement){}
+ let x=0,y=0,a=0,b=0,st=0,any=0;
+ for(const gp of pads){if(!gp)continue;const o=PADS[gp.index];if(o!==undefined&&o!=='p1')continue;const i=readPad(gp);x+=i.x;y+=i.y;const bt=k=>gp.buttons[k]&&gp.buttons[k].pressed;a|=bt(0);b|=bt(1);st|=bt(9);if(padActive(gp)||bt(9))any=1;if(any&&o===undefined&&!Object.values(PADS).includes('p1'))PADS[gp.index]='p1'}
+ const dir=Math.abs(x)>.5||Math.abs(y)>.5?(Math.abs(x)>Math.abs(y)?[Math.sign(x),0]:[0,Math.sign(y)]):null;
+ if(dir){const k=dir.join();if(k!==NAV.dk){NAV.dk=k;NAV.t=.35;navMove(dir[0],dir[1])}else{NAV.t-=dt;if(NAV.t<=0){NAV.t=.13;navMove(dir[0],dir[1])}}}else NAV.dk=null;
+ const P_=NAV.prev;
+ if(a&&!P_.a){if(!NAV.el||!navItems(box).includes(NAV.el))navMove(0,1);else{const e=NAV.el;if(e.tagName==='INPUT'||e.tagName==='SELECT')e.focus();else{e.click();SFX.click&&SFX.click()}}}
+ if(b&&!P_.b){if(document.activeElement&&document.activeElement.tagName==='INPUT')document.activeElement.blur();else navBack(box)}
+ if(st&&!P_.st&&box.id==='esc')$('#eRes').click();
+ NAV.prev={a,b,st}}
 function readInput(){let x=0,y=0,d=false,f=false,pa=false;
  if(keys.KeyA||keys.ArrowLeft)x-=1;if(keys.KeyD||keys.ArrowRight)x+=1;if(keys.KeyW||keys.ArrowUp)y-=1;if(keys.KeyS||keys.ArrowDown)y+=1;
  if(keys.Space||keys.KeyJ||keys.Enter)d=true;if(keys.KeyF||keys.KeyL)f=true;if(keys.ShiftLeft||keys.ShiftRight||keys.KeyK)pa=true;
- const pads=navigator.getGamepads?navigator.getGamepads():[];
+ const pads=navigator.getGamepads&&!navBox()?navigator.getGamepads():[];
  for(const gp of pads){if(!gp||(PADS[gp.index]!==undefined&&PADS[gp.index]!=='p1')||(PADS[gp.index]===undefined&&Object.values(PADS).includes('p1')))continue;const ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(hyp(ax,ay)>.2){x+=ax;y+=ay}
   if(gp.buttons[14]&&gp.buttons[14].pressed)x-=1;if(gp.buttons[15]&&gp.buttons[15].pressed)x+=1;if(gp.buttons[12]&&gp.buttons[12].pressed)y-=1;if(gp.buttons[13]&&gp.buttons[13].pressed)y+=1;
   const bt=i=>gp.buttons[i]&&gp.buttons[i].pressed;if(bt(0)||bt(7))d=true;if(bt(2)||bt(5))f=true;if(bt(1)||bt(4))pa=true;
@@ -1691,7 +1716,7 @@ $('#volMu').oninput=e=>{initAudio();musVol=+e.target.value;store.set('musvol',mu
 let last=performance.now(),acc=0,sendAcc=0;const STEP=1/60;
 let lastL=performance.now();
 function logic(){const n_=performance.now();let dt=Math.min(.1,(n_-lastL)/1000);lastL=n_;
- if(NET.mode)sendInput(dt);
+ gpNav(dt);if(NET.mode)sendInput(dt);
  if(NET.mode==='host'&&S){let sdt=dt;if(S.hs>0){S.hs-=dt;sdt*=.08}else if(S.slowT>0){S.slowT-=dt;sdt*=.3}acc+=sdt;let n=0;while(acc>=STEP&&n<6){simStep(STEP);acc-=STEP;n++}if(n>=6)acc=0;
   sendAcc+=dt;if(sendAcc>=1/30){sendAcc=0;if(NET.conns.size)broadcast();else S.evq=[]}V=S;Music.wob=Math.max(0,...S.players.map(p=>p.buzz))*.3}}
 setInterval(()=>{if(document.hidden&&NET.mode==='host')logic()},16);
