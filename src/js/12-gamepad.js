@@ -9,7 +9,7 @@ function navMove(dx,dy){const box=navBox();if(!box)return;const it=navItems(box)
  const a=NAV.el.getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2;let best=null,bs=1e9;
  for(const e of it){if(e===NAV.el)continue;const r=e.getBoundingClientRect();const along=dx>0?r.left-a.right:dx<0?a.left-r.right:dy>0?r.top-a.bottom:a.top-r.bottom;const ac=dx?(r.left+r.width/2-ax)*dx:(r.top+r.height/2-ay)*dy;if(ac<=4||along<-a.height*.5)continue;const gap=dx?Math.max(0,r.top-a.bottom,a.top-r.bottom):Math.max(0,r.left-a.right,a.left-r.right);const al=Math.max(0,along);if(gap>Math.max(al,30)*1.5)continue;const sc=al+gap*2+Math.abs(dx?(r.top+r.height/2-ay):(r.left+r.width/2-ax))*.05;if(sc<bs){bs=sc;best=e}}
  if(best){navMark(best);SFX.click&&SFX.click()}}
-function navBack(box){const ids={ward:'#bWard',esc:'#eRes',stats:'#bStBack',lb:'#bLBBack',browse:'#bBrBack'};const b=ids[box.id]&&$(ids[box.id]);if(b&&vis(b))b.click()}
+function navBack(box){const ids={opts:'#oDone',daily:'#dDone',ward:'#bWard',esc:'#eRes',stats:'#bStBack',lb:'#bLBBack',browse:'#bBrBack'};const b=ids[box.id]&&$(ids[box.id]);if(b&&vis(b))b.click()}
 function padStart(){const b=$('#bStart');if(curScreen==='lobby'&&b&&vis(b)){b.click();return}toggleEsc()}
 function gpNav(dt){const pads=navigator.getGamepads?navigator.getGamepads():[];const box=navBox();
  if(!box){if(NAV.el)navMark(null);let st=0,a=0,b=0;for(const gp of pads){if(!gp)continue;const o=PADS[gp.index];if(o!==undefined&&o!=='p1')continue;st|=!!(gp.buttons[9]&&gp.buttons[9].pressed);a|=!!(gp.buttons[0]&&gp.buttons[0].pressed);b|=!!(gp.buttons[1]&&gp.buttons[1].pressed)}NAV.prev={a,b,st};return}

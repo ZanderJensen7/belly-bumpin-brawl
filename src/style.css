@@ -152,3 +152,5 @@ body>.foot{position:fixed;left:50%;bottom:6px;transform:translateX(-50%);margin:
 .dq{margin-top:10px;padding:8px 10px;border:3px solid #2a1608;border-radius:12px;background:#fff6e0;text-align:left;color:#2a1608}.dq.dn{background:#d9f2c4}
 .dqt{display:flex;justify-content:space-between;gap:8px;font:600 16px Fredoka,sans-serif}.dqt span{white-space:nowrap;color:#b3541e}
 .dbar{height:10px;border:2px solid #2a1608;border-radius:6px;background:#fff;margin:6px 0 2px;overflow:hidden}.dbar i{display:block;height:100%;background:#f5a623}.dq.dn .dbar i{background:#4cd964}
+/* the top bar gained a Settings button: keep it on screen on narrow phones */
+@media (max-width:480px){#tools{gap:4px}#tools input[type=range]{width:50px}#tools button{padding:4px 8px}}

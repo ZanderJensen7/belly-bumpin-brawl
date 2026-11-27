@@ -110,7 +110,7 @@ function updateFX(dt){for(const q of parts){q.t+=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.
  for(const q of pops)q.t+=dt;pops=pops.filter(q=>q.t<q.life);for(const g of rings)g.t+=dt;rings=rings.filter(g=>g.t<g.life);for(const k in bumpSq)bumpSq[k]=Math.max(0,bumpSq[k]-dt*2);
  if(!V)return;for(const p of V.players){const a=A_(p.id);const sp=hyp(p.vx,p.vy);a.walk+=dt*sp*.06;
   // dust: puffs at the feet when running, dashing, skidding after a hit, or teetering on an edge
-  if(p.alive&&!p.pzv&&V.phase!=='results'){a.dT=(a.dT||0)-dt;const skid=p.stun>0&&sp>180,dsh=p.dash>0,run=sp>170&&p.stun<=0&&!dsh;if(a.dT<=0&&(skid||dsh||run||p.teeter)){a.dT=skid?.035:dsh?.03:run?.15:.13;for(let i=skid?2:1;i--;)parts.push({x:p.x+rnd(-p.r*.5,p.r*.5),y:p.y+p.r*.55+rnd(-3,3),vx:-p.vx*.12+rnd(-25,25),vy:-p.vy*.12+rnd(-22,4),z:0,vz:0,t:0,life:rnd(.28,.5),sz:rnd(3,skid?8:6)*(dsh?1.2:1),col:'rgba(255,246,224,.5)',g:0,d:1})}}
+  if(p.alive&&!p.pzv&&V.phase!=='results'){a.dT=(a.dT||0)-dt;const skid=p.stun>0&&sp>180,dsh=p.dash>0,run=sp>170&&p.stun<=0&&!dsh;if(a.dT<=0&&(skid||dsh||run||(p.teeter&&sp>25))){a.dT=skid?.035:dsh?.03:run?.15:.13;for(let i=skid?2:1;i--;)parts.push({x:p.x+rnd(-p.r*.5,p.r*.5),y:p.y+p.r*.55+rnd(-3,3),vx:-p.vx*.12+rnd(-25,25),vy:-p.vy*.12+rnd(-22,4),z:0,vz:0,t:0,life:rnd(.28,.5),sz:rnd(3,skid?8:6)*(dsh?1.2:1),col:'rgba(255,246,224,.5)',g:0,d:1})}}
   const ax=(p.vx-a.lvx),ay=(p.vy-a.lvy);a.lvx=p.vx;a.lvy=p.vy;a.pvx-=ax*.25;a.pvy-=ay*.25;
   a.pvx+=(-a.px*160-a.pvx*5)*dt;a.pvy+=(-a.py*160-a.pvy*5)*dt;if(p.stun>0){a.pvx+=Math.cos(gtime*15)*400*dt;a.pvy+=Math.sin(gtime*15)*400*dt}a.px+=a.pvx*dt;a.py+=a.pvy*dt;
   a.px=clamp(a.px,-8,8);a.py=clamp(a.py,-8,8);a.sq=Math.max(0,a.sq-dt*3);
