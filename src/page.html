@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<title>Belly Bumpin' Brawl</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/*__CSS__*/
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="title" class="screen on">
+  <div class="logo"><span>BELLY</span> <span>BUMPIN'</span> <span>BRAWL</span></div>
+  <div class="tag">Bump your friends into the beer.</div>
+  <div class="panel tpanel">
+    <div class="row tme"><canvas id="pv" width="200" height="200" style="width:84px;height:84px;flex:none"></canvas><div class="col" style="flex:1;gap:4px"><input id="nm" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Your name"><div id="lvl" class="lvlbar"></div></div></div>
+    <div class="row" style="gap:8px;margin-top:10px"><button id="bHost" class="big" style="flex:1">🍺 Host</button><button id="bFind" class="big go" style="flex:1">🌐 Find game</button></div>
+    <div class="row" style="margin-top:10px"><input id="code" placeholder="CODE" maxlength="5" autocomplete="off" spellcheck="false"><button id="bJoin" class="go" style="font-size:24px;padding:10px 18px">Join</button></div>
+    <div class="row" style="gap:8px;margin-top:10px"><button id="bHub" class="big hubbtn" style="flex:1">🍻 Hub<span>hang out · chat</span></button><button id="bTCust" class="big custbtn" style="flex:1">🎨 Customize<span>hats · faces · tags</span></button></div>
+    <div class="row tsub" style="gap:8px;margin-top:10px"><button id="bSolo" class="ghost">🤖 Practice</button><button id="bStats" class="ghost">📊 Stats</button><button id="bLB" class="ghost">🏆 Leaders</button></div>
+    <div style="display:none"><div class="col">
+        
+        <label>Color</label><div class="pick"><button data-p="c-1">◀</button><span id="cn"></span><button data-p="c1">▶</button></div>
+        <label>Hat</label><div class="pick"><button data-p="h-1">◀</button><span id="hn"></span><button data-p="h1">▶</button></div>
+        <label>Face</label><div class="pick"><button data-p="f-1">◀</button><span id="fnn"></span><button data-p="f1">▶</button></div>
+        <label>Back</label><div class="pick"><button data-p="b-1">◀</button><span id="bnn"></span><button data-p="b1">▶</button></div>
+        <button class="maim keyonly" style="margin-top:6px;font-size:14px;padding:5px 8px"></button>
+      </div>
+    </div>
+</div>
+  </div>
+  <div class="foot">Drink responsibly. Water counts.</div>
+</div>
+
+<div id="touch"><div id="tstick"><div id="tbase"><div id="tknob"></div></div><div class="hint">drag to move</div></div>
+<div class="tb2" id="tParry"><b>🛡️</b>PARRY</div><div class="tb2" id="tBump"><b>🍺</b>BUMP</div><div class="tb2" id="tThrow"><b>🥛</b>THROW</div><div class="tb2" id="tEmote">😂</div></div>
+<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build __BUILD__<span id="netinfo"></span></div>
+<div id="rotate"><div>📱↻</div>Turn your phone sideways to brawl</div>
+<div id="lobby" class="screen">
+  <div class="panel"><button class="mtog" id="bMini">▲ Hide menu (practice)</button>
+    <div class="small" style="text-align:center;font-weight:700">ROOM CODE</div>
+    <div class="codebox" id="lcode">----</div>
+    <div style="display:flex;gap:6px;margin-top:6px"><button id="bCopy" style="flex:1;font-size:16px">Copy invite</button></div>
+    <div class="small" id="lhint" style="text-align:center;margin-top:6px">Share this code</div>
+    <div class="lvlbar" id="lvlL" title="Your stats"></div><button id="bCust" class="go" style="margin-top:8px;width:100%;font-size:20px;padding:8px">🎨 Wardrobe</button>
+    
+    <ul class="plist" id="plist"></ul><div id="couchHint" class="small" style="display:none;text-align:center;margin:4px 0;font-weight:700">🎮 Extra controller? Press <b>START</b> on it to add a player</div>
+    <div class="small" id="linfo" style="text-align:center;font-weight:700"></div>
+    <div id="hostOpts">
+      <label>Mode</label>
+      <div class="seg wrap" id="segM"><button data-v="classic">Last One Standing</button><button data-v="teams">Tag Team 2v2</button><button data-v="stock">Stock Brawl</button><button data-v="draft">Sore Losers</button><button data-v="happy">Happy Hour</button><button data-v="koth">King of the Coaster</button></div>
+      <div class="small" id="mdesc" style="margin:4px 0 8px"></div>
+      <label>Map</label>
+      <div class="seg wrap" id="segP"><button data-v="random">🎲 Random</button><button data-v="round">Round Table</button><button data-v="counter">Bar Counter</button><button data-v="pong">Beer Pong</button><button data-v="coasters">Coaster Hop</button><button data-v="belt">Keg Line</button><button data-v="ice">Ice Bucket</button><button data-v="seesaw">Seesaw</button><button data-v="donut">The Donut</button><button data-v="pool">Pool Table</button><button data-v="dance">Dance Floor</button><button data-v="bridge">Two Tables</button><button data-v="swiss">Swiss Cheese</button></div>
+      <div id="livesWrap"><label style="display:block;margin-top:8px">Lives</label>
+      <div class="seg" id="segL"><button data-v="2">❤️❤️</button><button data-v="3">❤️❤️❤️</button></div></div>
+      <div id="tgtWrap"><label style="display:block;margin-top:8px">First to</label>
+      <div class="seg" id="segT"><button data-v="3">3</button><button data-v="5">5</button><button data-v="7">7</button></div></div>
+      <label style="display:block;margin-top:8px">Drink cards</label>
+      <div class="seg" id="segD"><button data-v="1">🍺 On</button><button data-v="0">🧃 Off</button></div>
+      <label style="display:block;margin-top:8px">Mystery crates (gun + powerups)</label>
+      <div class="seg" id="segG"><button data-v="1">🍾 On</button><button data-v="0">Off</button></div>
+      <div id="pubWrap"><label style="display:block;margin-top:8px">Room</label>
+      <div class="seg" id="segV"><button data-v="0">🔒 Friends only</button><button data-v="1">🌐 Public</button></div></div>
+      <label style="display:block;margin-top:8px">Ghosts (KO'd players drop peanuts)</label>
+      <div class="seg" id="segH"><button data-v="0">Off</button><button data-v="1">👻 On</button></div>
+      <label style="display:block;margin-top:8px">Bots</label>
+      <div class="seg" id="segB"><button data-v="0">😴 Easy</button><button data-v="1">🍺 Normal</button><button data-v="2">💀 Hard</button></div>
+      <div class="seg" style="margin-top:6px"><button id="bBot">+ Add bot</button></div>
+      <button id="bStart" class="big go">Start the brawl!<span class="padhint"> (START)</span></button>
+    </div>
+    <div class="waitmsg" id="lwait">Waiting for host...</div>
+    <div class="ctrls"><div class="touchonly">Drag left side to move. Hold <b>BUMP</b>, release to launch. <b>PARRY</b> right before a hit.</div><div class="keyonly"><kbd>WASD</kbd> move · hold <kbd>Space</kbd> bump · <kbd>Shift</kbd> parry · <kbd>F</kbd> throw (tap twice) · <kbd>1-4</kbd> emotes</div>Knock everyone into the beer. Hold full charge too long and you burp.</div>
+  </div>
+</div>
+
+<div id="results" class="screen"><div class="panel">
+  <div class="small H" id="rround">ROUND 1</div>
+  <div class="rtitle" id="rtitle">X WINS</div>
+  <div class="scores" id="rscores"></div>
+  <div id="rpick"></div>
+  <div class="card"><h3 id="rcardh">🍺 Drink card</h3><div id="rlines"></div></div>
+  <button id="bNext" class="big go">Next round ▶</button>
+  <div class="bar"><i id="rbar"></i></div>
+</div></div>
+
+<div id="ward"><div class="panel"><div class="rtitle" style="font-size:32px">🎨 Wardrobe</div><canvas id="wpv" width="240" height="240" style="width:170px;height:170px;display:block;margin:0 auto"></canvas><div id="wname" style="text-align:center;font:600 20px Fredoka,sans-serif;margin:-6px 0 6px;-webkit-text-stroke:0;text-shadow:-2px -2px 0 #2a1608,2px -2px 0 #2a1608,-2px 2px 0 #2a1608,2px 2px 0 #2a1608,0 2px 0 #2a1608;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+    <div class="mebox" id="mebox">
+      <input id="lnm" maxlength="24" autocomplete="off" spellcheck="false" placeholder="Your name" style="width:100%;box-sizing:border-box">
+      <div class="pick" style="margin-top:6px"><button data-l="c-1">◀</button><span id="lcn" style="font-size:16px"></span><button data-l="c1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="h-1">◀</button><span id="lhn" style="font-size:16px"></span><button data-l="h1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="f-1">◀</button><span id="lfn" style="font-size:16px"></span><button data-l="f1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="b-1">◀</button><span id="lbn" style="font-size:16px"></span><button data-l="b1">▶</button></div><div class="pick" style="margin-top:4px"><button data-l="i-1">◀</button><span id="lin" style="font-size:16px"></span><button data-l="i1">▶</button></div><input id="ltag" maxlength="4" autocomplete="off" spellcheck="false" placeholder="Clan tag (4 letters)" style="width:100%;box-sizing:border-box;margin-top:6px;text-transform:uppercase"><button class="maim keyonly" style="width:100%;margin-top:6px;font-size:14px;padding:5px 8px"></button>
+    </div><div class="small" id="wlock" style="text-align:center;margin-top:6px"></div><button id="bWard" class="big go">Done</button></div></div>
+<div id="chatw"><div class="ch">💬 Chat</div><div id="clog"></div><input id="cin" maxlength="80" placeholder="Press Enter to chat" autocomplete="off" spellcheck="false"></div>
+<div id="hub" class="screen"><div class="panel"><div class="rtitle" style="font-size:28px">🍻 The Hub</div><div class="small" id="hcount">Just you so far</div><div class="small" style="margin-top:6px;opacity:.8">Walk into a glowing portal to join a match, or onto the 🍻 pad to host one.</div><button id="bHubLeave" class="ghost">Leave hub</button></div></div>
+<div id="lb" class="screen"><div class="panel"><div class="rtitle" style="font-size:34px">🏆 Leaderboard</div><div class="seg" id="lbTabs" style="margin:6px 0"><button data-k="lv" class="sel">Level</button><button data-k="w">Wins</button><button data-k="k">KOs</button><button data-k="pz">Deep End</button><button data-k="a">🏆</button></div><div id="lbList" class="rlist"></div><div class="small" id="lbNote" style="opacity:.7">Loading...</div><button id="bLBBack" class="ghost">Back</button></div></div>
+<div id="browse" class="screen"><div class="panel"><div class="rtitle" style="font-size:34px">🌐 Open rooms</div><button id="bQuick" class="big go" style="margin-top:6px">⚡ Quick match</button><div id="rlist" class="rlist"></div><button id="bBrBack" class="ghost">Back</button></div></div>
+<div id="stats" class="screen"><div class="panel"><div class="rtitle" style="font-size:34px">📊 <span id="stName" style="font-family:Fredoka,system-ui,sans-serif;font-weight:600;font-size:30px"></span></div><div class="sgrid" id="sgrid"></div><div id="achs"></div><button id="bStBack" class="big">Back</button></div></div>
+<div id="over" class="screen"><div class="panel">
+  <div class="small H">CHAMPION</div>
+  <canvas id="champ" width="240" height="240" style="width:180px;height:180px"></canvas>
+  <div class="rtitle" id="otitle">X</div>
+  <div class="scores" id="oscores"></div>
+  <div class="oxp" id="oxp"></div>
+  <div class="card"><h3>🏆 Awards</h3><div class="awards" id="oaw"></div></div>
+  <div id="ohost"><button id="bRe" class="big go">Rematch!</button><button id="bLob" class="ghost">Back to lobby</button></div>
+  <div class="waitmsg" id="owait">Waiting for the host...</div>
+</div></div>
+
+<div id="toast"></div>
+<div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bVoice" title="Announcer voice (click to change)">🗣️</button><button id="bFull" title="Fullscreen">⛶</button><button id="bMenu" title="Menu (Esc)">☰</button></div>
+<div id="draft"><div class="dh">PICK A POWER-UP!</div><div class="ds">Losers get stronger. They stack.</div><div class="dc" id="dcards"></div><div class="dt"><i id="dbar"></i></div></div>
+<div id="tut"><div class="ttx"></div></div>
+<div id="rpl"><b>▶ INSTANT REPLAY</b><span>any button to skip</span></div>
+<div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eLob" class="ghost">Back to lobby</button><div id="ePl"></div><button id="eSt" class="ghost">📊 My stats</button><button id="eBg" class="ghost"></button><button id="eTut" class="ghost">🎓 Show control tips again</button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
+
+<script>/*__PEERJS__*/</script>
+<script>
+/*__JS__*/
+</script>
+</body>
+</html>

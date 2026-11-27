@@ -1,5 +1,6 @@
 name: Build game
 
+# src/build.js joins src/page.html + src/style.css + src/js/*.js into one file.
 # PRs: build + syntax check, and attach the built game as a downloadable artifact.
 # main: bump the build number, fill it into CHANGELOG.md, rebuild index.html and publish it (Pages serves main).
 on:

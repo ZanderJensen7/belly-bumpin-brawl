@@ -14,6 +14,6 @@ A wobbly, drunk-friendly party brawler for 2–6 friends online. Belly-bump each
 
 We build this by talking to Claude in the Claude Code app, not with git by hand. Claude reads [CLAUDE.md](CLAUDE.md) for the workflow: sync first, branch, open a PR, merge.
 
-- Source is `src/src.html`. `index.html` is built and published automatically by the GitHub Action when something merges to `main`, so never edit it by hand.
+- Source is split by system in `src/` (`page.html` markup, `style.css`, `js/*.js` game code; see `CLAUDE.md` for which file holds what). `src/build.js` joins it into one file. `index.html` is built and published automatically by the GitHub Action when something merges to `main`, so never edit it by hand.
 - Shared to-do list: [Issues](https://github.com/ZanderJensen7/belly-bumpin-brawl/issues).
 - Every PR's checks attach the built game as a downloadable `game-build` artifact, so you can try a change before merging.
