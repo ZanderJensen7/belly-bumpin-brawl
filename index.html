@@ -180,7 +180,7 @@ body>.foot{position:fixed;left:50%;bottom:6px;transform:translateX(-50%);margin:
 
 <div id="touch"><div id="tstick"><div id="tbase"><div id="tknob"></div></div><div class="hint">drag to move</div></div>
 <div class="tb2" id="tParry"><b>🛡️</b>PARRY</div><div class="tb2" id="tBump"><b>🍺</b>BUMP</div><div class="tb2" id="tThrow"><b>🥛</b>THROW</div><div class="tb2" id="tEmote">😂</div></div>
-<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 68<span id="netinfo"></span></div>
+<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 69<span id="netinfo"></span></div>
 <div id="rotate"><div>📱↻</div>Turn your phone sideways to brawl</div>
 <div id="lobby" class="screen">
   <div class="panel"><button class="mtog" id="bMini">▲ Hide menu (practice)</button>
@@ -268,6 +268,7 @@ body>.foot{position:fixed;left:50%;bottom:6px;transform:translateX(-50%);margin:
 //# sourceMappingURL=peerjs.min.js.map
 </script>
 <script>
+// 01-utils-data.js: helpers, screen size, colours, and the cosmetics catalogue (hats, faces, backs, icons, emotes)
 'use strict';
 // ============================================================ utils
 const $=s=>document.querySelector(s);
@@ -293,6 +294,7 @@ const HAT_LV=[1,1,1,1,1,1,1,1,1,2,3,4,5,7,9,12,6,1,1];const HAT_ACH={17:'duck',1
 const HNAMES=['Lampshade','Traffic Cone','Top Hat','Party Hat','Viking','Cowboy','Propeller','Chef','Bald','Beanie','Beer Helmet','Devil Horns','Pirate','Wizard','Halo','Crown','Glizzy','Rubber Duck','Golden Mug'];
 const EMOTES=['HIC!','COME AT ME','♪ DANCE ♪','*BUUURP*'];
 const BUZZ=['Sober-ish','Tipsy','Buzzed','Sloshed','Hammered','Legendary','Gone','Ascended'];
+// 02-rules.js: bot names, mutators (MUTS), maps (MAPS), modes, perks, teams, shape maths
 const BOTNAMES=['Big Gary','Tiny Tim','Brenda','Sir Hic','Moist Dave','Karen II','Chug Norris','Ale Gore','Beerdan','Lager Lou','Sippy','Mr. Spill'];
 const MUTS={
  none:{n:'Warm-Up Round',d:'Just bellies.'},
@@ -349,6 +351,7 @@ function inShape(s,x,y){const dx=x-s.x,dy=y-s.y;if(s.t==='c')return dx*dx+dy*dy<
  const hw=s.w/2-s.h/2,cx=clamp(dx,-hw,hw);return (dx-cx)*(dx-cx)+dy*dy<=(s.h/2)*(s.h/2)}
 function toLocal(x,y,st){const sc=st.arenaR/BASE_R,c=Math.cos(-st.rot),sn=Math.sin(-st.rot),dx=x-CX,dy=y-CY;return [(dx*c-dy*sn)/sc,(dx*sn+dy*c)/sc]}
 function toWorld(lx,ly,st){const sc=st.arenaR/BASE_R,c=Math.cos(st.rot),sn=Math.sin(st.rot);return [CX+(lx*c-ly*sn)*sc,CY+(lx*sn+ly*c)*sc]}
+// 03-deep-end.js: the secret Deep End puzzle levels, and the lane the giant coaster floats along
 // ---- The Deep End: secret lobby mini-game. Level i lives at world (PZX, i*PZY).
 const PZX=9000,PZY=2200;
 const PZL=[
@@ -371,6 +374,7 @@ function floatLane(r){const pts=(x,y,rr,vert)=>{for(const o of [-rr-14,-rr*.5,0,
  for(const rr of [r,66,54]){for(let x=CX+BASE_R+20+rr;x<=1050;x+=8)if(clearV(x,rr))return {x,y:-100,vx:0,vy:52,r:rr};
   for(const ex of [600,760,900])for(const dir of [1,-1])for(let y=CY+dir*40;dir>0?y<=H-rr*.55:y>=rr*.6+50;y+=dir*8)if(clearH(y,rr,ex))return {x:W+120,y,vx:-52,vy:0,r:rr,ex}}
  return {x:1046,y:-100,vx:0,vy:52,r:54}}
+// 04-arena.js: "is this spot on the table?" checks, glass railings, small helpers (esc, shade, toast)
 function floaterAt(x,y){if(!S||!S.fl)return null;for(const f of S.fl)if(!f.flip&&hyp(x-f.x,y-f.y)<f.r)return f;return null}
 function onArena(x,y,st){st=st||S;const m=MAPS[st.map]||MAPS.round;const l=toLocal(x,y,st);return m.solids.some(q=>inShape(q,l[0],l[1]))&&!m.holes.some(h=>inShape(h,l[0],l[1]))}
 function clearAt(x,y,d,st){if(!onArena(x,y,st))return false;for(let i=0;i<8;i++){const a=i/8*TAU;if(!onArena(x+Math.cos(a)*d,y+Math.sin(a)*d,st))return false}return true}
@@ -401,11 +405,13 @@ function shade(hex,amt){let n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&2
  return 'rgb('+(r|0)+','+(g|0)+','+(b|0)+')'}
 let toastT=0;function toast(m,t=2.5){const e=$('#toast');e.textContent=m;e.classList.add('on');toastT=t}
 
+// 05-settings.js: saved settings (store / localStorage) and your profile
 // ============================================================ settings (local)
 const store={get(k,d){try{const v=localStorage.getItem('lcb_'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('lcb_'+k,JSON.stringify(v))}catch(e){}}};
 let me={name:store.get('name',pick(['Sloppy Joe','Tipsy Tina','Hammered Hank','Wobbly Wes','Drunk Dan','Pint Pat'])),color:store.get('color',ri(0,7)),hat:store.get('hat',ri(0,7)),fc:store.get('fc',0),bk:store.get('bk',0),tag:cleanTag(store.get('tag','')),ic:store.get('ic',0)};
 let muted=store.get('muted',false), voiceOn=store.get('voice',true), vol=store.get('vol',80), musVol=store.get('musvol',60);
 
+// 06-sfx.js: audio setup and every sound effect (SFX)
 // ============================================================ AUDIO
 let AC=null,MG,SG,MUG,NB;
 function initAudio(){
@@ -457,6 +463,7 @@ const SFX={
  cheer(){if(!AC)return;const t=now();for(let i=0;i<6;i++)noise(1.8,.18,'bandpass',rnd(900,3000),rnd(900,3000),3,t+Math.random()*.2);for(let i=0;i<3;i++){const st=t+.2+i*.35+Math.random()*.2;tone('sine',1800,2900,.25,.08,st)}},
  fanfare(){if(!AC)return;const t=now();[523,659,784,1047,784,1047].forEach((f,i)=>{tone('triangle',f,null,i>4?.6:.16,.3,t+i*.12);tone('square',f/2,null,i>4?.6:.16,.06,t+i*.12)})},
 };
+// 07-music.js: the procedural music
 // ---- music: 5 procedural songs (lobby lounge, polka, ska, shanty, disco), sections + intensity
 const MAJ=[0,2,4,5,7,9,11],MIN=[0,2,3,5,7,8,10];
 const RH={8:[[1,0,1,0,1,0,1,0],[1,0,1,1,1,0,1,0],[1,1,1,0,1,0,0,0],[1,0,0,1,0,0,1,0],[1,0,1,0,1,1,1,1],[0,0,1,1,1,0,1,0]],6:[[1,0,1,1,0,1],[1,0,0,1,0,0],[1,1,1,1,0,1],[1,0,1,1,1,0]],
@@ -542,6 +549,7 @@ const Music={next:0,step:0,timer:null,wob:0,cur:'lobby',int:0,
   const m=B.mel[e];if(m>0){let k=1;while(e+k<st&&B.mel[e+k]<0&&k<3)k++;this.lead(B.lead,m,t,Math.max(.12,sd*k*.9),wob)}}
 };
 
+// 08-announcer.js: the speech-synthesis announcer (say)
 // ============================================================ ANNOUNCER (speech synthesis)
 let lastSay=0;
 const VOX=[{n:'Bar Boss',p:.75,r:1.08,v:/Microsoft David|Google UK English Male|Daniel|Alex/i},{n:'Big Deep',p:.25,r:.9,v:/Microsoft Mark|Microsoft Guy|Fred|Alex|David/i},{n:'Hype Man',p:1.4,r:1.25,v:/Google US English|Microsoft Guy|Microsoft Andrew|Aaron|Samantha/i},{n:'Posh Butler',p:.9,r:.95,v:/Google UK English Male|Microsoft George|Microsoft Ryan|Daniel|Arthur|en[-_]GB/i},
@@ -553,6 +561,7 @@ try{speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
 function say(text,force){if(RPL.on)return;if(!voiceOn||!('speechSynthesis' in window))return;if(document.hidden&&!store.get('bgsnd',true))return;const t=performance.now();if(!force&&(speechSynthesis.speaking||t-lastSay<1200))return;
  lastSay=t;try{if(force)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);{const v=VOX[voxI]||VOX[0];u.rate=v.r;u.pitch=v.p;const vv=voxVoice(v,voxI);if(vv){u.voice=vv;u.lang=vv.lang}}u.volume=muted?0:vol/100;speechSynthesis.speak(u)}catch(e){}}
 
+// 09-keyboard.js: keyboard and pointer listeners, touch flags
 // ============================================================ INPUT
 const keys={};let emoteQ=-1;
 addEventListener('keydown',e=>{if(e.code==='Enter'&&e.target.tagName!=='INPUT'&&(curScreen==='lobby'||curScreen==='hub')&&!$('#ward').classList.contains('on')){e.preventDefault();for(const k in keys)keys[k]=false;$('#cin').focus();return}if(e.code==='Escape'){if($('#ward').classList.contains('on'))$('#ward').classList.remove('on');else toggleEsc();return}if(e.target.tagName==='INPUT')return;keys[e.code]=true;initAudio();
@@ -565,6 +574,7 @@ addEventListener('pointerdown',()=>initAudio());
 let padPrev={};let mouseAim=store.get('maim',0)?1:0;const touch={x:0,y:0,d:0,f:0,p:0};
 const IS_TOUCH=matchMedia('(pointer:coarse)').matches||/[?&]touch/.test(location.search);if(IS_TOUCH)document.body.classList.add('touch');
 const TUT={cur:null,a:0,on:0,held:0,dn:0,dev:"k",was:0};if(IS_TOUCH)setTimeout(()=>{const ci=$('#cin');if(ci)ci.placeholder='Tap to chat'},0);
+// 10-tips.js: first-time control tips during matches (TUT / HINTS)
 function tutKeys(){const g=TUT.dev,K=t=>'<kbd>'+t+'</kbd>';return g==='t'?{mv:'the joystick',bp:'Hold '+K('BUMP')+', let go',pa:K('PARRY'),dr:K('THROW')}:g==='g'?{mv:'the stick',bp:'Hold '+K('A')+', let go',pa:K('B'),dr:K('X')}:{mv:K('WASD'),bp:'Hold '+K(mouseAim?'LEFT CLICK':'SPACE')+', let go',pa:K(mouseAim?'RIGHT CLICK':'SHIFT'),dr:K(mouseAim?'F':'F')}}
 // FTUE: one contextual hint at a time, in matches. Bits in store 'ftue': 1 bump, 2 parry, 4 drink.
 const HINTS={b:[1,k=>k.mv+' to move · '+k.bp+' to <b>bump</b>'],p:[2,k=>'Tap '+k.pa+' right as someone bumps you to <b>parry</b> it back'],d:[4,k=>'Got a drink? '+k.dr+' chugs it, '+k.dr+' again <b>throws</b> it']};
@@ -588,6 +598,7 @@ function tutTick(inp,dt){const bits=store.get('ftue',0)|0,ph=V&&V.phase,inMatch=
  else if(c==='d')ok=alive&&inp.f&&!TUT.dn&&mp.gun>0;
  TUT.dn=inp.p||inp.f;
  if(ok)tutDone(1);else if(TUT.a>20)tutDone(0)}
+// 11-couch.js: couch play: extra controllers join as local guests (PADS, LOC)
 // ---- couch: extra local players on extra controllers. PADS[index] = 'p1' | guest slot k (1..3)
 const PADS={};const LOC=new Map();const COUCH_N=['Couch Carl','Sofa Sam','Recliner Rita','Beanbag Bo','Futon Fred','Lazy Larry'];
 function readPad(gp){let x=0,y=0;const ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(hyp(ax,ay)>.2){x+=ax;y+=ay}const bt=i=>gp.buttons[i]&&gp.buttons[i].pressed;
@@ -615,6 +626,7 @@ function couchPads(dt){const pads=navigator.getGamepads?navigator.getGamepads():
   else{const q=v=>Math.round(v*20)/20,ii=g.inp,key=q(ii.x)+','+q(ii.y)+ii.d+ii.f+ii.p;g.t-=dt;if(key!==g.bk||g.t<=0){g.bk=key;g.t=.25;try{NET.hostConn.send({t:'gi',k,x:q(ii.x),y:q(ii.y),d:ii.d,f:ii.f,p:ii.p})}catch(e){}}if(g.em>=0)try{NET.hostConn.send({t:'ge',k,e:g.em})}catch(e){}}
   g.em=-1}}
 addEventListener('keydown',()=>{window.lastKbT=performance.now()},true);setInterval(()=>{const el=$('#couchHint');if(!el)return;const n=navigator.getGamepads?[...navigator.getGamepads()].filter(Boolean).length:0;document.body.classList.toggle('haspad',n>0);el.style.display=n&&couchOk()&&LOC.size<3?'block':'none'},700);addEventListener('mousedown',()=>{window.lastKbT=performance.now()},true);
+// 12-gamepad.js: gamepad menu navigation (gpNav) and readInput for player 1
 // ---- gamepad menu navigation (P1's controller)
 const NAV={el:null,t:0,held:0,prev:{}};
 function vis(e){if(!e||e.disabled)return false;const r=e.getBoundingClientRect();if(r.width<4||r.height<4)return false;const cs=getComputedStyle(e);return cs.visibility!=='hidden'&&cs.display!=='none'&&e.offsetParent!==null}
@@ -652,6 +664,7 @@ function readInput(){let x=0,y=0,d=false,f=false,pa=false;
  if(mouseAim&&!IS_TOUCH){if(mouse.l)d=true}else if(mouse.l)f=true;if(mouse.r)pa=true;let a=null;if((mouseAim&&!IS_TOUCH||performance.now()-mouse.t<5000)&&V){const mp=V.players.find(q=>q.id===NET.myId);if(mp){const w=mouseWorld();a=Math.round(Math.atan2(w[1]-(mp.y-6),w[0]-mp.x)*100)/100}}
  return {x:Math.round(x*100)/100,y:Math.round(y*100)/100,d:d?1:0,f:f?1:0,p:pa?1:0,a,m:mouseAim&&!IS_TOUCH?1:0}}
 
+// 13-match.js: host game state, players, spawning, rounds, knock-outs, crates, drinks, emotes
 // ============================================================ HOST SIMULATION
 let S=null; // authoritative state (host only)
 function newState(code){return {code,phase:'lobby',pt:0,rt:0,t:0,round:0,mut:[],arenaR:BASE_R,rot:0,rotV:0,tiltA:0,gx:0,gy:0,sudden:false,
@@ -726,6 +739,7 @@ function fireCork(p){const a=p.aimA!=null?p.aimA:p.face,dx=Math.cos(a),dy=Math.s
 function endMatchCont(){if(S.phase!=='play')return;const c=[...S.players].sort((a,b)=>b.score-a.score)[0];S.phase='over';S.pt=0;S.items=[];S.corks=[];S.over=buildOver(c);ev('say',{text:c.name+' wins '+MODES[S.settings.mode].n+'!',force:1});ev('champ')}
 function emote(p,k){if(p.emCd>0)return;p.emote=k;p.emoteT=2.2;p.emCd=.7;ev('emote',{id:p.id,em:k})}
 
+// 14-bots.js: bot AI (botThink) and difficulty levels
 const BOTLV=[{re:.42,pp:.3,tr:3.5,att:.55,aim:.55,dz:.14,thr:.07,br:.3,lead:0,edge:.35},{re:.26,pp:.55,tr:6,att:1,aim:.3,dz:.05,thr:.14,br:.55,lead:.06,edge:.1},{re:.16,pp:.82,tr:11,att:1.45,aim:.13,dz:.012,thr:.24,br:.85,lead:.16,edge:0}];
 function botThink(b,dt){if(b.ai&&b.ai.fire){b.inp.d=0;b.ai.fire=0}if(S.phase==='intro'||S.phase==='results'||S.phase==='over'){b.inp.x=b.inp.y=0;b.inp.d=0;return}const ai=b.ai||(b.ai={t:0,tg:null,hold:0,wx:0,wy:0,sx:0,sy:0,pq:0,dz:0});ai.t-=dt;const L=BOTLV[S.settings.bots==null?1:S.settings.bots]||BOTLV[1];const others=S.players.filter(q=>q.alive&&q!==b&&!q.pz&&!(S.settings.mode==='teams'&&q.team===b.team&&S.phase!=='lobby'));
  const dcx=CX-b.x,dcy=CY-b.y,dc=hyp(dcx,dcy)||1;
@@ -759,6 +773,7 @@ function botThink(b,dt){if(b.ai&&b.ai.fire){b.inp.d=0;b.ai.fire=0}if(S.phase==='
  const l=hyp(mx,my);if(l>1){mx/=l;my/=l}const kk=1-Math.exp(-L.tr*dt);ai.sx+=(mx-ai.sx)*kk;ai.sy+=(my-ai.sy)*kk;b.inp.x=ai.sx;b.inp.y=ai.sy;if(b.stun>0){if(ai.brace===undefined||Math.random()<dt*3)ai.brace=Math.random()<L.br;if(ai.brace){const v=hyp(b.vx,b.vy)||1;b.inp.x=-b.vx/v;b.inp.y=-b.vy/v}else if(Math.random()<.5){b.inp.x=rnd(-1,1);b.inp.y=rnd(-1,1)}}
  if(Math.random()<dt*.04)emote(b,ri(0,3))}
 
+// 15-sim.js: simStep: the 60 Hz host simulation (movement, dashes, hits, mutators, maps)
 function simStep(dt){
  if(S.nuts&&S.nuts.length){for(const n of S.nuts){n.t+=dt;if(n.t>=.5&&!n.done){n.done=1;for(const q of S.players){if(!q.alive||q.inv>0)continue;const dx=q.x-n.x,dy=q.y-n.y,d=hyp(dx,dy);if(d<q.r+30){const ux=d>1?dx/d:Math.cos(n.x),uy=d>1?dy/d:Math.sin(n.y);q.vx+=ux*240;q.vy+=uy*240;q.wob=Math.max(q.wob||0,.25);ev('nuthit',{id:q.id,by:n.by})}}ev('nut',{x:n.x|0,y:n.y|0})}}S.nuts=S.nuts.filter(n=>n.t<.75)}
  S.t+=dt;S.pt+=dt;const M=S.mut,ph=S.phase,playing=ph==='play',free=ph==='lobby';
@@ -888,6 +903,7 @@ function simStep(dt){
  if(playing&&!cont&&S.phase==='play'){if(S.hydro?(S.hydroWin||S.rt>45):roundOver()){S.endT+=dt;if(S.endT>1.2)endRound()}}
  if(ph==='results'&&(S.settings.mode==='draft'&&S.offers?draftDone():S.pt>10))afterResults();
 }
+// 16-results.js: end of round and match: scorecards and awards
 function endRound(){let al=inPlay();if(S.hydro){const mx=Math.max(0,...S.players.map(p=>p.spl|0)),top=S.players.filter(p=>(p.spl|0)===mx&&mx>0);al=S.hydroWin&&P(S.hydroWin)?[P(S.hydroWin)]:top.length===1?top:[]}let w=null,wt=null;
  if(S.settings.mode==='teams'){const ts=[...new Set(al.map(p=>p.team))];if(ts.length===1){wt=ts[0];S.players.filter(p=>p.team===wt).forEach(p=>{p.score++;p.wins++;if(p.alive)p.buzz++})}}
  else{w=al.length===1?al[0]:null;if(w){w.score++;w.wins++;w.buzz++;if(!w.rhit)ev('meme',{t:'FLAWLESS',x:w.x|0,y:w.y|0,v:1});else if(S.settings.mode==='stock'&&w.lives===1)ev('meme',{t:'CLUTCH',x:w.x|0,y:w.y|0,v:1})}}S.lastWinner=w?w.id:null;S.items=[];S.corks=[];
@@ -928,6 +944,7 @@ function buildOver(c,title){const by=(f)=>[...S.players].sort((a,b)=>f(b)-f(a))[
  const fmt=p=>S.settings.mode==='koth'?Math.floor(p.score)+'/'+KOTH_T:String(p.score);
  return {id:c.id,name:title||c.name,color:title?null:c.color,tcol:title?TEAMS[c.team].c:null,hat:c.hat,pcolor:c.color,awards:A,board:[...S.players].sort((a,b)=>b.score-a.score).map(p=>[p.name,p.color,fmt(p),p.kos||0,p.hits||0,p.parries||0,p.falls||0,p.id,p.wins||0,p.glassed||0,p.selfs||0,p.team,p.bot?0:p.lv|0])}}
 
+// 17-net-relay.js: network setup, the MQTT relay client, room announcements, the Esc menu
 // ============================================================ NETWORK
 const NET={mode:null,peer:null,conns:new Map(),hostConn:null,myId:null,bc:null,lastIn:'',inT:0};
 function genCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=A[Math.floor(Math.random()*A.length)];return s}
@@ -972,6 +989,7 @@ function escList(){const isH=NET.mode==='host';$('#eLob').style.display=isH&&S&&
 function toggleEsc(on){if(!NET.mode&&!S){$('#esc').classList.remove('on');return}const o=on==null?!$('#esc').classList.contains('on'):on;$('#esc').classList.toggle('on',o);if(o){$('#eGrid').style.display='none';escList();quitArm=0;$('#eQuit').classList.remove('go')}}
 let quitArm=0;setInterval(()=>{if($('#esc').classList.contains('on'))escList();document.body.classList.toggle('inroom',!!NET.mode)},500);
 const MYUID=(()=>{let u=store.get('uid','');if(!u){u=Math.random().toString(36).slice(2,12);store.set('uid',u)}return u})();
+// 18-host.js: WebRTC signalling, hosting, host-side messages, chat, snapshots (PROTO, PK)
 // ---- direct WebRTC with signalling over the relay (fallback when the PeerJS server doesn't deliver)
 function gathered(pc){return new Promise(res=>{if(pc.iceGatheringState==='complete')return res();const t=setTimeout(res,1500);pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState==='complete'){clearTimeout(t);res()}})})}
 async function rtcUpgrade(){if(NET.mode!=='client'||!NET.relay||NET.rtcPc||typeof RTCPeerConnection==='undefined')return;try{
@@ -1048,6 +1066,7 @@ function snapshot0(){return {st:r2(S.t),fl:(S.fl||[]).map(f=>[f.x|0,f.y|0,f.r,r2
  bomb:S.bomb?{h:S.bomb.h,fuse:r2(S.bomb.fuse)}:null,offers:S.offers||null,ev:S.evq}}
 let V=null;const disp={};
 const BR={mqs:null,rooms:new Map(),tick:null};
+// 19-hub.js: The Hub hangout
 // ---- The Hub: big shared hangout. Everyone simulates themselves and shares position over the brokers.
 const HUBT='lcb1/hub/';const HUB={mqs:null,peers:new Map(),seen:new Set(),tick:null,ping:null,seq:0,t0:0,pads:[]};
 function hubStart(){if(NET.mode)return;NET.mode='host';NET.myId='host';S=newState('HUB');S.hub=1;S.map='hub';S.settings.map='hub';S.settings.pub=0;
@@ -1071,6 +1090,7 @@ function drawHubPeers(c,t){const n=performance.now(),dt=Math.min(.1,(n-(HUB.lt||
 function hubUI(){HUB.pads=hubPads();const n=HUB.peers.size;$('#hcount').textContent=n?(n+1)+' people here':'Just you so far. Invite friends!';const p=P('host');if(!p||!p.alive||performance.now()-HUB.t0<2500)return;
  for(const pd of HUB.pads){if(hyp(p.x-pd.x,p.y-pd.y)<pd.r){if(pd.host){hubStop();S=null;V=null;NET.mode=null;hostStart(false);if(S)S.settings.pub=1}else{const code=pd.room.c;hubStop();S=null;V=null;NET.mode=null;joinStart(code)}return}}}
 
+// 20-leaderboard.js: the public leaderboard
 // ---- public leaderboard: each player keeps one retained message per broker at lcb1/lb/<uid>
 const LBT='lcb1/lb/';let lbPubT=null;
 function lbEntry(){const st=getStats();return JSON.stringify({u:MYUID,n:String(me.name||'?').slice(0,24),tag:me.tag||'',ic:me.ic|0,c:me.color|0,lv:lvFor(st.xp),xp:st.xp|0,w:st.wins|0,k:st.kos|0,g:st.games|0,pz:+store.get('pzbest',0)||0,a:Object.keys(st.ach||{}).length,ts:Date.now()})}
@@ -1086,6 +1106,7 @@ function showLB(){showScreen('lb');LB.rows.clear();lbRender();$('#lbNote').textC
    const o={u:u2,n:String(r.n||'?').slice(0,24),tag:String(r.tag||''),ic:r.ic|0,c:clamp(r.c|0,0,COLORS.length-1),lv:clamp(r.lv|0,1,69),xp:clamp(r.xp|0,0,1e7),w:clamp(r.w|0,0,1e5),k:clamp(r.k|0,0,1e6),g:r.g|0,pz:clamp(+r.pz||0,0,36000),a:clamp(r.a|0,0,ACH.length),ts:+r.ts||0};
    const old=LB.rows.get(u2);if(!old||o.ts>=old.ts)LB.rows.set(u2,o);clearTimeout(LB.rt);LB.rt=setTimeout(lbRender,150)});mq.sub(LBT+'+');return mq})}
 
+// 21-join.js: room browser, Quick Match, bot fill, joining a room, client messages, sending input
 function startBrowse(){if(BR.mqs)return;BR.rooms.clear();BR.mqs=RELAYS.map(u=>{const mq=mqtt([u],(t,txt)=>{let m;try{m=JSON.parse(txt)}catch(e){return}if(!m||m.v!==PROTO||typeof m.c!=='string')return;BR.rooms.set(m.c.slice(0,6),{c:m.c.slice(0,6),n:String(m.n||'?').slice(0,24),p:m.p|0,m:MODES[m.m]?m.m:'classic',mp:m.mp,ph:m.ph,t:performance.now()})},()=>mq.pub(LOBQ,'1'));mq.sub(LOBA);return mq})}
 function stopBrowse(){if(BR.mqs){BR.mqs.forEach(m=>m.close());BR.mqs=null}clearInterval(BR.tick);BR.tick=null}
 function liveRooms(){const n=performance.now();for(const [k,r] of BR.rooms)if(n-r.t>11000)BR.rooms.delete(k);return [...BR.rooms.values()].sort((a,b)=>(a.ph==='lobby'?0:1)-(b.ph==='lobby'?0:1)||b.p-a.p)}
@@ -1139,6 +1160,7 @@ let lastInp=null;function sendInput(dt){couchPads(dt);const inp=readInput();last
   NET.pgT=(NET.pgT||0)-dt;if(NET.pgT<=0){NET.pgT=1;try{NET.hostConn.send({t:'pg',k:performance.now()})}catch(e){}}}
  emoteQ=-1}
 
+// 22-events-fx.js: client-side effects (particles, pops, rumble) and onEv, which reacts to game events
 // ============================================================ FX (client-side visuals)
 let kickX=0,kickY=0;function rumble(id,st,ms){if(!navigator.getGamepads)return;const own=id===NET.myId?'p1':(typeof id==='string'&&id.startsWith(NET.myId+'~'))?+id.split('~')[1]:null;if(own==null)return;const hasP1=Object.values(PADS).includes('p1');for(const gp of navigator.getGamepads()){if(!gp)continue;const o=PADS[gp.index];if(own==='p1'?(o==='p1'||(!hasP1&&o===undefined)):o===own){try{gp.vibrationActuator&&gp.vibrationActuator.playEffect('dual-rumble',{duration:ms,strongMagnitude:st,weakMagnitude:Math.min(1,st+.2)})}catch(_){}}}}
 let parts=[],pops=[],rings=[],shake=0,zoom=1,zoomT=0,zx=CX,zy=CY,flash=0;const anim={};const bumpSq={};
@@ -1207,6 +1229,7 @@ function onEv(e){const p=e.id?vp(e.id):null;if(NET.myId&&(e.id===NET.myId||e.kid
  case 'shot':SFX.whoosh(.5);shake=Math.max(shake,5);burst(e.x,e.y,10,['#fff','#ffe9a8','#fff6e0'],300,6,0);addPop(e.x,e.y-20,e.last?'LAST ONE!':'YEET!','#fff',e.last?24:28,.6);break;
  }}
 
+// 23-canvas-sea.js: canvas setup, mouse, and the sea background with floating props
 // ============================================================ RENDER
 const cv=$('#c'),ctx=cv.getContext('2d');let DPR=1,SC=1,OX=0,OY=0;
 function resize(){DPR=Math.min(window.devicePixelRatio||1,2);cv.width=innerWidth*DPR;cv.height=innerHeight*DPR;SC=Math.min(cv.width/W,cv.height/H);OX=(cv.width-W*SC)/2;OY=(cv.height-H*SC)/2}
@@ -1250,6 +1273,7 @@ function drawProp(k,t){ctx.lineWidth=2.5;ctx.strokeStyle='#2a1608';
   ctx.fillStyle='#fff';[[-15,-6],[14,-7],[0,10],[-8,-16],[7,-16],[-9,9]].forEach(([x,y])=>ctx.fillRect(x-1,y-1,2.5,2.5))}
  else if(k===5){ctx.lineJoin='round';ctx.fillStyle='#e9b46a';rr2(ctx,-22,-7,44,14,7);ctx.fill();ctx.stroke();ctx.fillStyle='#c0432a';rr2(ctx,-26,-4.5,52,9,4.5);ctx.fill();ctx.stroke();ctx.strokeStyle='#ffd23f';ctx.lineWidth=2.5;ctx.beginPath();for(let i=0;i<=8;i++)ctx.lineTo(-20+i*5,(i%2?-2:2));ctx.stroke()}
  else{ctx.fillStyle='#ffef9a';ctx.beginPath();ctx.arc(0,0,13,0,TAU);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3,-3,6,0,TAU);ctx.fill()}}
+// 24-map-art.js: map textures (getTex) and drawing the table (drawArena)
 const mapTex={};
 function addShape(c,q,rev){if(q.t==='c'){c.moveTo(q.x+q.r,q.y);if(rev)c.arc(q.x,q.y,q.r,TAU,0,true);else c.arc(q.x,q.y,q.r,0,TAU)}else if(q.t==='r'){const x=q.x-q.w/2,y=q.y-q.h/2,w=q.w,h=q.h,r=22;c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
  else{const hw=q.w/2-q.h/2,R=q.h/2;c.moveTo(q.x+hw,q.y-R);c.arc(q.x+hw,q.y,R,-Math.PI/2,Math.PI/2);c.lineTo(q.x-hw,q.y+R);c.arc(q.x-hw,q.y,R,Math.PI/2,Math.PI*1.5);c.closePath()}}
@@ -1308,6 +1332,7 @@ function drawArena(st,t){const m=MAPS[st.map]||MAPS.round,sc=st.arenaR/BASE_R,te
  if(st.map==='donut'){const h=m.holes[0],g=ctx.createRadialGradient(0,0,20,0,0,h.r);g.addColorStop(0,'rgba(90,40,0,.45)');g.addColorStop(1,'rgba(90,40,0,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,h.r,0,TAU);ctx.fill()}
  ctx.restore();
  if(st.gx||st.gy){ctx.save();ctx.translate(CX,CY);ctx.rotate(Math.atan2(st.gy,st.gx));ctx.fillStyle='rgba(255,255,255,.18)';for(let i=0;i<3;i++){const x=((t*120+i*90)%270)-135;ctx.beginPath();ctx.moveTo(x+30,0);ctx.lineTo(x,-24);ctx.lineTo(x,24);ctx.fill()}ctx.restore()}}
+// 25-draw-things.js: drawing characters (drawGuy, hats, faces, backs), name tags, bombs, kegs, Deep End, floaters, bumpers
 function drawTable(R,rot,gx,gy,t){const s=R/300;ctx.save();ctx.translate(CX+gx*.02,CY+gy*.02+18);ctx.fillStyle='rgba(60,20,0,.35)';ctx.beginPath();ctx.ellipse(0,0,R+12,R+6,0,0,TAU);ctx.fill();ctx.restore();
  // foam ring
  ctx.save();ctx.translate(CX,CY);ctx.fillStyle='rgba(255,246,224,.85)';ctx.beginPath();for(let i=0;i<=64;i++){const a=i/64*TAU,r=R+10+Math.sin(a*7+t*3)*4+Math.sin(a*11-t*2)*3;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}ctx.fill();
@@ -1500,6 +1525,7 @@ function drawBumper(c,b,i,t){const sq=bumpSq[i]||0;c.save();c.translate(b.x,b.y)
  c.fillStyle='#ffd23f';c.font='13px '+FONT;c.textAlign='center';c.fillText('BAR',0,2);c.restore()}
 
 let gtime=0,surge=0,surgeA=0;
+// 26-replay.js: instant replay of the last seconds of a match
 // ---- instant replay: last ~4s of a match, slow-mo at the end, before the champion screen
 const RPL={buf:[],on:0,v:null,lastPh:null};
 function unpackSnap(s){s.players=s.pk.map(a=>{const o={};PK.forEach((k,i)=>{o[k]=PKB.has(k)?!!a[i]:a[i]});return o});delete s.pk;s.ev=[...(s.ev||[])];return s}
@@ -1515,6 +1541,7 @@ function replayTick(dt){const ph=V&&V.phase;if(ph==='over'&&RPL.lastPh&&RPL.last
  if(RPL.t>=RPL.end){RPL.hold+=dt;if(RPL.hold>.9)stopReplay()}}
 addEventListener('keydown',e=>{if(RPL.on&&e.code!=='Escape'){stopReplay();e.stopPropagation()}},true);addEventListener('pointerdown',()=>{if(RPL.on)stopReplay()},true);
 setInterval(()=>{if(!RPL.on||!navigator.getGamepads)return;for(const gp of navigator.getGamepads())if(gp&&gp.buttons.some(b=>b&&b.pressed)){if(RPL.armed)stopReplay();return}RPL.armed=1},100);
+// 27-camera.js: the render() frame, camera and auto-fit (fitCam)
 function render(dt){const t=gtime;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#3b1d0a';ctx.fillRect(0,0,cv.width,cv.height);
  if(zoomT>0){zoomT-=dt;if(zoomT<=0)zoom=1}const FZ=fitCam();const zt=zoomT>0?zoom*FZ[0]:FZ[0];camZ=lerp(camZ,zt,Math.min(1,dt*(zoomT>0?6:3)));const mpz=V&&V.phase==='lobby'&&V.players.find(p=>p.id===NET.myId&&(p.pzv||(S&&S.hub)));if(mpz){const tx=S&&S.hub?mpz.x-120:mpz.x-lobbyShift()*.6+140,ty=mpz.y;if(hyp(camX-tx,camY-ty)>1500){camX=tx;camY=ty}else{camX=lerp(camX,tx,Math.min(1,dt*4));camY=lerp(camY,ty,Math.min(1,dt*4))}}else{
  if(hyp(camX-CX,camY-CY)>1500){camX=CX;camY=CY}camX=lerp(camX,zoomT>0?zx:(V&&V.phase==='lobby'?CX-lobbyShift():CX),Math.min(1,dt*5));camY=lerp(camY,zoomT>0?zy:FZ[1],Math.min(1,dt*5))}
@@ -1532,6 +1559,7 @@ function render(dt){const t=gtime;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#
 const MAPBB={};function mapBB(id){if(MAPBB[id])return MAPBB[id];const m=MAPS[id]||MAPS.round;let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const q of m.solids.concat(m.holes||[])){const hw=q.t==='c'?q.r:q.w/2,hh=q.t==='c'?q.r:q.h/2;a=Math.min(a,q.x-hw);b=Math.max(b,q.x+hw);c=Math.min(c,q.y-hh);d=Math.max(d,q.y+hh)}return MAPBB[id]=[a,b,c,d]}
 function fitCam(){if(!V||V.hub||(S&&S.hub)||!MAPS[V.map])return [1,CY];const sc=(V.arenaR||BASE_R)/BASE_R,bb=mapBB(V.map),spin=V.mut&&V.mut.includes('spin');let y0=bb[2]*sc,y1=bb[3]*sc,x0=bb[0]*sc,x1=bb[1]*sc;if(spin){const r=Math.max(-x0,x1,-y0,y1);x0=y0=-r;x1=y1=r}const lob=V.phase==='lobby',top=58,bot=lob?H-34:H-74,mg=26;let z=Math.min(1,(bot-top)/(y1-y0+mg*2));if(!lob)z=Math.min(z,(W-24)/(x1-x0+mg*2));z=Math.max(.72,z);const my=CY+(y0+y1)/2;return [z,my-((top+bot)/2-H/2)/z]}
 let camZ=1,camX=CX,camY=CY;function lobbyShift(){const pn=document.querySelector('#lobby .panel');if(!pn||pn.classList.contains('mini')||innerWidth<600)return 0;const w=pn.offsetWidth+16;if(w>innerWidth*.6)return 0;return (w/2)/(SC/DPR)/camZ}
+// 28-world-hud.js: drawing the world, disco, the HUD, and updating effects
 function drawWorld(t){drawSea(t);if(!V){drawArena({map:'round',arenaR:BASE_R,rot:t*.05,gx:0,gy:0},t);return}
  drawArena(V,t);
  if(V.zone){const z=V.zone,own=z.own,op=own&&own!=='X'?V.players.find(p=>p.id===own):null,col=own==='X'?'#ff5a5f':op?COLORS[op.color]:'#ffd23f',pul=1+Math.sin(t*6)*.05;ctx.save();ctx.translate(z.x,z.y);
@@ -1649,6 +1677,7 @@ function updateFX(dt){for(const q of parts){q.t+=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.
  if(V.bomb&&(V.phase==='play')){const f=V.bomb.fuse,rate=f<2?8:f<4?4:2;const k=Math.floor(f*rate);if(k!==tickK){tickK=k;SFX.tick()}}}
 let tickK=0;
 
+// 29-touch.js: on-screen touch controls
 // ============================================================ UI
 (function(){const st=$('#tstick'),base=$('#tbase'),knob=$('#tknob');let sid=null,ox=0,oy=0;
  st.addEventListener('pointerdown',e=>{e.preventDefault();initAudio();if(sid!==null)return;sid=e.pointerId;st.setPointerCapture(e.pointerId);ox=e.clientX;oy=e.clientY;base.style.display='block';base.style.left=ox+'px';base.style.top=oy+'px';knob.style.transform='';touch.x=touch.y=0});
@@ -1660,6 +1689,7 @@ let tickK=0;
  btn('#tBump','d');btn('#tParry','p');btn('#tThrow','f');btn('#tEmote',null);
  $('#touch').addEventListener('contextmenu',e=>e.preventDefault());
  $('#bMini').onclick=()=>{const p=$('#lobby .panel');p.classList.toggle('mini');$('#bMini').textContent=p.classList.contains('mini')?'▼ Show menu':'▲ Hide menu (practice)'}})();
+// 30-progress.js: levels and XP, cosmetic unlocks, stats, achievements
 let L69=(()=>{try{return JSON.parse(localStorage.getItem('lcb_stats')||'{}').l69?1:0}catch(e){return 0}})();const LVMAX=67;
 const lvRaw=xp=>{xp=xp||0;return xp<2450?Math.floor(Math.sqrt(xp/50))+1:8+Math.floor((xp-2450)/350)},lvFor=xp=>L69?69:Math.min(LVMAX,lvRaw(xp)),xpFor=l=>l<=8?50*(l-1)*(l-1):2450+350*(l-8);
 function lvB(l){l=l|0;return l?'<span class="lvb'+(l>=69?' l69':l>=LVMAX?' l67':'')+'">Lv '+l+'</span>':''}
@@ -1700,6 +1730,7 @@ let lastRec='';function recordStats(o){const key=(V&&V.code)+'|'+o.id+'|'+(V&&V.
 function showStats(inline){const st=getStats();$('#stName').textContent=me.name;const pct=st.games?Math.round(st.wins/st.games*100)+'%':'-';
  const cells=[['Level',lvFor(st.xp)],['XP',st.xp||0],['Games',st.games],['Wins',st.wins],['Win %',pct],['Rounds won',st.rounds],['KOs',st.kos],['Best KOs',st.bestKos],['Bumps',st.hits],['Parries',st.parries],['Glassings',st.glassed],['Falls',st.falls],['Self-yeets',st.selfs],['KO/fall',st.falls?(st.kos/st.falls).toFixed(1):st.kos],['Unlocks',(HATS.filter((h,i)=>HAT_LV[i]<=lvFor(st.xp)).length+FACES.filter((h,i)=>FACE_LV[i]<=lvFor(st.xp)).length+BACKS.filter((h,i)=>BACK_LV[i]<=lvFor(st.xp)).length+ICONS.filter((h,i)=>ICON_LV[i]<=lvFor(st.xp)).length)+'/'+(HATS.length+FACES.length+BACKS.length+ICONS.length)]];
  const h=cells.map(c=>'<div><b>'+c[1]+'</b><span>'+c[0]+'</span></div>').join('');if(inline){$('#eGrid').innerHTML=h;return}$('#sgrid').innerHTML=h;const ah=st.ach||{};$('#achs').innerHTML='<div id="achh" style="grid-column:1/-1;border:0;background:none;padding:0">🏆 Achievements '+ACH.filter(a=>ah[a[0]]).length+'/'+ACH.length+'</div>'+ACH.map(a=>{const got=ah[a[0]],hid=a[5]&&!got,rw=achReward(a[0]);return '<div class="'+(got?'':'no')+'"><i>'+(hid?'❔':a[1])+'</i><p style="margin:0"><b>'+(hid?'Secret':a[2])+'</b><span>'+(hid?'Keep exploring...':a[3])+(rw?' · 🎁 '+(hid?'???':rw):'')+'</span></p></div>'}).join('');showScreen('stats')}
+// 31-menus.js: screens, lobby and menu UI, all the button wiring
 function showScreen(id){if(id!=='lobby')$('#ward').classList.remove('on');document.body.classList.toggle('ingame',id==='lobby'||id==='none'||id==='hub');document.body.classList.toggle('chaton',id==='lobby'||id==='hub');if(id!=='lb')lbStop();['title','lobby','results','over','stats','browse','lb','hub'].forEach(s=>$('#'+s).classList.toggle('on',s===id));curScreen=id;if(id!=='browse'&&id!=='hub')stopBrowse();if(id==='title')lvBar()}
 let curScreen='title',uiKey='';
 function showLobby(){showScreen('lobby');uiKey='';lvBar()}
@@ -1791,6 +1822,7 @@ $('#volM').value=vol;$('#volMu').value=musVol;
 $('#volM').oninput=e=>{initAudio();vol=+e.target.value;store.set('vol',vol);if(muted&&vol>0)toggleMute();if(MG)MG.gain.value=muted?0:vol/100};
 $('#volMu').oninput=e=>{initAudio();musVol=+e.target.value;store.set('musvol',musVol);if(MUG)MUG.gain.value=.27*musVol/100};
 
+// 32-main.js: the main loop (logic, frame) and the title preview
 // ============================================================ MAIN LOOP
 let last=performance.now(),acc=0,sendAcc=0;const STEP=1/60;
 let lastL=performance.now();

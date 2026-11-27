@@ -9,7 +9,7 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
-## 2026-11-27 · asked by Zander (build ?)
+## 2026-11-27 · asked by Zander (build 69)
 - Behind the scenes: the game's code is now split into separate files by area (maps, bots, network, menus, sounds and so on), so Zander and Curt can work at the same time without stepping on each other. Nothing changes in the game.
 
 ## 2026-11-27 · asked by Zander (build 66)
