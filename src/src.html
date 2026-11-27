@@ -70,6 +70,7 @@ kbd{font-family:inherit;font-weight:700;background:var(--ink);color:var(--foam);
 .awards{text-align:left;font-size:18px;font-weight:600}
 #toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:20;background:var(--ink);color:var(--foam);font-weight:700;padding:10px 18px;border-radius:14px;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center}
 #toast.on{opacity:1}
+#rpl{display:none;position:fixed;left:0;right:0;top:0;bottom:0;z-index:18;pointer-events:none;box-shadow:inset 0 0 0 10px rgba(232,71,63,.85),inset 0 0 120px rgba(0,0,0,.55)}body.replay #rpl{display:block}#rpl b{position:absolute;left:24px;top:20px;font:400 30px 'Luckiest Guy',Impact,sans-serif;color:#fff;letter-spacing:1px;text-shadow:0 3px 0 #2a1608;background:#e8473f;padding:4px 14px;border-radius:10px;border:3px solid #2a1608;animation:rplb 1s infinite}#rpl span{position:absolute;right:24px;bottom:18px;color:#fff6e0;font-weight:700;font-size:14px;opacity:.8}@keyframes rplb{50%{opacity:.6}}body.replay #over,body.replay #results{display:none!important}
 body:not(.haspad) .padhint{display:none}.gpf{outline:4px solid #ffd23f!important;outline-offset:3px;box-shadow:0 0 0 7px rgba(42,22,8,.85),0 0 18px 6px rgba(255,210,63,.7)!important;position:relative;z-index:2}
 #tut{position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:19;background:rgba(30,14,4,.82);color:#fff6e0;border:3px solid #2a1608;border-radius:16px;padding:8px 16px;text-align:center;display:none;max-width:min(560px,calc(100vw - 32px));pointer-events:none;font-weight:600;font-size:18px;transition:background .2s}#tut.on{display:block}#tut kbd{font-family:inherit;background:#fff6e0;color:#2a1608;border-radius:7px;padding:1px 7px;font-size:15px;font-weight:700;box-shadow:0 2px 0 #b9a27f}#tut b{color:#ffd23f}#tut.ok{background:rgba(40,140,60,.9)}#tut.pop{animation:tpop .35s}@keyframes tpop{40%{transform:translateX(-50%) scale(1.08)}}
 #tools{position:fixed;right:12px;top:12px;z-index:21;display:flex;gap:6px}
@@ -237,6 +238,7 @@ body.touch #chatw{left:auto;right:calc(12px + env(safe-area-inset-right));top:62
 <div id="tools"><div class="volbox"><button id="bMute" title="Mute (M)">🔊</button><input type="range" id="volM" min="0" max="100" title="Volume"><span title="Music">🎵</span><input type="range" id="volMu" min="0" max="100" title="Music volume"></div><button id="bVoice" title="Announcer voice (click to change)">🗣️</button><button id="bFull" title="Fullscreen">⛶</button><button id="bMenu" title="Menu (Esc)">☰</button></div>
 <div id="draft"><div class="dh">PICK A POWER-UP!</div><div class="ds">Losers get stronger. They stack.</div><div class="dc" id="dcards"></div><div class="dt"><i id="dbar"></i></div></div>
 <div id="tut"><div class="ttx"></div></div>
+<div id="rpl"><b>▶ INSTANT REPLAY</b><span>any button to skip</span></div>
 <div id="esc"><div class="panel"><div class="rtitle" style="font-size:34px">☰ Menu</div><button id="eRes" class="big go">Resume</button><button id="eWard" class="ghost">🎨 Wardrobe</button><button id="eLob" class="ghost">Back to lobby</button><div id="ePl"></div><button id="eSt" class="ghost">📊 My stats</button><button id="eBg" class="ghost"></button><button id="eTut" class="ghost">🎓 Show control tips again</button><div class="sgrid" id="eGrid" style="display:none"></div><button id="eQuit" class="ghost" style="color:#c0392b">Leave room</button><div class="small" style="text-align:center;margin-top:6px">The game keeps running while this is open.</div></div></div>
 
 <script>/*__PEERJS__*/</script>
@@ -515,7 +517,7 @@ let voxI=store.get('vox',0)|0;
 function voxVoice(v,i){try{const vs=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang));if(!vs.length)return null;const loc=vs.filter(x=>x.localService);
  const m=(loc.find(x=>v.v.test(x.name)||v.v.test(x.lang)))||vs.find(x=>v.v.test(x.name)||v.v.test(x.lang));if(m)return m;const pool=loc.length?loc:vs;return pool[i%pool.length]}catch(e){return null}}
 try{speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
-function say(text,force){if(!voiceOn||!('speechSynthesis' in window))return;if(document.hidden&&!store.get('bgsnd',true))return;const t=performance.now();if(!force&&(speechSynthesis.speaking||t-lastSay<1200))return;
+function say(text,force){if(RPL.on)return;if(!voiceOn||!('speechSynthesis' in window))return;if(document.hidden&&!store.get('bgsnd',true))return;const t=performance.now();if(!force&&(speechSynthesis.speaking||t-lastSay<1200))return;
  lastSay=t;try{if(force)speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);{const v=VOX[voxI]||VOX[0];u.rate=v.r;u.pitch=v.p;const vv=voxVoice(v,voxI);if(vv){u.voice=vv;u.lang=vv.lang}}u.volume=muted?0:vol/100;speechSynthesis.speak(u)}catch(e){}}
 
 // ============================================================ INPUT
@@ -1091,7 +1093,7 @@ function joinStart(code){code=code.toUpperCase().replace(/[^A-Z0-9]/g,'');if(cod
 function clientMsg(m){if(!m)return;if(m.t==='gfull'){const g=LOC.get(m.k|0);if(g){LOC.delete(g.k);for(const i in PADS)if(PADS[i]===g.k)delete PADS[i]}toast('Room is full!',2);return}if(m.t==='hst'){NET.hrst=String(m.s).slice(0,14);return}if(m.t==='bq')return;if(m.t==='rtc'){const pc=NET.rtcPc;if(m.c){if(pc&&pc.remoteDescription)pc.addIceCandidate(m.c).catch(()=>{});return}if(pc&&pc.signalingState==='have-local-offer'){NET.rst='answered';}if(pc&&pc.signalingState==='have-local-offer')pc.setRemoteDescription({type:'answer',sdp:String(m.sdp)}).catch(e=>console.warn(e));return}if(m.t==='kick'){if(NET.mode==='client'){toast('🚪 The host kicked you out.',5);leaveToTitle(true)}return}if(m.t==='old'){toast(m.v>PROTO?'The host has a newer version. Refresh this page and rejoin!':'The host has an older version. Ask them to refresh!',8);leaveToTitle(true);return}if(m.t==='po'){const r=(performance.now()-m.k)/1000;if(r>=0&&r<5)NET.rtt=NET.rtt==null?r:NET.rtt*.8+r*.2;return}if(m.t==='w'){NET.myId=m.id;return}if(m.t==='full'){toast('Room is full (6 max)!',5);leaveToTitle(true);return}
  if(m.t==='s'){const s=m.s;if(s.pk){s.players=s.pk.map(a=>{const o={};PK.forEach((k,i)=>{o[k]=PKB.has(k)?!!a[i]:a[i]});return o});delete s.pk}if(!s.rails&&V)s.rails=V.rails;if(!s.rails)s.rails=[];
   for(const p of s.players){let d=disp[p.id];if(!d||!p.alive||hyp(d.x-p.x,d.y-p.y)>(p.id===NET.myId?260:160)){d=disp[p.id]={x:p.x,y:p.y}}d.tx=p.x;d.ty=p.y;d.vx=p.vx;d.vy=p.vy;d.age=0}
-  s._rx=performance.now();V=s;for(const e of s.ev)onEv(e)}}
+  s._rx=performance.now();V=s;recFrame(s);for(const e of s.ev)onEv(e)}}
 function leaveToTitle(silent){hubStop();couchReset();try{$('#clog').innerHTML=''}catch(e){}try{if(NET.mode==='client'&&NET.mq&&NET.hostConn)NET.hostConn.send({t:'bye'})}catch(e){}try{if(NET.mq)NET.mq.close()}catch(e){}NET.mq=null;try{(NET.mqp||[]).forEach(m=>m.close())}catch(e){}NET.mqp=null;try{(NET.mqs||[]).forEach(m=>m.close())}catch(e){}NET.mqs=null;NET.relay=0;try{if(NET.peer)NET.peer.destroy()}catch(e){}try{if(NET.bc)NET.bc.close()}catch(e){}try{if(NET.rtcPc)NET.rtcPc.close()}catch(e){}NET.rtcPc=null;NET.mode=null;NET.peer=null;NET.conns.clear();NET.banned=null;NET.hostConn=null;S=null;V=null;$('#esc').classList.remove('on');
  showScreen('title')}
 let lastInp=null;function sendInput(dt){couchPads(dt);const inp=readInput();lastInp=inp;tutTick(inp,dt);
@@ -1449,6 +1451,21 @@ function drawBumper(c,b,i,t){const sq=bumpSq[i]||0;c.save();c.translate(b.x,b.y)
  c.fillStyle='#ffd23f';c.font='13px '+FONT;c.textAlign='center';c.fillText('BAR',0,2);c.restore()}
 
 let gtime=0,surge=0,surgeA=0;
+// ---- instant replay: last ~4s of a match, slow-mo at the end, before the champion screen
+const RPL={buf:[],on:0,v:null,lastPh:null};
+function unpackSnap(s){s.players=s.pk.map(a=>{const o={};PK.forEach((k,i)=>{o[k]=PKB.has(k)?!!a[i]:a[i]});return o});delete s.pk;s.ev=[...(s.ev||[])];return s}
+function recFrame(s){if(!s||s.phase!=='play'||s.hub)return;RPL.buf.push({t:performance.now(),s});if(RPL.buf.length>150)RPL.buf.shift()}
+function startReplay(){const b=RPL.buf;if(b.length<30)return;const tEnd=b[b.length-1].t;const fr=b.filter(f=>f.t>=tEnd-4200);RPL.buf=[];RPL.fr=fr;RPL.t0=fr[0].t;RPL.end=tEnd-fr[0].t;RPL.t=0;RPL.i=0;RPL.hold=0;RPL.armed=0;RPL.on=1;document.body.classList.add('replay');SFX.whoosh&&SFX.whoosh(.9)}
+function stopReplay(){RPL.on=0;RPL.v=null;RPL.fr=null;document.body.classList.remove('replay')}
+function replayTick(dt){const ph=V&&V.phase;if(ph==='over'&&RPL.lastPh&&RPL.lastPh!=='over'&&!RPL.on)startReplay();if(ph&&ph!=='over'&&ph!=='play'&&ph!=='results'&&RPL.buf.length&&ph==='lobby')RPL.buf=[];RPL.lastPh=ph;
+ if(!RPL.on)return;if(ph!=='over'){stopReplay();return}
+ const left=RPL.end-RPL.t,sp=left>1500?1:.4;RPL.slow=sp<1;RPL.t+=dt*1000*sp;const fr=RPL.fr;
+ while(RPL.i<fr.length-1&&fr[RPL.i+1].t-RPL.t0<=RPL.t){RPL.i++;for(const e of (fr[RPL.i].s.ev||[]))if(!['chat','say','champ','pzlv','pzwin','emote'].includes(e.k))try{onEv(e)}catch(_){}}
+ const A=fr[RPL.i],B=fr[Math.min(RPL.i+1,fr.length-1)],span=Math.max(1,B.t-A.t),u=clamp((RPL.t-(A.t-RPL.t0))/span,0,1);
+ const bm=new Map(B.s.players.map(p=>[p.id,p]));RPL.v=Object.assign({},A.s,{players:A.s.players.map(p=>{const q=bm.get(p.id);return q?Object.assign({},p,{x:p.x+(q.x-p.x)*u,y:p.y+(q.y-p.y)*u}):Object.assign({},p)}),phase:'play'});
+ if(RPL.t>=RPL.end){RPL.hold+=dt;if(RPL.hold>.9)stopReplay()}}
+addEventListener('keydown',e=>{if(RPL.on&&e.code!=='Escape'){stopReplay();e.stopPropagation()}},true);addEventListener('pointerdown',()=>{if(RPL.on)stopReplay()},true);
+setInterval(()=>{if(!RPL.on||!navigator.getGamepads)return;for(const gp of navigator.getGamepads())if(gp&&gp.buttons.some(b=>b&&b.pressed)){if(RPL.armed)stopReplay();return}RPL.armed=1},100);
 function render(dt){const t=gtime;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#3b1d0a';ctx.fillRect(0,0,cv.width,cv.height);
  if(zoomT>0){zoomT-=dt;if(zoomT<=0)zoom=1}const zt=zoomT>0?zoom:1;camZ=lerp(camZ,zt,Math.min(1,dt*(zoomT>0?6:3)));const mpz=V&&V.phase==='lobby'&&V.players.find(p=>p.id===NET.myId&&(p.pzv||(S&&S.hub)));if(mpz){const tx=S&&S.hub?mpz.x-120:mpz.x-lobbyShift()*.6+140,ty=mpz.y;if(hyp(camX-tx,camY-ty)>1500){camX=tx;camY=ty}else{camX=lerp(camX,tx,Math.min(1,dt*4));camY=lerp(camY,ty,Math.min(1,dt*4))}}else{
  if(hyp(camX-CX,camY-CY)>1500){camX=CX;camY=CY}camX=lerp(camX,zoomT>0?zx:(V&&V.phase==='lobby'?CX-lobbyShift():CX),Math.min(1,dt*5));camY=lerp(camY,zoomT>0?zy:CY,Math.min(1,dt*5))}
@@ -1563,7 +1580,7 @@ function drawHUD(t){const ph=V.phase;
  if(ph==='lobby'){const mz=V.players.find(p=>p.id===NET.myId&&p.pzv);if(mz){const v=mz.pzv,tm=Math.max(0,pzTime()-v[2]),best=+store.get('pzbest',0);ctx.font='22px "Luckiest Guy",Impact,sans-serif';ctx.textAlign='center';ctx.lineWidth=6;ctx.strokeStyle='#2a1608';ctx.lineJoin='round';ctx.fillStyle='#bfe6ff';const tx='🌊 THE DEEP END · LEVEL '+(v[0]+1)+'/'+PZL.length+' · '+Math.floor(tm/60)+':'+String(Math.floor(tm%60)).padStart(2,'0')+' · 💀'+v[3]+(best?' · BEST '+Math.floor(best/60)+':'+String(Math.floor(best%60)).padStart(2,'0'):'');ctx.strokeText(tx,W/2+150,H-22);ctx.fillText(tx,W/2+150,H-22)}
   else{ctx.font='16px Fredoka,sans-serif';ctx.textAlign='center';ctx.fillStyle='rgba(255,246,224,.85)';ctx.fillText(S&&S.hub?'🍻 The Hub':'Practice area',W/2+150,H-20)}}
  const mp=V.players.find(p=>p.id===NET.myId);if(mp&&!mp.alive&&ph==='play'&&V.settings.mode==='stock'&&mp.lives>0){bigText('BACK IN A SEC',W/2,140,40,'#fff',Math.sin(t*2)*.05);ctx.font='18px Fredoka,sans-serif';ctx.fillStyle='#fff6e0';ctx.textAlign='center';ctx.fillText(mp.lives===1?'Last life. Make it count!':mp.lives+' lives left',W/2,172)}
- else if(mp&&!mp.alive&&ph==='play'){bigText('YOU\'RE FISH FOOD',W/2,140,40,'#fff',Math.sin(t*2)*.05);ctx.font='18px Fredoka,sans-serif';ctx.fillStyle='#fff6e0';ctx.textAlign='center';ctx.fillText(V.settings&&V.settings.ghosts?'👻 You\'re a ghost! Move and bump to drop peanuts':'Press 1-4 to heckle',W/2,172)}}
+ else if(mp&&!mp.alive&&ph==='play'&&!RPL.on){bigText('YOU\'RE FISH FOOD',W/2,140,40,'#fff',Math.sin(t*2)*.05);ctx.font='18px Fredoka,sans-serif';ctx.fillStyle='#fff6e0';ctx.textAlign='center';ctx.fillText(V.settings&&V.settings.ghosts?'👻 You\'re a ghost! Move and bump to drop peanuts':'Press 1-4 to heckle',W/2,172)}}
 function drawBlaster(c,ammo){c.lineWidth=2;c.strokeStyle='#2a1608';c.fillStyle='#2f7a3a';rr2(c,-6,-6,22,12,5);c.fill();c.stroke();c.fillStyle='#d9b44a';c.fillRect(14,-4,9,8);c.strokeRect(14,-4,9,8);
  c.fillStyle='#d9a066';rr2(c,22,-4.5,7,9,2);c.fill();c.stroke();c.fillStyle='#8a5a2e';rr2(c,-4,4,7,11,2);c.fill();c.stroke();c.fillStyle='#fff';c.fillRect(-2,-3,8,5);
  for(let i=0;i<3;i++){c.fillStyle=i<ammo?'#ffd23f':'rgba(0,0,0,.3)';c.beginPath();c.arc(-1+i*6,-11,2.5,0,TAU);c.fill()}}
@@ -1622,7 +1639,7 @@ function achReward(id){for(const i in HAT_ACH)if(HAT_ACH[i]===id)return HNAMES[i
 function E(s,k){return (s.ev&&s.ev[k])|0}
 function saveStats(st){try{localStorage.setItem('lcb_stats',JSON.stringify(st))}catch(e){}}
 function checkAch(st){st.ach=st.ach||{};const got=[];for(const a of ACH)if(!st.ach[a[0]]&&a[4](st)){st.ach[a[0]]=Date.now();st.xp=(st.xp||0)+30;got.push(a)}if(got.length){achQ.push(...got);setTimeout(lvBar,200)}return got.length}
-function achEv(k,n){if(NET.mode==='host'&&S&&S.code==='SOLO'&&!['duck','dance','burp','stow','treasure','deep','deepfast','nice'].includes(k))return;const st=getStats();st.ev=st.ev||{};st.ev[k]=(st.ev[k]|0)+(n||1);checkAch(st);saveStats(st)}
+function achEv(k,n){if(RPL.on)return;if(NET.mode==='host'&&S&&S.code==='SOLO'&&!['duck','dance','burp','stow','treasure','deep','deepfast','nice'].includes(k))return;const st=getStats();st.ev=st.ev||{};st.ev[k]=(st.ev[k]|0)+(n||1);checkAch(st);saveStats(st)}
 let lastRec='';function recordStats(o){const key=(V&&V.code)+'|'+o.id+'|'+(V&&V.round)+'|'+(o.board||[]).map(b=>b[2]).join(',');if(key===lastRec)return;lastRec=key;const b=(o.board||[]).find(r=>r[7]===NET.myId);if(!b)return;const st=getStats();
  st.games++;const won=o.id===NET.myId||(o.tcol&&b[11]!=null&&(V.players.find(p=>p.id===o.id)||{}).team===b[11]);if(won)st.wins++;st.kos+=b[3];st.hits+=b[4];st.parries+=b[5];st.falls+=b[6];st.rounds+=b[8];st.glassed+=b[9];st.selfs+=b[10];st.bestKos=Math.max(st.bestKos,b[3]);
  const l0=lvFor(st.xp),gain=20+(won?40:0)+b[3]*5+b[8]*10;st.xp=(st.xp||0)+gain;const l1=lvFor(st.xp);
@@ -1729,7 +1746,7 @@ let lastL=performance.now();
 function logic(){const n_=performance.now();let dt=Math.min(.1,(n_-lastL)/1000);lastL=n_;
  gpNav(dt);if(NET.mode)sendInput(dt);
  if(NET.mode==='host'&&S){let sdt=dt;if(S.hs>0){S.hs-=dt;sdt*=.08}else if(S.slowT>0){S.slowT-=dt;sdt*=.3}acc+=sdt;let n=0;while(acc>=STEP&&n<6){simStep(STEP);acc-=STEP;n++}if(n>=6)acc=0;
-  sendAcc+=dt;if(sendAcc>=1/30){sendAcc=0;if(NET.conns.size)broadcast();else S.evq=[]}V=S;Music.wob=Math.max(0,...S.players.map(p=>p.buzz))*.3}}
+  sendAcc+=dt;if(sendAcc>=1/30){sendAcc=0;if(S.phase==='play'&&!S.hub)recFrame(unpackSnap(snapshot0()));if(NET.conns.size)broadcast();else S.evq=[]}V=S;Music.wob=Math.max(0,...S.players.map(p=>p.buzz))*.3}}
 setInterval(()=>{if(document.hidden&&NET.mode==='host')logic()},16);
 let fpsN=0,fpsT=0,FPS=60;function frame(now_){let dt=Math.min(.1,(now_-last)/1000);last=now_;gtime+=dt;fpsN++;fpsT+=dt;if(fpsT>=2){FPS=Math.round(fpsN/fpsT);fpsN=0;fpsT=0}
  if(toastT>0){toastT-=dt;if(toastT<=0)$('#toast').classList.remove('on')}
@@ -1741,7 +1758,7 @@ let fpsN=0,fpsT=0,FPS=60;function frame(now_){let dt=Math.min(.1,(now_-last)/100
    d.x+=d.pvx*dt;d.y+=d.pvy*dt;d.age+=dt;const tx=d.tx+d.vx*(L-Math.min(d.age,L)*0),ty=d.ty+d.vy*L,cr=free?4:14;d.x+=(d.tx+d.vx*L-d.x)*Math.min(1,dt*cr);d.y+=(ty-d.y)*Math.min(1,dt*cr);p.x=d.x;p.y=d.y;continue}
   d.age+=dt;if(d.age<.15){d.tx+=d.vx*dt;d.ty+=d.vy*dt}d.x+=(d.tx-d.x)*Math.min(1,dt*16);d.y+=(d.ty-d.y)*Math.min(1,dt*16);p.x=d.x;p.y=d.y}
   for(const k of V.kegs)if(k.warn<=0){k.x+=k.vx*dt;k.y+=k.vy*dt}for(const c of V.corks)c.x+=c.vx*dt,c.y+=c.vy*dt;if(V.phase==='play'){V.matchT+=dt;V.mutT+=dt}if(V.bomb&&V.phase==='play')V.bomb.fuse=Math.max(0,V.bomb.fuse-dt);V.pt+=dt;}
- updateFX(dt);render(dt);syncUI();
+ replayTick(dt);updateFX(dt);if(RPL.on&&RPL.v){const live=V;V=RPL.v;try{render(dt)}finally{V=live}}else render(dt);syncUI();
  if(IS_TOUCH&&V){const mp=V.players.find(q=>q.id===NET.myId);$('#tThrow').classList.toggle('has',!!(mp&&mp.gun>0))}
  if(curScreen==='title')drawPreview(pvc,200);if($('#ward').classList.contains('on'))drawPreview(wpc,240);
  requestAnimationFrame(frame)}
