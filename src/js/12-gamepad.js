@@ -2,7 +2,7 @@
 // ---- gamepad menu navigation (P1's controller)
 const NAV={el:null,t:0,held:0,prev:{}};
 function vis(e){if(!e||e.disabled)return false;const r=e.getBoundingClientRect();if(r.width<4||r.height<4)return false;const cs=getComputedStyle(e);return cs.visibility!=='hidden'&&cs.display!=='none'&&e.offsetParent!==null}
-function navBox(){if($('#opts').classList.contains('on'))return $('#opts');if($('#ward').classList.contains('on'))return $('#ward');if($('#esc').classList.contains('on'))return $('#esc');for(const id of ['over','results','stats','lb','browse','title']){const e=$('#'+id);if(e&&e.classList.contains('on'))return e}return null}
+function navBox(){if($('#opts').classList.contains('on'))return $('#opts');if($('#daily').classList.contains('on'))return $('#daily');if($('#ward').classList.contains('on'))return $('#ward');if($('#esc').classList.contains('on'))return $('#esc');for(const id of ['over','results','stats','lb','browse','title']){const e=$('#'+id);if(e&&e.classList.contains('on'))return e}return null}
 function navItems(box){return [...box.querySelectorAll('button,input:not([type=range]),select,[data-nav]')].filter(e=>vis(e)&&!e.closest('[hidden]'))}
 function navMark(e){document.querySelectorAll('.gpf').forEach(x=>x.classList.remove('gpf'));NAV.el=e;if(e){e.classList.add('gpf');e.scrollIntoView({block:'nearest',inline:'nearest'})}}
 function navMove(dx,dy){const box=navBox();if(!box)return;const it=navItems(box);if(!it.length)return;if(!NAV.el||!it.includes(NAV.el)){navMark((box.id!=='ward'&&box.id!=='esc'&&it.find(e=>e.classList.contains('go')))||it[0]);return}
