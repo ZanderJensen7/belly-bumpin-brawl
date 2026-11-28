@@ -9,6 +9,10 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
+## 2026-11-28 · asked by Zander (build ?)
+- Mouse aim is now on by default on PC: left click bumps toward the cursor, right click parries
+- Phones and tablets keep it off, and if you already switched it off in Settings > Controls, it stays off
+
 ## 2026-11-28 · asked by Curt (build 74)
 - Removed the crowd reactions too: no more crowd "oooh" on big hits and near-falls, and no crowd cheer on knockouts. The Settings switch for them is gone.
 
