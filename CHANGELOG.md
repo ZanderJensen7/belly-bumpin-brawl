@@ -9,7 +9,7 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
-## 2026-11-28 · asked by Zander (build ?)
+## 2026-11-28 · asked by Zander (build 82)
 - The bar crowd is back, but only for the big moments, and it sounds like actual people now: a room shouting "yeah!" with claps and the odd whistle, instead of the old hiss
 - The crowd cheers some knockouts, and goes louder for a mug kill, a butt bump or perfect hit KO, a double KO or better, and knocking out the leader
 - A gasp when someone teeters on the edge and saves it, or falls off on their own
