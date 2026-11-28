@@ -11,13 +11,16 @@ let fpsN=0,fpsT=0,FPS=60;function frame(now_){let dt=Math.min(.1,(now_-last)/100
  if(toastT>0){toastT-=dt;if(toastT<=0)$('#toast').classList.remove('on')}
  logic();
  if(NET.mode==='client'&&V){const L=Math.min(.45,(NET.rtt||.08)/2+(NET.relay?.06:.03));for(const p of V.players){const d=disp[p.id];if(!d)continue;
-  if(p.id===NET.myId&&p.alive&&V.phase!=='intro'&&V.phase!=='results'&&V.phase!=='over'){const inp=lastInp||{x:0,y:0};let ix=inp.x||0,iy=inp.y||0;if(V.mut&&V.mut.includes('nolegs')&&V.phase==='play'){ix=0;iy=0}if(V.mut&&V.mut.includes('reverse')){ix=-ix;iy=-iy}
+  const predOk=p.alive&&V.phase!=='intro'&&V.phase!=='results'&&V.phase!=='over';
+  // Forget a half-charged or still-running predicted dash while we're dead or between rounds, or it fires on its own when play resumes.
+  if(p.id===NET.myId&&!predOk&&d.pd){const q=d.pd;q.h=q.t=q.w=q.lg=0;d.pvx=null}
+  if(p.id===NET.myId&&predOk){const inp=lastInp||{x:0,y:0};let ix=inp.x||0,iy=inp.y||0;if(V.mut&&V.mut.includes('nolegs')&&V.phase==='play'){ix=0;iy=0}if(V.mut&&V.mut.includes('reverse')){ix=-ix;iy=-iy}
    // Predict our own dash the moment Space is released, instead of waiting a round trip for the host.
    // PD mirrors the host's rules: h = hold time, q = dash charges left (2, refill after .9s), t = predicted dash time left,
    // w = window in which the host's (late) copy of this dash is ignored so it isn't applied twice.
    const PD=d.pd||(d.pd={h:0,q:2,qt:0,t:0,w:0}),act=V.phase==='play'||V.phase==='lobby',rev=V.mut&&V.mut.includes('reverse');
-   if(PD.q<2&&PD.t<=0){PD.qt+=dt;if(PD.qt>=.9){PD.q=2;PD.qt=0}}PD.w=Math.max(0,PD.w-dt);if(p.stun>0||!p.alive){PD.t=0;PD.w=0;PD.h=0}
-   const canDash=act&&p.stun<=0&&PD.t<=0&&!(PD.lg>0)&&(p.dash<=0||PD.w>0)&&PD.q>0&&!p.aiming&&!p.pzv;
+   if(PD.q<2&&PD.t<=0){PD.qt+=dt;if(PD.qt>=.9){PD.q=2;PD.qt=0}}PD.w=Math.max(0,PD.w-dt);if(p.stun>0||!p.alive||p.hand>0){PD.t=0;PD.w=0;PD.h=0}
+   const canDash=act&&p.stun<=0&&!(p.hand>0)&&PD.t<=0&&!(PD.lg>0)&&(p.dash<=0||PD.w>0)&&PD.q>0&&!p.aiming&&!p.pzv;
    if(inp.d&&canDash)PD.h+=dt;else if(PD.h>0){const cm=(p.courage>0?4:1)*Math.pow(1.3,p.pks?p.pks.split(PERKS.quick[0]).length-1:0),c=Math.min(1,PD.h*1.5*cm),burped=PD.h>(1/(1.5*cm))+1.4;
     if(!inp.d&&canDash&&!burped){let dx,dy;const l=hyp(inp.x||0,inp.y||0);if(inp.m&&typeof inp.a==='number'){dx=Math.cos(inp.a);dy=Math.sin(inp.a)}else if(l>.2){dx=inp.x/l;dy=inp.y/l}else{dx=Math.cos(p.face)*(rev?-1:1);dy=Math.sin(p.face)*(rev?-1:1)}
      if(rev){dx=-dx;dy=-dy}const sp=470+720*c;d.pvx=dx*sp;d.pvy=dy*sp;PD.t=.2+.25*c;PD.w=PD.t+L*2+.12;PD.q--;PD.qt=0}PD.h=0}
