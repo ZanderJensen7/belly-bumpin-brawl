@@ -1,7 +1,7 @@
 // 27-camera.js: the render() frame, camera and auto-fit (fitCam)
 function render(dt){const t=gtime;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#3b1d0a';ctx.fillRect(0,0,cv.width,cv.height);
- if(zoomT>0){zoomT-=dt;if(zoomT<=0)zoom=1}const FZ=fitCam();const zt=zoomT>0?zoom*FZ[0]:FZ[0];camZ=lerp(camZ,zt,Math.min(1,dt*(zoomT>0?6:3)));const mpz=V&&V.phase==='lobby'&&V.players.find(p=>p.id===NET.myId&&(p.pzv||(S&&S.hub)));if(mpz){const tx=S&&S.hub?mpz.x-120:mpz.x-lobbyShift()*.6+140,ty=mpz.y;if(hyp(camX-tx,camY-ty)>1500){camX=tx;camY=ty}else{camX=lerp(camX,tx,Math.min(1,dt*4));camY=lerp(camY,ty,Math.min(1,dt*4))}}else{
- if(hyp(camX-CX,camY-CY)>1500){camX=CX;camY=CY}camX=lerp(camX,zoomT>0?zx:(V&&V.phase==='lobby'?CX-lobbyShift():CX),Math.min(1,dt*5));camY=lerp(camY,zoomT>0?zy:FZ[1],Math.min(1,dt*5))}
+ if(zoomT>0){zoomT-=dt;if(zoomT<=0)zoom=1}const FZ=fitCam();const rc=RPL.on&&RPL.cam;const zt=rc?rc.z*FZ[0]:zoomT>0?zoom*FZ[0]:FZ[0];camZ=lerp(camZ,zt,Math.min(1,dt*(rc||zoomT>0?6:3)));if(rc){camX=lerp(camX,rc.x,Math.min(1,dt*7));camY=lerp(camY,rc.y,Math.min(1,dt*7))}else{const mpz=V&&V.phase==='lobby'&&V.players.find(p=>p.id===NET.myId&&(p.pzv||(S&&S.hub)));if(mpz){const tx=S&&S.hub?mpz.x-120:mpz.x-lobbyShift()*.6+140,ty=mpz.y;if(hyp(camX-tx,camY-ty)>1500){camX=tx;camY=ty}else{camX=lerp(camX,tx,Math.min(1,dt*4));camY=lerp(camY,ty,Math.min(1,dt*4))}}else{
+ if(hyp(camX-CX,camY-CY)>1500){camX=CX;camY=CY}camX=lerp(camX,zoomT>0?zx:(V&&V.phase==='lobby'?CX-lobbyShift():CX),Math.min(1,dt*5));camY=lerp(camY,zoomT>0?zy:FZ[1],Math.min(1,dt*5))}}
  shake=Math.max(0,shake-dt*40);const kd=Math.exp(-dt*14);kickX*=kd;kickY*=kd;const sk=SHK[shakeLv],sx=(rnd(-1,1)*shake+kickX)*sk,sy=(rnd(-1,1)*shake+kickY)*sk;
  const goggles=V&&V.mut&&V.mut.includes('goggles')&&(V.phase==='play'||V.phase==='intro');
  const world=()=>{ctx.translate(W/2+sx,H/2+sy);ctx.scale(camZ,camZ);ctx.translate(-camX,-camY);drawWorld(t)};
