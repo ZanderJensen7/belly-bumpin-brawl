@@ -13,6 +13,7 @@ Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub 
 - Nobody spawns on, inside or right next to a bar stool bumper any more: round starts, respawns and crate drops all keep a gap
 - Bumpers are now placed after players, away from where everyone is standing
 - Rolling kegs also count as danger when picking a respawn spot
+- The Keg Line: you now spawn on the still strip between the belts, and the belts wait for GO before they start moving
 - Tables get bigger with more players: a bit bigger with 3, about 15% bigger with 4, about 22% bigger with 5 or 6. The camera still shows the whole table
 
 ## 2026-11-28 · asked by Zander (build 75)

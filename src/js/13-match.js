@@ -12,19 +12,20 @@ function uniqueColor(want){const used=S.players.map(p=>p.color);if(!used.include
 function balTeam(){const c0=S.players.filter(p=>p.team===0).length,c1=S.players.filter(p=>p.team===1).length;return c0<=c1?0:1}
 function addBot(){if(S.players.length>=6)return;const used=S.players.map(p=>p.name);const n=pick(BOTNAMES.filter(b=>!used.includes(b)))||'Bot';
  const p=newPlayer('bot'+Math.random().toString(36).slice(2,7),n,uniqueColor(ri(0,7)),ri(0,7),true);p.fc=Math.random()<.5?ri(1,3):0;p.bk=Math.random()<.35?ri(1,2):0;p.team=balTeam();placeRandom(p);if(S.phase!=='lobby'){p.alive=false;if(S.phase==='play'&&isCont())p.respawn=1}S.players.push(p)}
-// hard: [[x,y,minDist]] spots a point must keep clear of (bumpers, kegs). strict: return [] instead of falling back when nothing is clear.
-function safePoints(n,clear,avoid,tries,hard,strict){const m=MAPS[S.map]||MAPS.round;let c=[];for(let i=0;i<(tries||260);i++){const lx=rnd(-m.ext,m.ext),ly=rnd(-m.ext,m.ext);const w=toWorld(lx,ly,S);if(clearAt(w[0],w[1],clear,S))c.push([w[0],w[1],lx,ly])}
+// hard: [[x,y,minDist]] spots a point must keep clear of (bumpers, kegs). strict: return [] instead of falling back when nothing is clear. spawn: players, so stay off conveyor belts.
+function safePoints(n,clear,avoid,tries,hard,strict,spawn){const m=MAPS[S.map]||MAPS.round;let c=[];for(let i=0;i<(tries||260);i++){const lx=rnd(-m.ext,m.ext),ly=rnd(-m.ext,m.ext);const w=toWorld(lx,ly,S);if(clearAt(w[0],w[1],clear,S))c.push([w[0],w[1],lx,ly])}
+ if(spawn&&m.belts){const ok=c.filter(p=>!m.belts.some(b=>Math.abs(p[2]-b.x)<b.w/2&&Math.abs(p[3]-b.y)<b.h/2));if(ok.length)c=ok}
  if(hard&&hard.length){const ok=c.filter(p=>hard.every(q=>hyp(p[0]-q[0],p[1]-q[1])>=q[2]));if(ok.length||strict)c=ok}
  if(!c.length)return strict?[]:Array.from({length:n},()=>[CX,CY,0,0]);const out=[],av=(avoid||[]).slice().concat((hard||[]).map(q=>[q[0],q[1]]));
  for(let k=0;k<n;k++){let best=c[0],bd=-1;for(const p of c){let md=av.length?1e9:Math.random();for(const q of av)md=Math.min(md,hyp(p[0]-q[0],p[1]-q[1]));if(md>bd){bd=md;best=p}}out.push(best);av.push(best)}return out}
 function hazards(pr){pr=pr||26;return (S.bumpers||[]).map(b=>[b.x,b.y,b.r+pr+45]).concat((S.kegs||[]).map(k=>[k.x,k.y,k.r+pr+90]))}
-function placeRandom(p){if(S&&S.hub){p.x=p.sx=CX+rnd(-160,160);p.y=p.sy=CY+rnd(-90,90);p.vx=p.vy=0;return}const av=S.players.filter(q=>q!==p&&q.alive).map(q=>[q.x,q.y]);const pt=safePoints(1,50,av,200,hazards(p.r))[0];p.x=pt[0];p.y=pt[1];p.sx=pt[0];p.sy=pt[1];p.vx=p.vy=0}
+function placeRandom(p){if(S&&S.hub){p.x=p.sx=CX+rnd(-160,160);p.y=p.sy=CY+rnd(-90,90);p.vx=p.vy=0;return}const av=S.players.filter(q=>q!==p&&q.alive).map(q=>[q.x,q.y]);const pt=safePoints(1,50,av,200,hazards(p.r),0,1)[0];p.x=pt[0];p.y=pt[1];p.sx=pt[0];p.sy=pt[1];p.vx=p.vy=0}
 // Bumpers go down after players spawn, and keep clear of every standing player and of each other.
 function makeBumpers(){if(!S.mut.includes('bumpers'))return[];const out=[],pl=S.players.filter(p=>p.alive).map(p=>[p.x,p.y,30+p.r+45]);for(let i=0;i<4;i++){const hd=pl.concat(out.map(b=>[b.x,b.y,140])),q=safePoints(1,75,[[CX,CY]],260,hd,1)[0]||safePoints(1,45,[[CX,CY]],260,hd,1)[0];if(!q)break;out.push({lx:q[2],ly:q[3],x:q[0],y:q[1],r:30})}return out}
 // More players, bigger table: the whole map scales up (camera still fits it).
 function mapScale(n){return n<=2?1:n===3?1.08:n===4?1.15:1.22}
 function pickMap(){const st=S.settings.map;if(st&&st!=='random'&&MAPS[st])return st;if(/[?&]donger/.test(location.search)||Math.random()<1/30){S.vote=null;return 'donger'}const vm=voteWinner();if(vm)return vm;return pick(Object.keys(MAPS).filter(k=>k!==S.map&&!MAPS[k].rare))}
-function spawnRing(){S.players.forEach(p=>{p.pz=null;p.pzv=0});const pts=safePoints(S.players.length,60,[],400,hazards(S.mut.includes('big')?40:26));S.players.forEach((p,i)=>{p.x=pts[i][0];p.y=pts[i][1];p.sx=p.x;p.sy=p.y;
+function spawnRing(){S.players.forEach(p=>{p.pz=null;p.pzv=0});const pts=safePoints(S.players.length,60,[],400,hazards(S.mut.includes('big')?40:26),0,1);S.players.forEach((p,i)=>{p.x=pts[i][0];p.y=pts[i][1];p.sx=p.x;p.sy=p.y;
  p.vx=p.vy=0;p.face=Math.atan2(CY-p.y,CX-p.x);p.respawn=0;p.inv=0;p.slosh=0;p.gun=1+((p.pk&&p.pk.ammo)|0);p.aiming=0;p.parry=0;p.wob=0;p.pcd=0;p.armor=(p.pk&&p.pk.armor)?1:0;p.courage=0;p.gulp=0;p.alive=true;p.fall=0;p.stun=0;p.dash=0;p.charge=0;p.charging=0;p.hitBy=null;p.teeter=0;p.windUsed=0;p.r=S.mut.includes('big')?40:26;p.hicT=rnd(2,5)})}
 function startMatch(){S.round=0;S.players.forEach(p=>{p.score=0;p.buzz=0;p.kos=0;p.falls=0;p.selfs=0;p.hics=0;p.taken=0;p.wins=0;p.gun=1;p.hits=0;p.parries=0;p.glassed=0;p.lastKB=null;p.pk={};p.pks=''});S.offers=null;S.over=null;S.lastMut=[];S.map='';S.matchT=0;S.nextMutT=30;S.zone=null;
  if(S.settings.mode==='teams'&&(!S.players.some(p=>p.team===0)||!S.players.some(p=>p.team===1)))S.players.forEach((p,i)=>p.team=i%2);nextRound()}

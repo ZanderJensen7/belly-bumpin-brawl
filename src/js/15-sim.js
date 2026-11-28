@@ -89,7 +89,7 @@ function simStep(dt){
   const rx=p.x-CX,ry=p.y-CY;
   if(S.rotV){dvx+=-ry*S.rotV;dvy+=rx*S.rotV}
   let k=p.dodge>0?1.2:p.dash>0?.8:(p.stun>0?1.5:7);if(M.includes('spill'))k=p.dash>0?.4:(p.stun>0?.8:2.6);
-  const MP=MAPS[S.map];if(MP&&(MP.ice||MP.belts)&&!p.pz){const L=toLocal(p.x,p.y,S);if(MP.ice&&!MP.grip.some(g=>hyp(L[0]-g.x,L[1]-g.y)<g.r))k=p.dash>0?.35:(p.stun>0?.6:1.6);if(MP.belts&&p.alive)for(const b of MP.belts)if(Math.abs(L[0]-b.x)<b.w/2&&Math.abs(L[1]-b.y)<b.h/2){p.x+=b.vx*(S.arenaR/BASE_R)*dt;break}}
+  const MP=MAPS[S.map];if(MP&&(MP.ice||MP.belts)&&!p.pz){const L=toLocal(p.x,p.y,S);if(MP.ice&&!MP.grip.some(g=>hyp(L[0]-g.x,L[1]-g.y)<g.r))k=p.dash>0?.35:(p.stun>0?.6:1.6);if(MP.belts&&p.alive&&S.phase!=='intro')for(const b of MP.belts)if(Math.abs(L[0]-b.x)<b.w/2&&Math.abs(L[1]-b.y)<b.h/2){p.x+=b.vx*(S.arenaR/BASE_R)*dt;break}}
   if(p.stun>0&&p.dash<=0){const sp0=hyp(p.vx,p.vy);if(sp0>1){const dot=-(ix*p.vx+iy*p.vy)/sp0;if(dot>.3)k+=4.5*dot;if(dot>.3&&Math.random()<dt*6)p.brace=1}}
   const f=1-Math.exp(-k*dt);p.vx+=(dvx-p.vx)*f;p.vy+=(dvy-p.vy)*f;
   if(playing&&(S.gx||S.gy)){p.vx+=S.gx*dt;p.vy+=S.gy*dt}
