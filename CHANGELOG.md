@@ -9,6 +9,9 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
+## 2026-11-28 · asked by Curt (build ?)
+- Removed the constant bar-crowd background noise and its random glass clinks. It was annoying and sounded like a whirring propeller. The crowd still reacts to big hits and knockouts, and Settings has a switch for that ("Crowd reactions").
+
 ## 2026-11-28 · asked by Zander (build 71)
 - The Deep End is quieter for everyone else: you now only hear your own splashes, checkpoints and level-ups in the jumping puzzle, not other players'. Entering it and beating it still play for the whole room.
 
