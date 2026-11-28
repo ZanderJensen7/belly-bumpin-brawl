@@ -9,6 +9,10 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
+## 2026-11-28 · asked by Zander (build ?)
+- The end-of-match replay now eases into slow motion right before the hit that decided it, and slows again for the final splash
+- If the winning knock-out came from a thrown drink, the camera zooms in and rides along with the mug, then follows the victim into the water
+
 ## 2026-11-28 · asked by Zander (build 78)
 - Removed The Hiccups chaos rule. It made you bump in random directions on your own, which felt like a bug.
 
