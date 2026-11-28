@@ -9,7 +9,7 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
-## 2026-11-28 · asked by Zander (build ?)
+## 2026-11-28 · asked by Zander (build 77)
 - Fixed joined players dashing on their own. If you were holding Space when you got knocked out or the round ended, you'd fly off in a random dash as soon as you respawned or the next round started. Now that half-charged dash is forgotten.
 - Also no more phantom dash while the Hand of God has you.
 
