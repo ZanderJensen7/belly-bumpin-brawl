@@ -9,7 +9,7 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
-## 2026-11-28 · asked by Zander (build ?)
+## 2026-11-28 · asked by Zander (build 83)
 - Smoother frame rate, most of all on high-res screens and slower laptops: the dark edge around the screen is now drawn once instead of every frame. It looks exactly the same
 
 ## 2026-11-28 · asked by Zander (build 82)
