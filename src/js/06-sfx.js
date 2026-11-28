@@ -9,7 +9,7 @@ function initAudio(){
  SG=AC.createGain();SG.gain.value=.9;SG.connect(comp);
  MUG=AC.createGain();MUG.gain.value=.27*musVol/100;MUG.connect(comp);
  NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
- Music.start();Amb.start();
+ Music.start();
 }
 const now=()=>AC.currentTime;
 function env(g,t0,a,vol,dur){g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+a);g.gain.exponentialRampToValueAtTime(0.0001,t0+dur)}
@@ -62,14 +62,5 @@ const SFX={
  clink(){if(!AC)return;const t=now();tone('sine',2600,2500,.25,.1,t);tone('sine',3900,3800,.18,.05,t);tone('sine',3100,3000,.22,.07,t+.05)},
  fanfare(){if(!AC)return;const t=now();[523,659,784,1047,784,1047].forEach((f,i)=>{tone('triangle',f,null,i>4?.6:.16,.3,t+i*.12);tone('square',f/2,null,i>4?.6:.16,.06,t+i*.12)})},
 };
-// ---- bar ambience: a quiet crowd murmur (three bands of noise, each "talking" at its own rhythm) and the odd glass clink.
-// Runs through the SFX bus, so the volume slider and mute cover it. Toggle in Settings ("Bar ambience").
-let ambOn=store.get('amb',true)?1:0;const Amb={g:null,t:0,
- start(){if(!AC||this.g)return;this.g=AC.createGain();this.g.gain.value=0;this.g.connect(SG);
-  [[320,2.3,.9],[640,3.4,1],[1150,4.6,.55]].forEach(([fq,lf,lv],i)=>{const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain(),l=AC.createOscillator(),lg=AC.createGain();s.buffer=NB;s.loop=true;s.loopStart=i*.31;f.type='bandpass';f.frequency.value=fq;f.Q.value=1.6;
-   g.gain.value=.55*lv;l.frequency.value=lf;lg.gain.value=.4*lv;l.connect(lg);lg.connect(g.gain);s.connect(f);f.connect(g);g.connect(this.g);s.start(0,i*.4);l.start()});
-  setInterval(()=>this.tick(),250)},
- tick(){if(!AC||!this.g)return;const inRoom=typeof V!=='undefined'&&V,ph=inRoom&&V.phase,quiet=document.hidden&&!store.get('bgsnd',true);
-  const lv=!ambOn||quiet?0:!inRoom?.06:ph==='play'?.075:ph==='intro'?.05:.105;this.g.gain.setTargetAtTime(lv,AC.currentTime,.6);
-  this.t-=.25;if(this.t<=0){this.t=rnd(3.5,9);if(lv>0){const t=now()+Math.random()*.2,f=rnd(2300,3400);tone('sine',f,f*.98,.2,.022,t);if(Math.random()<.5)tone('sine',f*1.31,f*1.3,.16,.014,t+.07)}}}};
-
+// Crowd reactions (SFX.ooh / SFX.crowd) can be switched off in Settings. The constant background murmur was removed in build 71: it sounded like a whirring propeller.
+let ambOn=store.get('amb',true)?1:0;

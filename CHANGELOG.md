@@ -9,6 +9,9 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
+## 2026-11-28 · asked by Curt (build ?)
+- Removed the constant bar-crowd background noise and its random glass clinks. It was annoying and sounded like a whirring propeller. The crowd still reacts to big hits and knockouts, and Settings has a switch for that ("Crowd reactions").
+
 ## 2026-11-27 · asked by Curt (build 70)
 - Menus tidied up: every option now lives in Settings, in three groups (Sound, Display, Controls). Mouse aim, the announcer voice, "sound when tabbed out" and "show control tips again" moved there from the title screen, Wardrobe, top bar and Esc menu. The Esc menu is now Resume, Wardrobe, My stats, Settings, then the player list and the leave buttons.
 - Settings (the gear button, or the Esc menu): turn screen shake down or off, turn off flashes and disco lights, switch the bar ambience off, show a shape next to each name for colour-blind players, and rebind your keys. Mouse aim is in there too.
