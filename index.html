@@ -205,7 +205,7 @@ body.touch #oKeys{display:none}
 
 <div id="touch"><div id="tstick"><div id="tbase"><div id="tknob"></div></div><div class="hint">drag to move</div></div>
 <div class="tb2" id="tParry"><b>🛡️</b>PARRY</div><div class="tb2" id="tBump"><b>🍺</b>BUMP</div><div class="tb2" id="tThrow"><b>🥛</b>THROW</div><div class="tb2" id="tEmote">😂</div></div>
-<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 75<span id="netinfo"></span></div>
+<div id="buildno" style="position:fixed;right:8px;bottom:4px;z-index:30;font:600 11px Fredoka,sans-serif;color:#fff6e0;opacity:.55;pointer-events:none;text-shadow:0 1px 0 #2a1608">build 76<span id="netinfo"></span></div>
 <div id="rotate"><div>📱↻</div>Turn your phone sideways to brawl</div>
 <div id="lobby" class="screen">
   <div class="panel"><button class="mtog" id="bMini">▲ Hide menu (practice)</button>
@@ -734,22 +734,29 @@ function uniqueColor(want){const used=S.players.map(p=>p.color);if(!used.include
 function balTeam(){const c0=S.players.filter(p=>p.team===0).length,c1=S.players.filter(p=>p.team===1).length;return c0<=c1?0:1}
 function addBot(){if(S.players.length>=6)return;const used=S.players.map(p=>p.name);const n=pick(BOTNAMES.filter(b=>!used.includes(b)))||'Bot';
  const p=newPlayer('bot'+Math.random().toString(36).slice(2,7),n,uniqueColor(ri(0,7)),ri(0,7),true);p.fc=Math.random()<.5?ri(1,3):0;p.bk=Math.random()<.35?ri(1,2):0;p.team=balTeam();placeRandom(p);if(S.phase!=='lobby'){p.alive=false;if(S.phase==='play'&&isCont())p.respawn=1}S.players.push(p)}
-function safePoints(n,clear,avoid,tries){const m=MAPS[S.map]||MAPS.round,c=[];for(let i=0;i<(tries||260);i++){const lx=rnd(-m.ext,m.ext),ly=rnd(-m.ext,m.ext);const w=toWorld(lx,ly,S);if(clearAt(w[0],w[1],clear,S))c.push([w[0],w[1],lx,ly])}
- if(!c.length)return Array.from({length:n},()=>[CX,CY,0,0]);const out=[],av=(avoid||[]).slice();
+// hard: [[x,y,minDist]] spots a point must keep clear of (bumpers, kegs). strict: return [] instead of falling back when nothing is clear. spawn: players, so stay off conveyor belts.
+function safePoints(n,clear,avoid,tries,hard,strict,spawn){const m=MAPS[S.map]||MAPS.round;let c=[];for(let i=0;i<(tries||260);i++){const lx=rnd(-m.ext,m.ext),ly=rnd(-m.ext,m.ext);const w=toWorld(lx,ly,S);if(clearAt(w[0],w[1],clear,S))c.push([w[0],w[1],lx,ly])}
+ if(spawn&&m.belts){const ok=c.filter(p=>!m.belts.some(b=>Math.abs(p[2]-b.x)<b.w/2&&Math.abs(p[3]-b.y)<b.h/2));if(ok.length)c=ok}
+ if(hard&&hard.length){const ok=c.filter(p=>hard.every(q=>hyp(p[0]-q[0],p[1]-q[1])>=q[2]));if(ok.length||strict)c=ok}
+ if(!c.length)return strict?[]:Array.from({length:n},()=>[CX,CY,0,0]);const out=[],av=(avoid||[]).slice().concat((hard||[]).map(q=>[q[0],q[1]]));
  for(let k=0;k<n;k++){let best=c[0],bd=-1;for(const p of c){let md=av.length?1e9:Math.random();for(const q of av)md=Math.min(md,hyp(p[0]-q[0],p[1]-q[1]));if(md>bd){bd=md;best=p}}out.push(best);av.push(best)}return out}
-function placeRandom(p){if(S&&S.hub){p.x=p.sx=CX+rnd(-160,160);p.y=p.sy=CY+rnd(-90,90);p.vx=p.vy=0;return}const av=S.players.filter(q=>q!==p&&q.alive).map(q=>[q.x,q.y]);const pt=safePoints(1,50,av,120)[0];p.x=pt[0];p.y=pt[1];p.sx=pt[0];p.sy=pt[1];p.vx=p.vy=0}
-function makeBumpers(){return S.mut.includes('bumpers')?safePoints(4,75,[[CX,CY]]).map(q=>({lx:q[2],ly:q[3],x:q[0],y:q[1],r:30})):[]}
+function hazards(pr){pr=pr||26;return (S.bumpers||[]).map(b=>[b.x,b.y,b.r+pr+45]).concat((S.kegs||[]).map(k=>[k.x,k.y,k.r+pr+90]))}
+function placeRandom(p){if(S&&S.hub){p.x=p.sx=CX+rnd(-160,160);p.y=p.sy=CY+rnd(-90,90);p.vx=p.vy=0;return}const av=S.players.filter(q=>q!==p&&q.alive).map(q=>[q.x,q.y]);const pt=safePoints(1,50,av,200,hazards(p.r),0,1)[0];p.x=pt[0];p.y=pt[1];p.sx=pt[0];p.sy=pt[1];p.vx=p.vy=0}
+// Bumpers go down after players spawn, and keep clear of every standing player and of each other.
+function makeBumpers(){if(!S.mut.includes('bumpers'))return[];const out=[],pl=S.players.filter(p=>p.alive).map(p=>[p.x,p.y,30+p.r+45]);for(let i=0;i<4;i++){const hd=pl.concat(out.map(b=>[b.x,b.y,140])),q=safePoints(1,75,[[CX,CY]],260,hd,1)[0]||safePoints(1,45,[[CX,CY]],260,hd,1)[0];if(!q)break;out.push({lx:q[2],ly:q[3],x:q[0],y:q[1],r:30})}return out}
+// More players, bigger table: the whole map scales up (camera still fits it).
+function mapScale(n){return n<=2?1:n===3?1.08:n===4?1.15:1.22}
 function pickMap(){const st=S.settings.map;if(st&&st!=='random'&&MAPS[st])return st;if(/[?&]donger/.test(location.search)||Math.random()<1/30){S.vote=null;return 'donger'}const vm=voteWinner();if(vm)return vm;return pick(Object.keys(MAPS).filter(k=>k!==S.map&&!MAPS[k].rare))}
-function spawnRing(){S.players.forEach(p=>{p.pz=null;p.pzv=0});const pts=safePoints(S.players.length,60,S.bumpers.map(b=>[b.x,b.y]));S.players.forEach((p,i)=>{p.x=pts[i][0];p.y=pts[i][1];p.sx=p.x;p.sy=p.y;
+function spawnRing(){S.players.forEach(p=>{p.pz=null;p.pzv=0});const pts=safePoints(S.players.length,60,[],400,hazards(S.mut.includes('big')?40:26),0,1);S.players.forEach((p,i)=>{p.x=pts[i][0];p.y=pts[i][1];p.sx=p.x;p.sy=p.y;
  p.vx=p.vy=0;p.face=Math.atan2(CY-p.y,CX-p.x);p.respawn=0;p.inv=0;p.slosh=0;p.gun=1+((p.pk&&p.pk.ammo)|0);p.aiming=0;p.parry=0;p.wob=0;p.pcd=0;p.armor=(p.pk&&p.pk.armor)?1:0;p.courage=0;p.gulp=0;p.alive=true;p.fall=0;p.stun=0;p.dash=0;p.charge=0;p.charging=0;p.hitBy=null;p.teeter=0;p.windUsed=0;p.r=S.mut.includes('big')?40:26;p.hicT=rnd(2,5)})}
 function startMatch(){S.round=0;S.players.forEach(p=>{p.score=0;p.buzz=0;p.kos=0;p.falls=0;p.selfs=0;p.hics=0;p.taken=0;p.wins=0;p.gun=1;p.hits=0;p.parries=0;p.glassed=0;p.lastKB=null;p.pk={};p.pks=''});S.offers=null;S.over=null;S.lastMut=[];S.map='';S.matchT=0;S.nextMutT=30;S.zone=null;
  if(S.settings.mode==='teams'&&(!S.players.some(p=>p.team===0)||!S.players.some(p=>p.team===1)))S.players.forEach((p,i)=>p.team=i%2);nextRound()}
 function chooseMuts(first){const r=S.round,mp=MAPS[S.map]||{};if(first)return (mp.noMut||[]).includes('rails')?['none']:['rails'];let pool=MUT_POOL.filter(m=>!S.lastMut.includes(m)&&!(mp.noMut||[]).includes(m));const a=pick(pool);
  if(r>=3&&Math.random()<.4){const b=pick(pool.filter(m=>m!==a&&!(a==='reverse'&&m==='goggles')&&!(a==='goggles'&&m==='reverse')));if(b)return[a,b]}return[a]}
-function nextRound(){S.round++;S.arenaR=BASE_R;S.rot=0;S.map=pickMap();S.mut=chooseMuts(S.round===1);S.mutT=0;S.zone=null;S.items=[];S.corks=[];S.loose=[];S.itemT=rnd(3,6);S.lastMut=S.mut.slice();S.phase='intro';S.pt=0;S.disco=Math.random()<1/12||/[?&]disco/.test(location.search);S.hydro=!S.disco&&['classic','draft'].includes(S.settings.mode)&&((S.round>1&&Math.random()<1/10)||/[?&]hydro/.test(location.search));S.hydroWin=null;if(S.hydro)setTimeout(()=>ev('say',{text:'Hydration break! Water round. Splash three people to win.',force:1}),50);S.rt=0;S.kegs=[];S.bomb=null;S.bombNext=2.5;S.kegT=1.5;
- S.arenaR=BASE_R;S.rot=0;S.rotV=0;S.tiltA=Math.random()*TAU;S.gx=S.gy=0;S.sudden=false;S.waveT=3;S.waveWarn=0;S.waveHit=0;S.outOrder=[];S.fb=0;S.players.forEach(p=>{p.rhit=0;p.streak=0;p.spl=0});S.card=null;S.endT=0;S.slowT=0;S.cd=0;
- S.bumpers=makeBumpers();S.rails=makeRails();
- spawnRing();S.players.forEach(p=>{p.lives=S.settings.mode==='stock'?(S.settings.lives||3):0});const nm=S.mut.map(m=>MUTS[m].n).join(' plus ');ev('say',{text:(S.disco?'Disco round! ':'')+(isCont()?MODES[S.settings.mode].n+'! On '+MAPS[S.map].n+'.':'Round '+S.round+'. '+MAPS[S.map].n+'. '+nm+'.'),force:1})}
+function nextRound(){S.round++;S.mapS=mapScale(S.players.length);S.arenaR=BASE_R*S.mapS;S.rot=0;S.map=pickMap();S.mut=chooseMuts(S.round===1);S.mutT=0;S.zone=null;S.items=[];S.corks=[];S.loose=[];S.itemT=rnd(3,6);S.lastMut=S.mut.slice();S.phase='intro';S.pt=0;S.disco=Math.random()<1/12||/[?&]disco/.test(location.search);S.hydro=!S.disco&&['classic','draft'].includes(S.settings.mode)&&((S.round>1&&Math.random()<1/10)||/[?&]hydro/.test(location.search));S.hydroWin=null;if(S.hydro)setTimeout(()=>ev('say',{text:'Hydration break! Water round. Splash three people to win.',force:1}),50);S.rt=0;S.kegs=[];S.bomb=null;S.bombNext=2.5;S.kegT=1.5;
+ S.arenaR=BASE_R*S.mapS;S.rot=0;S.rotV=0;S.tiltA=Math.random()*TAU;S.gx=S.gy=0;S.sudden=false;S.waveT=3;S.waveWarn=0;S.waveHit=0;S.outOrder=[];S.fb=0;S.players.forEach(p=>{p.rhit=0;p.streak=0;p.spl=0});S.card=null;S.endT=0;S.slowT=0;S.cd=0;
+ S.bumpers=[];S.rails=makeRails();
+ spawnRing();S.bumpers=makeBumpers();S.players.forEach(p=>{p.lives=S.settings.mode==='stock'?(S.settings.lives||3):0});const nm=S.mut.map(m=>MUTS[m].n).join(' plus ');ev('say',{text:(S.disco?'Disco round! ':'')+(isCont()?MODES[S.settings.mode].n+'! On '+MAPS[S.map].n+'.':'Round '+S.round+'. '+MAPS[S.map].n+'. '+nm+'.'),force:1})}
 function alive(){return S.players.filter(p=>p.alive)}
 function doDash(p,c){const l=hyp(p.inp.x,p.inp.y);let dx,dy;if(p.inp.m&&typeof p.inp.a==='number'){dx=Math.cos(p.inp.a);dy=Math.sin(p.inp.a);if(S.mut.includes('reverse')){dx=-dx;dy=-dy}}else if(l>.2){dx=p.inp.x/l;dy=p.inp.y/l;if(S.mut.includes('reverse')){dx=-dx;dy=-dy}}else{dx=Math.cos(p.face);dy=Math.sin(p.face)}
  p.dq=(p.dq==null?2:p.dq)-1;p.dqT=0;const sp=470+720*c;p.vx=dx*sp;p.vy=dy*sp;p.dash=.2+.25*c;p.dpow=.45+c;p.dc=c;p.face=Math.atan2(dy,dx);ev('dash',{id:p.id,c:Math.round(c*100)/100,x:p.x|0,y:p.y|0})}
@@ -843,8 +850,8 @@ function simStep(dt){
     z.t-=dt;const zw=toWorld(z.lx,z.ly,S);z.x=zw[0];z.y=zw[1];const inz=alive().filter(p=>hyp(p.x-z.x,p.y-z.y)<z.r);z.own=inz.length===1?inz[0].id:inz.length>1?'X':null;if(inz.length===1)inz[0].score+=dt;
     if(S.players.some(p=>p.score>=KOTH_T)||S.matchT>=KOTH_MAX)endMatchCont()}
    else if(S.matchT>=HAPPY_T)endMatchCont()}
-  let R=M.includes('shrink')?lerp(BASE_R,135,clamp(S.mutT/35,0,1)):BASE_R;
-  if(!cont&&S.rt>45){if(!S.sudden){S.sudden=true;ev('say',{text:'Sudden death! The table is shrinking!',force:1});ev('sudden')}R=Math.min(R,BASE_R-(S.rt-45)*17)}
+  const ms=S.mapS||1,B0=BASE_R*ms;let R=M.includes('shrink')?lerp(B0,135*ms,clamp(S.mutT/35,0,1)):B0;
+  if(!cont&&S.rt>45){if(!S.sudden){S.sudden=true;ev('say',{text:'Sudden death! The table is shrinking!',force:1});ev('sudden')}R=Math.min(R,B0-(S.rt-45)*17*ms)}
   S.arenaR=Math.max(R,40);
   if(M.includes('spin')){S.rotV=Math.min(.42,S.rotV+dt*.15)}S.rot+=S.rotV*dt;
   S.waveHit=Math.max(0,(S.waveHit||0)-dt);
@@ -852,8 +859,8 @@ function simStep(dt){
    else{S.waveT=(S.waveT||3)-dt;if(S.waveT<=0){S.waveT=rnd(6,9);S.waveA=Math.random()*TAU;S.waveWarn=1.7;ev('wavewarn',{a:r2(S.waveA)})}}}
   if(S.map==='seesaw'&&S.phase==='play'){let tq=0;for(const q of S.players)if(q.alive&&!q.pz)tq+=(q.x-CX)*(q.r>30?1.5:1);const tg=clamp(tq/450*200,-320,320);S.gx+=(tg-S.gx)*Math.min(1,dt*1.4);S.gy=0}
   if(M.includes('tilt')){S.tiltA+=dt*.4;const g=210*clamp(S.mutT/2,0,1);S.gx=Math.cos(S.tiltA)*g;S.gy=Math.sin(S.tiltA)*g}
-  if(M.includes('kegs')){S.kegT-=dt;if(S.kegT<=0){S.kegT=rnd(1.6,2.6)-(S.rt>20?.5:0);const a=Math.random()*TAU,sx=CX+Math.cos(a)*560,sy=CY+Math.sin(a)*560;
-    const tx=CX+rnd(-120,120),ty=CY+rnd(-120,120),l=hyp(tx-sx,ty-sy),sp=rnd(300,400);S.kegs.push({x:sx,y:sy,vx:(tx-sx)/l*sp,vy:(ty-sy)/l*sp,a:0,warn:1,r:30})}}
+  if(M.includes('kegs')){S.kegT-=dt;if(S.kegT<=0){S.kegT=rnd(1.6,2.6)-(S.rt>20?.5:0);const a=Math.random()*TAU,sx=CX+Math.cos(a)*560*(S.mapS||1),sy=CY+Math.sin(a)*560*(S.mapS||1);
+    const tx=CX+rnd(-120,120)*(S.mapS||1),ty=CY+rnd(-120,120)*(S.mapS||1),l=hyp(tx-sx,ty-sy),sp=rnd(300,400);S.kegs.push({x:sx,y:sy,vx:(tx-sx)/l*sp,vy:(ty-sy)/l*sp,a:0,warn:1,r:30})}}
   if(M.includes('bomb')){if(!S.bomb){S.bombNext-=dt;const a=alive();if(S.bombNext<=0&&a.length>1){S.bomb={h:pick(a).id,fuse:rnd(6.5,10.5),cd:.5};ev('pass',{id:S.bomb.h,first:1})}}
    else{const B=S.bomb;B.fuse-=dt;B.cd-=dt;if(B.fuse<=0){const H=P(B.h);S.bomb=null;S.bombNext=2.5;if(H){ev('boom',{x:H.x|0,y:H.y|0});
      for(const q of alive()){const dx=q.x-H.x,dy=q.y-H.y,d=hyp(dx,dy);if(q===H){const a=Math.atan2(CY-H.y,CX-H.x)+Math.PI+rnd(-.9,.9);q.vx=Math.cos(a)*1150;q.vy=Math.sin(a)*1150;q.stun=1.1;q.hitBy=null}
@@ -861,7 +868,7 @@ function simStep(dt){
  }
  for(const b of S.bumpers){const w=toWorld(b.lx,b.ly,S);b.x=w[0];b.y=w[1]}
  // cork blaster pickups
- if(S.settings.guns&&(playing||free)){S.itemT-=dt;if(S.itemT<=0){S.itemT=rnd(5,8);if(S.items.length<2){const q=safePoints(1,45,alive().map(p=>[p.x,p.y]).concat(S.items.map(i=>[i.x,i.y])),120)[0];S.items.push({lx:q[2],ly:q[3],x:q[0],y:q[1]});ev('item',{x:q[0]|0,y:q[1]|0})}}}
+ if(S.settings.guns&&(playing||free)){S.itemT-=dt;if(S.itemT<=0){S.itemT=rnd(5,8);if(S.items.length<2){const q=safePoints(1,45,alive().map(p=>[p.x,p.y]).concat(S.items.map(i=>[i.x,i.y])),120,hazards(20))[0];S.items.push({lx:q[2],ly:q[3],x:q[0],y:q[1]});ev('item',{x:q[0]|0,y:q[1]|0})}}}
  for(const it of S.items){const w=toWorld(it.lx,it.ly,S);it.x=w[0];it.y=w[1]}
  for(const r of S.rails){const a=toWorld(r.la[0],r.la[1],S),b=toWorld(r.lb[0],r.lb[1],S);r.ax=a[0];r.ay=a[1];r.bx=b[0];r.by=b[1];
   for(const k of S.kegs)if(k.warn<=0&&r.hp>0&&segDist(k.x,k.y,r)[0]<k.r+7){dmgRail(r,2);ev('glass',{x:(r.ax+r.bx)/2|0,y:(r.ay+r.by)/2|0,hp:0})}
@@ -920,7 +927,7 @@ function simStep(dt){
   const rx=p.x-CX,ry=p.y-CY;
   if(S.rotV){dvx+=-ry*S.rotV;dvy+=rx*S.rotV}
   let k=p.dodge>0?1.2:p.dash>0?.8:(p.stun>0?1.5:7);if(M.includes('spill'))k=p.dash>0?.4:(p.stun>0?.8:2.6);
-  const MP=MAPS[S.map];if(MP&&(MP.ice||MP.belts)&&!p.pz){const L=toLocal(p.x,p.y,S);if(MP.ice&&!MP.grip.some(g=>hyp(L[0]-g.x,L[1]-g.y)<g.r))k=p.dash>0?.35:(p.stun>0?.6:1.6);if(MP.belts&&p.alive)for(const b of MP.belts)if(Math.abs(L[0]-b.x)<b.w/2&&Math.abs(L[1]-b.y)<b.h/2){p.x+=b.vx*(S.arenaR/BASE_R)*dt;break}}
+  const MP=MAPS[S.map];if(MP&&(MP.ice||MP.belts)&&!p.pz){const L=toLocal(p.x,p.y,S);if(MP.ice&&!MP.grip.some(g=>hyp(L[0]-g.x,L[1]-g.y)<g.r))k=p.dash>0?.35:(p.stun>0?.6:1.6);if(MP.belts&&p.alive&&S.phase!=='intro')for(const b of MP.belts)if(Math.abs(L[0]-b.x)<b.w/2&&Math.abs(L[1]-b.y)<b.h/2){p.x+=b.vx*(S.arenaR/BASE_R)*dt;break}}
   if(p.stun>0&&p.dash<=0){const sp0=hyp(p.vx,p.vy);if(sp0>1){const dot=-(ix*p.vx+iy*p.vy)/sp0;if(dot>.3)k+=4.5*dot;if(dot>.3&&Math.random()<dt*6)p.brace=1}}
   const f=1-Math.exp(-k*dt);p.vx+=(dvx-p.vx)*f;p.vy+=(dvy-p.vy)*f;
   if(playing&&(S.gx||S.gy)){p.vx+=S.gx*dt;p.vy+=S.gy*dt}
@@ -1635,7 +1642,7 @@ function render(dt){const t=gtime;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#
  const vg=ctx.createRadialGradient(W/2,H/2,H*.45,W/2,H/2,H*.95);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(40,10,0,.5)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
  if(V)drawHUD(t);ctx.restore()}
 const MAPBB={};function mapBB(id){if(MAPBB[id])return MAPBB[id];const m=MAPS[id]||MAPS.round;let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const q of m.solids.concat(m.holes||[])){const hw=q.t==='c'?q.r:q.w/2,hh=q.t==='c'?q.r:q.h/2;a=Math.min(a,q.x-hw);b=Math.max(b,q.x+hw);c=Math.min(c,q.y-hh);d=Math.max(d,q.y+hh)}return MAPBB[id]=[a,b,c,d]}
-function fitCam(){if(!V||V.hub||(S&&S.hub)||!MAPS[V.map])return [1,CY];const sc=(V.arenaR||BASE_R)/BASE_R,bb=mapBB(V.map),spin=V.mut&&V.mut.includes('spin');let y0=bb[2]*sc,y1=bb[3]*sc,x0=bb[0]*sc,x1=bb[1]*sc;if(spin){const r=Math.max(-x0,x1,-y0,y1);x0=y0=-r;x1=y1=r}const lob=V.phase==='lobby',top=58,bot=lob?H-34:H-74,mg=26;let z=Math.min(1,(bot-top)/(y1-y0+mg*2));if(!lob)z=Math.min(z,(W-24)/(x1-x0+mg*2));z=Math.max(.72,z);const my=CY+(y0+y1)/2;return [z,my-((top+bot)/2-H/2)/z]}
+function fitCam(){if(!V||V.hub||(S&&S.hub)||!MAPS[V.map])return [1,CY];const sc=(V.arenaR||BASE_R)/BASE_R,bb=mapBB(V.map),spin=V.mut&&V.mut.includes('spin');let y0=bb[2]*sc,y1=bb[3]*sc,x0=bb[0]*sc,x1=bb[1]*sc;if(spin){const r=Math.max(-x0,x1,-y0,y1);x0=y0=-r;x1=y1=r}const lob=V.phase==='lobby',top=58,bot=lob?H-34:H-74,mg=26;let z=Math.min(1,(bot-top)/(y1-y0+mg*2));if(!lob)z=Math.min(z,(W-24)/(x1-x0+mg*2));z=Math.max(.6,z);const my=CY+(y0+y1)/2;return [z,my-((top+bot)/2-H/2)/z]}
 let camZ=1,camX=CX,camY=CY;function lobbyShift(){const pn=document.querySelector('#lobby .panel');if(!pn||pn.classList.contains('mini')||innerWidth<600)return 0;const w=pn.offsetWidth+16;if(w>innerWidth*.6)return 0;return (w/2)/(SC/DPR)/camZ}
 // 28-world-hud.js: drawing the world, disco, the HUD, and updating effects
 function drawWorld(t){drawSea(t);if(!V){drawArena({map:'round',arenaR:BASE_R,rot:t*.05,gx:0,gy:0},t);return}

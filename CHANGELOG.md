@@ -9,7 +9,7 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
-## 2026-11-28 · asked by Zander (build ?)
+## 2026-11-28 · asked by Zander (build 76)
 - Nobody spawns on, inside or right next to a bar stool bumper any more: round starts, respawns and crate drops all keep a gap
 - Bumpers are now placed after players, away from where everyone is standing
 - Rolling kegs also count as danger when picking a respawn spot
