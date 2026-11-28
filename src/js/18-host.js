@@ -64,7 +64,7 @@ function hostMsg(c,m){if(!m||!S)return;const id=connId(c);if(NET.banned&&(NET.ba
  else if(m.t==='pg'){c.send({t:'po',k:m.k})}
  else if(m.t==='bye'){S.players=S.players.filter(x=>x!==p&&x.owner!==id)}}
 function broadcast(){if(!S)return;const s=snapshot();const rl=new Set();for(const c of NET.conns.values()){if(c.relay){rl.add(c.mq);continue}try{if(c.open!==false)c.send({t:'s',s})}catch(e){}}if(rl.size){NET.rev=(NET.rev||[]).concat(s.ev);NET.rtick=(NET.rtick||0)+1;if(NET.rtick%(NET.rhalf?2:1)===0||NET.rev.length>12){const j=JSON.stringify({t:'s',s:Object.assign({},s,{ev:NET.rev})});NET.rev=[];for(const mq of rl)mq.pub(RT(S.code)+'all',j)}}S.evq=[]}
-const PROTO=21;const PKI=new Set(['x','y','vx','vy','ghx','ghy']);const PKB=new Set(['alive','bot']);
+const PROTO=22;const PKI=new Set(['x','y','vx','vy','ghx','ghy']);const PKB=new Set(['alive','bot']);
 const PK=['ghx','ghy','id','name','color','hat','bot','x','y','vx','vy','face','r','alive','fall','charge','dash','stun','buzz','score','emote','emoteT','teeter','kos','falls','team','inv','gun','armor','courage','gulp','aiming','aimA','aimC','thT','parry','wob','dodge','slosh','ctr','fullT','full','lives','lv','pks','fc','bk','spl','tag','ic','hand','pzv'];
 const r2=v=>Math.round(v*100)/100;
 let lastRails='',railsT=0;function snapshot(){const sn=snapshot0();const rj=JSON.stringify(sn.rails);railsT++;if(rj===lastRails&&railsT%30)delete sn.rails;else lastRails=rj;return sn}

@@ -9,6 +9,15 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
+## 2026-11-28 · asked by Zander (build ?)
+- The bar crowd is back, but only for the big moments, and it sounds like actual people now: a room shouting "yeah!" with claps and the odd whistle, instead of the old hiss
+- The crowd cheers some knockouts, and goes louder for a mug kill, a butt bump or perfect hit KO, a double KO or better, and knocking out the leader
+- A gasp when someone teeters on the edge and saves it, or falls off on their own
+- A big roar for round and match wins, and in the end-of-match replay a gasp on the slow-mo hit and a roar on the splash
+- The host decides every cheer, so everyone online hears the same one at the same moment. There's a short cooldown so it never turns into constant noise
+- Settings > Sound has a "Crowd cheers" switch to turn it off. It follows your volume
+- Everyone needs to refresh to this build to play together
+
 ## 2026-11-28 · asked by Curt (build 81)
 - Took out the "instant dash" for joined players that came in with build 70. It could fire dashes the host never made and cut your dash short on your own screen. Dashes for joined players work the way they did before build 70 again: your dash starts when the host says so, and what you see is what happened. Walking still responds instantly.
 

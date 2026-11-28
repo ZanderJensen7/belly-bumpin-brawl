@@ -8,10 +8,10 @@ function recFrame(s){if(!s||s.phase!=='play'||s.hub)return;const t=Math.round((s
 const rplHost=()=>NET.mode!=='client';
 // host: start from its own buffer and pick the moment. client: start from the host's plan (rp)
 function startReplay(rp){const b=RPL.buf;if(b.length<(rp?5:30))return;const tEnd=rp?rp.a+rp.e:b[b.length-1].t,t0=rp?rp.a:tEnd-4200;const fr=b.filter(f=>f.t>=t0-40&&f.t<=tEnd+40);if(fr.length<2)return;
- RPL.buf=[];RPL.fr=fr;RPL.t0=rp?rp.a:fr[0].t;RPL.end=rp?rp.e:tEnd-fr[0].t;RPL.t=rp?rp.t:0;RPL.i=0;RPL.hold=0;RPL.armed=0;RPL.cam=null;
+ RPL.buf=[];RPL.fr=fr;RPL.t0=rp?rp.a:fr[0].t;RPL.end=rp?rp.e:tEnd-fr[0].t;RPL.t=rp?rp.t:0;RPL.i=0;RPL.hold=0;RPL.armed=0;RPL.cam=null;RPL.cD=RPL.cK=0;
  if(rp){RPL.tD=rp.d;RPL.tK=rp.k;RPL.vic=rp.v;RPL.tM=rp.m;RPL.mug=null;if(rp.m!=null)rplMug(rp.hx,rp.hy,rp.d)}else{rplPlan();if(S)S.rp={a:RPL.t0,e:Math.round(RPL.end),d:Math.round(RPL.tD),k:Math.round(RPL.tK),v:RPL.vic,m:RPL.mug?Math.round(RPL.tM):null,hx:RPL.hx|0,hy:RPL.hy|0,t:0}}
  while(RPL.i<fr.length-1&&fr[RPL.i+1].t-RPL.t0<=RPL.t)RPL.i++;RPL.on=1;document.body.classList.add('replay');SFX.whoosh&&SFX.whoosh(.9)}
-function stopReplay(){RPL.on=0;RPL.v=null;RPL.fr=null;RPL.cam=null;document.body.classList.remove('replay');if(rplHost()&&S)S.rp=null}
+function stopReplay(){if(RPL.on&&V&&V.phase==='over')SFX.crowd('cheer',2);RPL.on=0;RPL.v=null;RPL.fr=null;RPL.cam=null;document.body.classList.remove('replay');if(rplHost()&&S)S.rp=null}
 function replayTick(dt){const ph=V&&V.phase,host=rplHost();
  if(host){if(ph==='over'&&RPL.lastPh&&RPL.lastPh!=='over'&&!RPL.on)startReplay()}else if(ph==='over'&&V.rp&&!RPL.on&&RPL.lastRp!==V.rp.a)startReplay(V.rp);
  if(!host)RPL.lastRp=V&&V.rp?V.rp.a:RPL.lastRp;if(ph==='lobby'){RPL.buf=[];RPL.lastRp=null}RPL.lastPh=ph;
@@ -19,10 +19,12 @@ function replayTick(dt){const ph=V&&V.phase,host=rplHost();
  const sp=rplSpeed(RPL.t);RPL.slow=sp<1;RPL.t+=dt*1000*sp;
  if(!host){const rp=V.rp,tg=rp.t+Math.min(200,performance.now()-(V._rx||performance.now()))*rplSpeed(rp.t),df=tg-RPL.t;if(Math.abs(df)>300)RPL.t=tg;else RPL.t+=df*Math.min(1,dt*4)}
  const fr=RPL.fr;RPL.t=Math.min(RPL.t,RPL.end);
- while(RPL.i<fr.length-1&&fr[RPL.i+1].t-RPL.t0<=RPL.t){RPL.i++;for(const e of (fr[RPL.i].s.ev||[]))if(!['chat','say','champ','pzlv','pzwin','emote'].includes(e.k))try{onEv(e)}catch(_){}}
+ while(RPL.i<fr.length-1&&fr[RPL.i+1].t-RPL.t0<=RPL.t){RPL.i++;for(const e of (fr[RPL.i].s.ev||[]))if(!['chat','say','champ','pzlv','pzwin','emote','crowd'].includes(e.k))try{onEv(e)}catch(_){}}
  const A=fr[RPL.i],B=fr[Math.min(RPL.i+1,fr.length-1)],span=Math.max(1,B.t-A.t),u=clamp((RPL.t-(A.t-RPL.t0))/span,0,1);
  const bm=new Map(B.s.players.map(p=>[p.id,p]));RPL.v=Object.assign({},A.s,{players:A.s.players.map(p=>{const q=bm.get(p.id);return q?Object.assign({},p,{x:p.x+(q.x-p.x)*u,y:p.y+(q.y-p.y)*u}):Object.assign({},p)}),phase:'play'});
  RPL.cam=rplCam(A,B,u);
+ // the crowd gasps as the slow-mo hit lands and roars at the splash. Everyone's replay clock follows the host's plan, so it lands together
+ if(RPL.vic){if(!RPL.cD&&RPL.t>=RPL.tD-60&&RPL.tD<RPL.tK-200){RPL.cD=1;SFX.crowd('ooh',2)}if(!RPL.cK&&RPL.t>=RPL.tK&&RPL.t<RPL.tK+1500){RPL.cK=RPL.cD=1;SFX.crowd('cheer',3)}}
  if(host){if(S.rp)S.rp.t=Math.round(RPL.t);if(RPL.t>=RPL.end){RPL.hold+=dt;if(RPL.hold>.9)stopReplay()}}}
 // only the host can skip (it ends the replay for everyone); offline that's you
 addEventListener('keydown',e=>{if(RPL.on&&e.code!=='Escape'){if(rplHost())stopReplay();e.stopPropagation()}},true);addEventListener('pointerdown',()=>{if(RPL.on&&rplHost())stopReplay()},true);

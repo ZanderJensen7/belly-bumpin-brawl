@@ -2,7 +2,7 @@
 (function(){const O=$('#opts'),KN={up:'Move up',down:'Move down',left:'Move left',right:'Move right',bump:'Bump',parry:'Parry',throw:'Drink / throw'};let wait=null;
  const kname=keyName;
  const voiceLbl=()=>{const b=$('#bVoice');b.style.opacity=1;b.textContent=voiceOn?VOX[voxI].n:'Off'};$('#bVoice').addEventListener('click',()=>setTimeout(voiceLbl,0));
- function draw(){voiceLbl();$('#oShake').textContent=['Off','Less','Full'][shakeLv];$('#oFlash').textContent=flashOn?'On':'Off';$('#oCb').textContent=cbOn?'On  ●■▲':'Off';
+ function draw(){voiceLbl();$('#oShake').textContent=['Off','Less','Full'][shakeLv];$('#oFlash').textContent=flashOn?'On':'Off';$('#oAmb').textContent=ambOn?'On':'Off';$('#oCb').textContent=cbOn?'On  ●■▲':'Off';
   $('#oKeys').innerHTML=Object.keys(KEYDEF).map(k=>'<div class="orow"><span>'+KN[k]+'</span><button class="ghost'+(wait===k?' go':'')+'" data-k="'+k+'">'+(wait===k?'Press a key…':esc(kname(KB[k])))+'</button></div>').join('');
   $('#oKeys').querySelectorAll('button').forEach(b=>b.onclick=()=>{SFX.click();wait=wait===b.dataset.k?null:b.dataset.k;draw()})}
  const open=()=>{wait=null;draw();O.classList.add('on')},close=()=>{wait=null;O.classList.remove('on')};
@@ -10,6 +10,7 @@
  O.addEventListener('pointerdown',e=>{if(e.target===O)close()});
  $('#oShake').onclick=()=>{shakeLv=(shakeLv+2)%3;store.set('shake',shakeLv);shake=Math.max(shake,14);draw()};
  $('#oFlash').onclick=()=>{flashOn=flashOn?0:1;store.set('flash',!!flashOn);if(flashOn)flash=.2;draw()};
+ $('#oAmb').onclick=()=>{ambOn=ambOn?0:1;store.set('amb',!!ambOn);if(ambOn){initAudio();SFX.crowd('cheer',1)}draw()};
  $('#oCb').onclick=()=>{cbOn=cbOn?0:1;store.set('cb',!!cbOn);draw()};
  $('#oReset').onclick=()=>{SFX.click();KB=Object.assign({},KEYDEF);KBU=new Set(Object.values(KB));store.set('keys',{});wait=null;draw()};
  // capture phase, so a key pressed while rebinding never reaches the game

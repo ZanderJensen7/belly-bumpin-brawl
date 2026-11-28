@@ -42,11 +42,12 @@ function onEv(e){const p=e.id?vp(e.id):null;if(NET.myId&&(e.id===NET.myId||e.kid
  case 'cd':SFX.ding(e.n);break;
  case 'go':SFX.horn();setTimeout(()=>SFX.cheer(),100);flash=.15;break;
  case 'final':zoom=1.55;zoomT=1.2;zx=e.x;zy=e.y;break;
- case 'win':if(e.id){SFX.fanfare();SFX.cheer()}else SFX.sad();break;
- case 'champ':for(let i=0;i<5;i++)burst(CX+(i-2)*210,CY+rnd(-60,60),26,['#ff5a5f','#3fa7ff','#ffd23f','#4cd964','#c77dff','#fff6e0'],520,7,1);SFX.fanfare();setTimeout(()=>SFX.cheer(),400);setTimeout(()=>SFX.fanfare(),900);break;
+ case 'win':if(e.id){SFX.fanfare();if(ambOn)SFX.crowd('cheer',2);else SFX.cheer()}else SFX.sad();break;
+ case 'champ':for(let i=0;i<5;i++)burst(CX+(i-2)*210,CY+rnd(-60,60),26,['#ff5a5f','#3fa7ff','#ffd23f','#4cd964','#c77dff','#fff6e0'],520,7,1);SFX.fanfare();setTimeout(()=>{if(!ambOn)SFX.cheer();else if(!RPL.on)SFX.crowd('cheer',3)},400);setTimeout(()=>SFX.fanfare(),900);break;
  case 'full':if(e.id===NET.myId)SFX.full();break;
  case 'sudden':SFX.horn();flash=.2;break;
  case 'glass':{const big=e.hp<=0&&!e.small;SFX.glass(e.hp<=0);shake=Math.max(shake,big?9:4);burst(e.x,e.y,big?26:8,['#d8f3ff','#ffffff','#a8dcf5'],big?420:200,big?6:4,1);addPop(e.x,e.y-30,big?pick(['SMASH!','SHATTER!','CRASH!']):'CRACK!',big?'#d8f3ff':'#fff',big?36:24);break}
+ case 'crowd':SFX.crowd(e.c,e.v);break;
  case 'whoa':if(p){addPop(p.x,p.y-60,pick(['WHOA!','NOPE!','CLOSE ONE']),'#fff',20,.7);const a=A_(p.id);a.pvx+=200}break;
  case 'wavewarn':SFX.horn();break;
  case 'wave':SFX.splash();shake=Math.max(shake,22);surge=1;surgeA=e.a;burst(CX+Math.cos(e.a)*-300,CY+Math.sin(e.a)*-300,40,['#fff6e0','#ffe9a8','#fff'],500,10,1);addPop(CX,CY-120,'SLOOOSH!','#fff6e0',72,1.1);break;
