@@ -62,5 +62,5 @@ const SFX={
  clink(){if(!AC)return;const t=now();tone('sine',2600,2500,.25,.1,t);tone('sine',3900,3800,.18,.05,t);tone('sine',3100,3000,.22,.07,t+.05)},
  fanfare(){if(!AC)return;const t=now();[523,659,784,1047,784,1047].forEach((f,i)=>{tone('triangle',f,null,i>4?.6:.16,.3,t+i*.12);tone('square',f/2,null,i>4?.6:.16,.06,t+i*.12)})},
 };
-// Crowd reactions (SFX.ooh / SFX.crowd) can be switched off in Settings. The constant background murmur was removed in build 71: it sounded like a whirring propeller.
+// Crowd reactions (SFX.ooh / SFX.crowd) can be switched off in Settings. The constant background murmur was removed: it sounded like a whirring propeller.
 let ambOn=store.get('amb',true)?1:0;
