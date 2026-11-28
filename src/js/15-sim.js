@@ -99,7 +99,6 @@ function simStep(dt){
   const flr=free&&!p.pz?floaterAt(p.x,p.y):null;if(flr&&p.dash<=0){p.x+=flr.vx*dt;p.y+=flr.vy*dt;if(flr.gold&&hyp(p.x-flr.x,p.y-flr.y)<flr.r*.8){flr.gold=0;ev('treasure',{id:p.id,x:flr.x|0,y:flr.y|0});ev('meme',{t:'🏆 SECRET MUG!',x:flr.x|0,y:flr.y|0,v:1})}}
   if(p.charging&&p.inp.m&&typeof p.inp.a==='number'&&p.stun<=0)p.face=p.inp.a+(S.mut.includes('reverse')?Math.PI:0);
   const sp=hyp(p.vx,p.vy);if(p.stun<=0&&sp>40&&p.dash<=0&&!p.aiming&&!(p.charging&&p.inp.m)){const ta=Math.atan2(p.vy,p.vx);let da=((ta-p.face+Math.PI*3)%TAU)-Math.PI;p.face+=da*Math.min(1,dt*10)}
-  if(M.includes('hic')&&playing){p.hicT-=dt;if(p.hicT<=0){p.hicT=rnd(2.2,5);p.hics++;ev('hic',{id:p.id});if(p.stun<=0&&p.dash<=0){const a=Math.random()*TAU;const s=p.inp;const ox=s.x,oy=s.y;s.x=Math.cos(a);s.y=Math.sin(a);doDash(p,.3);s.x=ox;s.y=oy;p.charging=0;p.charge=0}}}
   const on=(p.pz?!!pzp:onArena(p.x,p.y))||!!flr;if(on){p.sx=p.x;p.sy=p.y;p.teeter=(flr||pzp)?0:clearAt(p.x,p.y,p.r*.7)?0:1}else p.teeter=1;
   if(playing||free){if(on)p.flT=0;if(!on&&p.dash<=0&&p.pk&&p.pk.floaty&&(p.flT||0)<.55*p.pk.floaty){p.flT=(p.flT||0)+dt;if(p.flT<dt*1.5)ev('meme',{t:'🎈',x:p.x|0,y:p.y|0})}else if(!on&&p.dash<=0){if(p.stun>0||S.t-p.hitT<.6||hyp(p.vx,p.vy)>300||hyp(p.x-p.sx,p.y-p.sy)>45)knockOut(p,'fall');else{p.edgeT=(p.edgeT||0)+dt*2;if(p.edgeT>.3){knockOut(p,'fall')}else{p.x=p.sx;p.y=p.sy;p.vx*=-.2;p.vy*=-.2;if(S.t-(p.whoaT||0)>1.2){p.whoaT=S.t;ev('whoa',{id:p.id})}}}}else if(on)p.edgeT=Math.max(0,(p.edgeT||0)-dt)}
   else if(!on){p.x=p.sx;p.y=p.sy;p.vx*=-.3;p.vy*=-.3}
