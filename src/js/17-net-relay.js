@@ -40,6 +40,6 @@ function onRelay(mq,txt,topic){{if(!S)return;if(topic===LOBQ){if(S.settings.pub&
   if(m.d&&m.d.t==='bye'){dropConn(id);return}hostMsg(c,m.d)}}
 function escList(){const isH=NET.mode==='host';$('#eLob').style.display=isH&&S&&S.phase!=='lobby'?'':'none';$('#eWard').style.display=V&&V.phase==='lobby'?'':'none';$('#eQuit').textContent=isH?(V&&V.code==='SOLO'?'Quit practice':'Close room'):'Leave room';
  const L=isH&&V?V.players.filter(p=>p.id!==NET.myId):[];$('#ePl').innerHTML=L.length?'<div class="small" style="border:0;background:none;padding:0">Players</div>'+L.map(p=>'<div><span style="color:'+COLORS[p.color]+'">●</span><span>'+esc(p.name)+(p.bot?' 🤖':'')+'</span><button data-ek="'+p.id+'">Kick</button></div>').join(''):''}
-function toggleEsc(on){if(!NET.mode&&!S){$('#esc').classList.remove('on');return}const o=on==null?!$('#esc').classList.contains('on'):on;$('#esc').classList.toggle('on',o);if(o){$('#eGrid').style.display='none';escList();quitArm=0;$('#eQuit').classList.remove('go')}}
+function toggleEsc(on){if(!NET.mode&&!S){$('#esc').classList.remove('on');return}const o=on==null?!$('#esc').classList.contains('on'):on;$('#esc').classList.toggle('on',o);if(!o)$('#mst').classList.remove('on');if(o){escList();quitArm=0;$('#eQuit').classList.remove('go')}}
 let quitArm=0;setInterval(()=>{if($('#esc').classList.contains('on'))escList();document.body.classList.toggle('inroom',!!NET.mode)},500);
 const MYUID=(()=>{let u=store.get('uid','');if(!u){u=Math.random().toString(36).slice(2,12);store.set('uid',u)}return u})();
