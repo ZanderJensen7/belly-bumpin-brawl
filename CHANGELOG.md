@@ -9,6 +9,9 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
+## 2026-11-28 · asked by Curt (build ?)
+- Removed the crowd reactions too: no more crowd "oooh" on big hits and near-falls, and no crowd cheer on knockouts. The Settings switch for them is gone.
+
 ## 2026-11-28 · asked by Zander (build 73)
 - My stats now opens in its own window with a Back button, instead of squeezing into the menu between Wardrobe and Settings
 - Back (or Esc) returns you to the menu, so Kick and Close room are right where you left them
