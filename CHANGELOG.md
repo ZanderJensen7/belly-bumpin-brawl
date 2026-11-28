@@ -9,7 +9,7 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
-## 2026-11-28 · asked by Zander (build ?)
+## 2026-11-28 · asked by Zander (build 71)
 - The Deep End is quieter for everyone else: you now only hear your own splashes, checkpoints and level-ups in the jumping puzzle, not other players'. Entering it and beating it still play for the whole room.
 
 ## 2026-11-27 · asked by Curt (build 70)
