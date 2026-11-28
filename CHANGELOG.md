@@ -9,6 +9,9 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
+## 2026-11-28 · asked by Curt (build ?)
+- Took out the "instant dash" for joined players that came in with build 70. It could fire dashes the host never made and cut your dash short on your own screen. Dashes for joined players work the way they did before build 70 again: your dash starts when the host says so, and what you see is what happened. Walking still responds instantly.
+
 ## 2026-11-28 · asked by Zander (build 79)
 - The end-of-match replay now eases into slow motion right before the hit that decided it, and slows again for the final splash
 - If the winning knock-out came from a thrown drink, the camera zooms in and rides along with the mug, then follows the victim into the water

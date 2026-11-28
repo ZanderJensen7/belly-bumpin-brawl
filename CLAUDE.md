@@ -124,7 +124,7 @@ Common jobs: a new map touches `02-rules.js` (shape), `24-map-art.js` (texture) 
   - Controller ownership lives in `PADS`, and guest state in `LOC`.
   - Gamepad menu navigation is in `gpNav`.
 - **Maps.** The `MAPS` object holds shapes (`c` circle, `r`/`s` rect) plus optional `belts`, `ice`/`grip` and `holes`. Textures are drawn in `getTex(id)`, and lobby map buttons live in `#segP`. The camera auto-fits each map (`fitCam`).
-- **Client prediction.** A joined player predicts their own walking and dash locally (`32-main.js`, the `disp`/`PD` block) and is corrected toward the host. If you change movement or dash rules in `15-sim.js` or `doDash`, mirror them there.
+- **Client prediction.** A joined player predicts their own **walking** locally (`32-main.js`, the `disp` block) and is corrected toward the host. **Dashes are not predicted**: they start when the host says so. Dash prediction was tried in build 70 and removed, because it fired dashes the host never made and cut dashes short on the joined player's screen. Don't bring it back without testing on real connections (including the relay) through knock-outs, respawns and round changes.
 - **Saved data.** Settings and progress live in localStorage under `lcb_*` keys, read and written through `store.get/set`. Stats live in `lcb_stats`.
 - **URL test flags.**
   - `?local` lets two tabs on one machine play together.
