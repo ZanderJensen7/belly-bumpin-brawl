@@ -48,6 +48,16 @@ const SFX={
  sad(){if(!AC)return;const t=now();[392,370,349,311].forEach((f,i)=>{const d=i==3?1:.32,st=t+i*.34,o=AC.createOscillator(),fl=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.setValueAtTime(f,st);
   if(i==3)vib(o,5,9,st,d);fl.type='lowpass';fl.frequency.value=1100;env(g,st,.03,.22,d);o.connect(fl);fl.connect(g);g.connect(SG);o.start(st);o.stop(st+d+.05)})},
  cheer(){if(!AC)return;const t=now();for(let i=0;i<6;i++)noise(1.8,.18,'bandpass',rnd(900,3000),rnd(900,3000),3,t+Math.random()*.2);for(let i=0;i<3;i++){const st=t+.2+i*.35+Math.random()*.2;tone('sine',1800,2900,.25,.08,st)}},
+ // crowd reactions (host decides when, see crowdEv): c 'cheer' = a room of voices shouting "yeah!" plus claps, 'ooh' = a gasp that slides down. v 1..3 = how big
+ crowd(c,v){if(!AC||!ambOn)return;v=clamp(v||1,1,3);const t=now(),ooh=c==='ooh',n=ooh?6+v*2:7+v*3,out=AC.createGain(),lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=ooh?1800:3200;out.gain.value=ooh?.5+.15*v:.42+.14*v;lp.connect(out);out.connect(SG);
+  const F=ooh?[[330,5],[780,6]]:pick([[[760,6],[1250,7]],[[620,6],[1700,8]]]);
+  for(let i=0;i<n;i++){const st=t+Math.random()*(ooh?.12:.3),d=(ooh?.75:.9)+v*.2+Math.random()*.5,f0=Math.random()<.5?rnd(110,190):rnd(200,340),o=AC.createOscillator(),g=AC.createGain();o.type='sawtooth';
+   if(ooh){o.frequency.setValueAtTime(f0*1.12,st);o.frequency.exponentialRampToValueAtTime(f0*.78,st+d)}else{o.frequency.setValueAtTime(f0*.85,st);o.frequency.exponentialRampToValueAtTime(f0*1.18,st+.22);o.frequency.exponentialRampToValueAtTime(f0*.92,st+d)}
+   vib(o,rnd(4.5,7),f0*.02,st,d);for(const [ff,q] of F){const bp=AC.createBiquadFilter();bp.type='bandpass';bp.frequency.value=ff*rnd(.92,1.08);bp.Q.value=q;o.connect(bp);bp.connect(g)}
+   const pk=.07/Math.sqrt(n)*3;g.gain.setValueAtTime(.0001,st);g.gain.linearRampToValueAtTime(pk,st+(ooh?.08:.12));g.gain.setValueAtTime(pk*.8,st+d*.55);g.gain.exponentialRampToValueAtTime(.0001,st+d);g.connect(lp);o.start(st);o.stop(st+d+.05)}
+  // breath of the room under the voices
+  {const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain(),d=1.2+v*.35;s.buffer=NB;f.type='bandpass';f.frequency.value=ooh?700:1300;f.Q.value=.7;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime((ooh?.05:.08)*v,t+.2);g.gain.exponentialRampToValueAtTime(.0001,t+d);s.connect(f);f.connect(g);g.connect(out);s.start(t,Math.random()*.5);s.stop(t+d+.05)}
+  if(!ooh){for(let i=0;i<v*7;i++)noise(.035,rnd(.1,.22),'bandpass',rnd(1300,2600),null,1.2,t+.15+Math.random()*(.8+v*.4));if(v>=2)for(let i=0;i<v-1;i++){const st=t+.2+Math.random()*.5,o=tone('sine',rnd(1900,2300),null,.5,.05,st);if(o){o.frequency.linearRampToValueAtTime(rnd(2600,3000),st+.18);o.frequency.linearRampToValueAtTime(rnd(2000,2400),st+.45)}}}},
  // victim's grunt, pitched per player
  oof(p,s){if(!AC)return;const t=now(),o=AC.createOscillator(),f=AC.createBiquadFilter(),g=AC.createGain(),f0=210*p*(1+Math.min(.5,s*.2));o.type='sawtooth';o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f0*.55,t+.16);
   f.type='bandpass';f.frequency.setValueAtTime(900,t);f.frequency.exponentialRampToValueAtTime(500,t+.16);f.Q.value=4;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.8,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.2);o.connect(f);f.connect(g);g.connect(SG);o.start(t);o.stop(t+.22)},
@@ -57,3 +67,5 @@ const SFX={
  clink(){if(!AC)return;const t=now();tone('sine',2600,2500,.25,.1,t);tone('sine',3900,3800,.18,.05,t);tone('sine',3100,3000,.22,.07,t+.05)},
  fanfare(){if(!AC)return;const t=now();[523,659,784,1047,784,1047].forEach((f,i)=>{tone('triangle',f,null,i>4?.6:.16,.3,t+i*.12);tone('square',f/2,null,i>4?.6:.16,.06,t+i*.12)})},
 };
+// Crowd cheers (SFX.crowd) can be switched off in Settings (saved as 'amb'). The old constant background murmur stays removed: it sounded like a whirring propeller.
+let ambOn=store.get('amb',true)?1:0;

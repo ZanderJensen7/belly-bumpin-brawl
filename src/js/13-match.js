@@ -63,7 +63,11 @@ function knockOut(p,cause){if(p.pz){p.pz.d++;ev('pzfall',{id:p.id,x:p.x|0,y:p.y|
  else if(killer)ev('say',{text:pick([killer.name+' yeeted '+v+'!',v+' is sleeping with the fishes.',v+' has left the chat.',killer.name+' sends '+v+' swimming!'])});
  else ev('say',{text:pick([v+' fell off all by themselves. Incredible.',v+', are you okay?',v+' tripped over nothing.',v+' chose the beer.'])});
  if(S.bomb&&S.bomb.h===p.id){const a=alive();S.bomb=a.length>1?{h:pick(a).id,fuse:Math.max(S.bomb.fuse,3),cd:.8}:null}
- if(!cont&&S.phase==='play'&&roundOver()){S.slowT=1.1;ev('final',{x:p.x|0,y:p.y|0})}}
+ if(!cont&&S.phase==='play'&&roundOver()){S.slowT=1.1;ev('final',{x:p.x|0,y:p.y|0})}else if(S.phase==='play')crowdKO(p,killer,self)}
+// Crowd cheers. The host decides when and how big, and sends a 'crowd' event, so everyone online hears the same cheer at the same moment.
+// A cooldown keeps it to the big moments: small ones wait 3.5s since the last cheer, big ones 0.8s.
+function crowdEv(c,v){const g=S.t-(S.crT??-99);if(g>=0&&g<(v>=2?.8:3.5))return;S.crT=S.t;ev('crowd',{c,v})}
+function crowdKO(p,killer,self){if(killer){const hit=p.hitST===p.hitT,mug=hit&&p.hitC,shut=p.score>0&&p.score===Math.max(...S.players.map(q=>q.score))&&p.score>killer.score,big=mug||(hit&&p.hitB)||shut||killer.streak>=2;const v=killer.streak>=3?3:big?2:1;if(v===1&&Math.random()<.4)return;crowdEv('cheer',v)}else if(self&&Math.random()<.6)crowdEv('ooh',1)}
 function handSlap(p){p.x=p.sx;p.y=p.sy;const o=alive().filter(q=>q!==p&&!q.hand);const tg=o.length&&Math.random()<.75?pick(o):null;let dx,dy;if(tg){dx=tg.x-p.x;dy=tg.y-p.y}else{dx=CX-p.x;dy=CY-p.y}const l=hyp(dx,dy)||1;dx/=l;dy/=l;
  const sp=tg?1350:650;p.vx=dx*sp;p.vy=dy*sp;p.face=Math.atan2(dy,dx);p.dash=tg?.55:.3;p.dpow=tg?1.6:.4;p.dc=tg?1:.2;p.inv=.8;ev('slap',{id:p.id,x:p.x|0,y:p.y|0,a:Math.round(p.face*100)/100,at:tg?1:0});ev('meme',{t:tg?'🖐️ HAND OF GOD → '+tg.name.toUpperCase():'🖐️ HAND OF GOD',x:p.x|0,y:p.y|0,v:0});ev('say',{text:tg?pick(['The hand chose violence. Sorry '+tg.name+'.','Divine intervention! Aimed at '+tg.name+'.']):pick(['Saved by the hand of God.','Back you go.']),force:1})}
 function inPlay(){return S.settings.mode==='stock'?S.players.filter(p=>p.alive||p.respawn>0):alive()}
