@@ -9,7 +9,7 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
-## 2026-11-28 · asked by Zander (build ?)
+## 2026-11-28 · asked by Zander (build 78)
 - Removed The Hiccups chaos rule. It made you bump in random directions on your own, which felt like a bug.
 
 ## 2026-11-28 · asked by Zander (build 77)
