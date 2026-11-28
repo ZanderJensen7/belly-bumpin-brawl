@@ -9,6 +9,11 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
+## 2026-11-28 · asked by Zander (build ?)
+- My stats now opens in its own window with a Back button, instead of squeezing into the menu between Wardrobe and Settings
+- Back (or Esc) returns you to the menu, so Kick and Close room are right where you left them
+- Clicking your level bar in the lobby opens the same stats window
+
 ## 2026-11-28 · asked by Curt (build 72)
 - Removed the constant bar-crowd background noise and its random glass clinks. It was annoying and sounded like a whirring propeller. The crowd still reacts to big hits and knockouts, and Settings has a switch for that ("Crowd reactions").
 
