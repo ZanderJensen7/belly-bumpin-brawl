@@ -9,7 +9,7 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
-## 2026-11-28 · asked by Zander (build ?)
+## 2026-11-28 · asked by Zander (build 75)
 - Mouse aim is now on by default on PC: left click bumps toward the cursor, right click parries
 - Phones and tablets keep it off, and if you already switched it off in Settings > Controls, it stays off
 
