@@ -9,6 +9,11 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
+## 2026-11-28 · asked by Zander (build ?)
+- The end-of-match replay now plays in sync for everyone in an online match: the host picks the slow-mo moment and runs the replay clock, and every player follows it
+- Only the host can skip the replay now, and skipping ends it for everybody
+- Everyone needs to refresh to this build to play together
+
 ## 2026-11-28 · asked by Zander (build 79)
 - The end-of-match replay now eases into slow motion right before the hit that decided it, and slows again for the final splash
 - If the winning knock-out came from a thrown drink, the camera zooms in and rides along with the mug, then follows the victim into the water
