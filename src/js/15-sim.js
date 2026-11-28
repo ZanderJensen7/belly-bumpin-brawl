@@ -12,8 +12,8 @@ function simStep(dt){
     z.t-=dt;const zw=toWorld(z.lx,z.ly,S);z.x=zw[0];z.y=zw[1];const inz=alive().filter(p=>hyp(p.x-z.x,p.y-z.y)<z.r);z.own=inz.length===1?inz[0].id:inz.length>1?'X':null;if(inz.length===1)inz[0].score+=dt;
     if(S.players.some(p=>p.score>=KOTH_T)||S.matchT>=KOTH_MAX)endMatchCont()}
    else if(S.matchT>=HAPPY_T)endMatchCont()}
-  let R=M.includes('shrink')?lerp(BASE_R,135,clamp(S.mutT/35,0,1)):BASE_R;
-  if(!cont&&S.rt>45){if(!S.sudden){S.sudden=true;ev('say',{text:'Sudden death! The table is shrinking!',force:1});ev('sudden')}R=Math.min(R,BASE_R-(S.rt-45)*17)}
+  const ms=S.mapS||1,B0=BASE_R*ms;let R=M.includes('shrink')?lerp(B0,135*ms,clamp(S.mutT/35,0,1)):B0;
+  if(!cont&&S.rt>45){if(!S.sudden){S.sudden=true;ev('say',{text:'Sudden death! The table is shrinking!',force:1});ev('sudden')}R=Math.min(R,B0-(S.rt-45)*17*ms)}
   S.arenaR=Math.max(R,40);
   if(M.includes('spin')){S.rotV=Math.min(.42,S.rotV+dt*.15)}S.rot+=S.rotV*dt;
   S.waveHit=Math.max(0,(S.waveHit||0)-dt);
@@ -21,8 +21,8 @@ function simStep(dt){
    else{S.waveT=(S.waveT||3)-dt;if(S.waveT<=0){S.waveT=rnd(6,9);S.waveA=Math.random()*TAU;S.waveWarn=1.7;ev('wavewarn',{a:r2(S.waveA)})}}}
   if(S.map==='seesaw'&&S.phase==='play'){let tq=0;for(const q of S.players)if(q.alive&&!q.pz)tq+=(q.x-CX)*(q.r>30?1.5:1);const tg=clamp(tq/450*200,-320,320);S.gx+=(tg-S.gx)*Math.min(1,dt*1.4);S.gy=0}
   if(M.includes('tilt')){S.tiltA+=dt*.4;const g=210*clamp(S.mutT/2,0,1);S.gx=Math.cos(S.tiltA)*g;S.gy=Math.sin(S.tiltA)*g}
-  if(M.includes('kegs')){S.kegT-=dt;if(S.kegT<=0){S.kegT=rnd(1.6,2.6)-(S.rt>20?.5:0);const a=Math.random()*TAU,sx=CX+Math.cos(a)*560,sy=CY+Math.sin(a)*560;
-    const tx=CX+rnd(-120,120),ty=CY+rnd(-120,120),l=hyp(tx-sx,ty-sy),sp=rnd(300,400);S.kegs.push({x:sx,y:sy,vx:(tx-sx)/l*sp,vy:(ty-sy)/l*sp,a:0,warn:1,r:30})}}
+  if(M.includes('kegs')){S.kegT-=dt;if(S.kegT<=0){S.kegT=rnd(1.6,2.6)-(S.rt>20?.5:0);const a=Math.random()*TAU,sx=CX+Math.cos(a)*560*(S.mapS||1),sy=CY+Math.sin(a)*560*(S.mapS||1);
+    const tx=CX+rnd(-120,120)*(S.mapS||1),ty=CY+rnd(-120,120)*(S.mapS||1),l=hyp(tx-sx,ty-sy),sp=rnd(300,400);S.kegs.push({x:sx,y:sy,vx:(tx-sx)/l*sp,vy:(ty-sy)/l*sp,a:0,warn:1,r:30})}}
   if(M.includes('bomb')){if(!S.bomb){S.bombNext-=dt;const a=alive();if(S.bombNext<=0&&a.length>1){S.bomb={h:pick(a).id,fuse:rnd(6.5,10.5),cd:.5};ev('pass',{id:S.bomb.h,first:1})}}
    else{const B=S.bomb;B.fuse-=dt;B.cd-=dt;if(B.fuse<=0){const H=P(B.h);S.bomb=null;S.bombNext=2.5;if(H){ev('boom',{x:H.x|0,y:H.y|0});
      for(const q of alive()){const dx=q.x-H.x,dy=q.y-H.y,d=hyp(dx,dy);if(q===H){const a=Math.atan2(CY-H.y,CX-H.x)+Math.PI+rnd(-.9,.9);q.vx=Math.cos(a)*1150;q.vy=Math.sin(a)*1150;q.stun=1.1;q.hitBy=null}
@@ -30,7 +30,7 @@ function simStep(dt){
  }
  for(const b of S.bumpers){const w=toWorld(b.lx,b.ly,S);b.x=w[0];b.y=w[1]}
  // cork blaster pickups
- if(S.settings.guns&&(playing||free)){S.itemT-=dt;if(S.itemT<=0){S.itemT=rnd(5,8);if(S.items.length<2){const q=safePoints(1,45,alive().map(p=>[p.x,p.y]).concat(S.items.map(i=>[i.x,i.y])),120)[0];S.items.push({lx:q[2],ly:q[3],x:q[0],y:q[1]});ev('item',{x:q[0]|0,y:q[1]|0})}}}
+ if(S.settings.guns&&(playing||free)){S.itemT-=dt;if(S.itemT<=0){S.itemT=rnd(5,8);if(S.items.length<2){const q=safePoints(1,45,alive().map(p=>[p.x,p.y]).concat(S.items.map(i=>[i.x,i.y])),120,hazards(20))[0];S.items.push({lx:q[2],ly:q[3],x:q[0],y:q[1]});ev('item',{x:q[0]|0,y:q[1]|0})}}}
  for(const it of S.items){const w=toWorld(it.lx,it.ly,S);it.x=w[0];it.y=w[1]}
  for(const r of S.rails){const a=toWorld(r.la[0],r.la[1],S),b=toWorld(r.lb[0],r.lb[1],S);r.ax=a[0];r.ay=a[1];r.bx=b[0];r.by=b[1];
   for(const k of S.kegs)if(k.warn<=0&&r.hp>0&&segDist(k.x,k.y,r)[0]<k.r+7){dmgRail(r,2);ev('glass',{x:(r.ax+r.bx)/2|0,y:(r.ay+r.by)/2|0,hp:0})}
