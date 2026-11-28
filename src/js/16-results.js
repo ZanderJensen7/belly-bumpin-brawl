@@ -34,7 +34,6 @@ function buildOver(c,title){const by=(f)=>[...S.players].sort((a,b)=>f(b)-f(a))[
  const ko=by(p=>p.kos);if(ko&&ko.kos>0)A.push('🥊 Most KOs: '+nm(ko)+' ('+ko.kos+')');
  const fl=by(p=>p.falls);if(fl&&fl.falls>0)A.push('🐟 Fish food: '+nm(fl)+' ('+fl.falls+')');
  const sf=by(p=>p.selfs);if(sf&&sf.selfs>0)A.push('🤡 Self-yeets: '+nm(sf)+' ('+sf.selfs+')');
- const hc=by(p=>p.hics);if(hc&&hc.hics>0)A.push('😵 Hiccups: '+nm(hc)+' ('+hc.hics+')');
  const gl=by(p=>p.glassed||0);if(gl&&gl.glassed>0)A.push("🎯 Bartender's arm: "+nm(gl)+' ('+gl.glassed+')');
  const pr=by(p=>p.parries||0);if(pr&&pr.parries>0)A.push('🛡️ Not today: '+nm(pr)+' ('+pr.parries+' parries)');
  const hb=by(p=>p.taken||0);if(hb&&hb.taken>2)A.push('🥴 Human piñata: '+nm(hb)+' (hit '+hb.taken+'×)');

@@ -9,7 +9,7 @@ const MUTS={
  tilt:{n:'Tipsy Table',d:'Everything slides.'},
  spin:{n:'Lazy Susan',d:'The table spins.'},
  shrink:{n:'Last Call Shrinkage',d:'The table shrinks.'},
- hic:{n:'The Hiccups',d:'*hic* random bumps *hic*'},
+ hic:{n:'The Hiccups',d:'*hic* random bumps *hic*'}, // retired: random dashes felt like a bug. Kept so an older host's rounds still show a name.
  big:{n:'Big Boned',d:'Everyone is huge.'},
  reverse:{n:'Mixed Up',d:'Controls reversed.'},
  goggles:{n:'Beer Goggles',d:'Double vision.'},
@@ -17,7 +17,7 @@ const MUTS={
  rails:{n:'Glass Railings',d:'Two hits smash them.'},
  nolegs:{n:'No Legs',d:'No walking. Dash to move.'},
 };
-const MUT_POOL=['nolegs','rails','slosh','spill','bumpers','kegs','bomb','tilt','spin','shrink','hic','big','reverse','goggles'];
+const MUT_POOL=['nolegs','rails','slosh','spill','bumpers','kegs','bomb','tilt','spin','shrink','big','reverse','goggles'];
 const CUPS=[];[1,-1].forEach(sg=>{[[390,-66],[390,0],[390,66],[328,-33],[328,33],[266,0]].forEach(([x,y])=>CUPS.push({t:'c',x:sg*x,y,r:30}))});
 const MAPS={
  round:{n:'The Round Table',solids:[{t:'c',x:0,y:0,r:290}],holes:[],ext:300,rim:'#4a2810'},
