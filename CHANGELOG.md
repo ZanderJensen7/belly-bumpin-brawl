@@ -9,7 +9,7 @@ Newest first. Every change adds an entry. Format:
 
 Write `(build ?)` exactly as shown. When the change lands on `main`, the GitHub Action replaces it with the real build number.
 
-## 2026-11-28 · asked by Zander (build ?)
+## 2026-11-28 · asked by Zander (build 80)
 - The end-of-match replay now plays in sync for everyone in an online match: the host picks the slow-mo moment and runs the replay clock, and every player follows it
 - Only the host can skip the replay now, and skipping ends it for everybody
 - Everyone needs to refresh to this build to play together
